@@ -14,8 +14,12 @@ See the vision statement here :  [Vision Statement](https://code.cs.umanitoba.ca
 
 ## Features
 
+* See the features here : [Features](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/issues?sort=created_date&state=opened&label_name%5B%5D=feature&first_page_size=50)
+
 
 ## User Stories
+
+* See the user stories here : [User Stories](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/issues?sort=created_date&state=opened&label_name%5B%5D=user-story&first_page_size=50)
 
 
 
