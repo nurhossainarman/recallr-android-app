@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.recallr"
+    namespace = "comp3350.flashcard"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.recallr"
+        applicationId = "comp3350.flashcard"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
