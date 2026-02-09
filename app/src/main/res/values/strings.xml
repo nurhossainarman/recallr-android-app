@@ -6,9 +6,13 @@
     <string name="save_card">Save Card</string>
     <string name="add_deck">Add Deck</string>
     <string name="edit_deck">Edit Deck</string>
+    <string name="create_deck">Create Deck</string>
     <string name="delete_deck">Delete Deck</string>
     <string name="save_deck">Save Deck</string>
     <string name="deck_name_hint">Deck Name</string>
     <string name="card_front_hint">Front: (Question)</string>
     <string name="card_back_hint">Back: (Answer)</string>
+    <string name="deck_title">Deck Title</string>
+    <string name="card_count">10 cards</string>
+    <string name="study">Study</string>
 </resources>

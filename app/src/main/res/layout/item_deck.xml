@@ -23,7 +23,7 @@
             app:layout_constraintEnd_toStartOf="@+id/btnEditDeck"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Spanish Basics" />
+            tools:text="@string/deck_title" />
 
         <TextView
             android:id="@+id/tvCardCount"
@@ -33,7 +33,7 @@
             android:textColor="#616161"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvDeckTitle"
-            tools:text="25 cards" />
+            tools:text="@string/card_count" />
 
         <ImageButton
             android:id="@+id/btnEditDeck"
