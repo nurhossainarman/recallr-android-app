@@ -82,4 +82,6 @@ public interface FlashcardPersistence {
      * @return true if a flashcard with this ID exists
      */
     boolean flashcardExists(int flashcardId);
+
+    void clearAll();
 }
