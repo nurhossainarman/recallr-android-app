@@ -84,4 +84,6 @@ public interface DeckPersistence {
      * @return true if a deck with this name exists (excluding the specified ID)
      */
     boolean deckNameExists(String name, int excludeId);
+
+    void clearAll();
 }

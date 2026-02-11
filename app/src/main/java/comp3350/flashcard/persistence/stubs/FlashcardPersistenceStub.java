@@ -164,6 +164,7 @@ public class FlashcardPersistenceStub implements FlashcardPersistence {
     /**
      * Clears all flashcards. Useful for testing.
      */
+    @Override
     public void clearAll() {
         flashcards.clear();
         nextId.set(1);
