@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="comp3350.flashcard">
 
     <application
         android:allowBackup="true"
@@ -11,15 +12,32 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Recallr">
+
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".presentation.DeckDetailActivity"
+            android:exported="false"
+            android:label="@string/deck_detail" />
+
+        <activity
+            android:name=".presentation.EditDeckActivity"
+            android:exported="false"
+            android:label="@string/edit_deck" />
+
+        <activity
+            android:name=".presentation.EditCardActivity"
+            android:exported="false"
+            android:label="@string/edit_card" />
+
+
     </application>
 
 </manifest>
