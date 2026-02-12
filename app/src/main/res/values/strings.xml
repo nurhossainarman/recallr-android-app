@@ -15,4 +15,15 @@
     <string name="deck_title">Deck Title</string>
     <string name="card_count">10 cards</string>
     <string name="study">Study</string>
+    <string name="card_added_prompt">New card added!</string>
+    <string name="deck_added_prompt">New deck added!</string>
+    <string name="deck_updated_prompt">Deck updated!</string>
+    <string name="card_updated_prompt">Card updated!</string>
+    <string name="invalid_input_prompt">Please write something on front and back of the card.</string>
+    <string name="invalid_deck_name">"A valid name is required"</string>
+    <string name="deck_name_taken">"This deck name is already taken"</string>
+    <string name="deck_detail">"Deck Detail"</string>
+
+
+
 </resources>

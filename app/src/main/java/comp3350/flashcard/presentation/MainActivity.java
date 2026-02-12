@@ -2,33 +2,32 @@ package comp3350.flashcard.presentation;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
-
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
+import comp3350.flashcard.logic.DeckManager;
 import comp3350.flashcard.objects.Deck;
-import comp3350.flashcard.persistence.DeckPersistence;
-import comp3350.flashcard.persistence.FlashcardPersistence;
 
+/**
+ * MainActivity - Shows a list of all decks.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView rvDecks;
-    private DeckAdapter deckAdapter;
-    private DeckPersistence deckPersistence;
-    private FlashcardPersistence flashcardPersistence;
+    private Adapter adapter;
+    private DeckManager deckManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        deckPersistence = Services.getDeckPersistence();
-        flashcardPersistence = Services.getFlashcardPersistence();
-
+        deckManager = Services.getDeckManager();
         initUI();
     }
 
@@ -36,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
         rvDecks = findViewById(R.id.rvDecks);
         rvDecks.setLayoutManager(new LinearLayoutManager(this));
 
-        FloatingActionButton fabAddDeck = findViewById(R.id.fabAddDeck);
-        fabAddDeck.setOnClickListener(v -> startActivity(new Intent(this, EditDeckActivity.class)));
+        FloatingActionButton btnAddDeck = findViewById(R.id.btnAddDeck);
+        btnAddDeck.setOnClickListener(v -> startActivity(new Intent(this, EditDeckActivity.class)));
 
         loadDecks();
     }
@@ -49,43 +48,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadDecks() {
-        List<Deck> decks = deckPersistence.getAllDecks();
-        
-        // Update card counts
+        List<Deck> decks = deckManager.getAllDecks();
         for (Deck deck : decks) {
-            deck.setCardCount(flashcardPersistence.getFlashcardCountByDeckId(deck.getId()));
+            deck.setCardCount(deckManager.getFlashcardCount(deck.getId()));
         }
 
-        if (deckAdapter == null) {
-            deckAdapter = new DeckAdapter(decks, createDeckClickListener());
-            rvDecks.setAdapter(deckAdapter);
+        if (adapter == null) {
+            // Setup the generic adapter for Decks
+            adapter = new Adapter(decks, R.layout.item_deck, (view, item) -> {
+                Deck deck = (Deck) item;
+                ((TextView) view.findViewById(R.id.tvDeckTitle)).setText(deck.getName());
+                ((TextView) view.findViewById(R.id.tvCardCount)).setText(deck.getCardCount() + " cards");
+                
+                view.findViewById(R.id.btnEditDeck).setOnClickListener(v -> 
+                    startActivity(new Intent(this, EditDeckActivity.class).putExtra("DECK_ID", deck.getId())));
+                
+                view.findViewById(R.id.btnDeleteDeck).setOnClickListener(v -> {
+                    deckManager.deleteDeck(deck.getId());
+                    loadDecks();
+                });
+
+                view.setOnClickListener(v -> 
+                    startActivity(new Intent(this, DeckDetailActivity.class).putExtra("DECK_ID", deck.getId())));
+            });
+            rvDecks.setAdapter(adapter);
         } else {
-            deckAdapter.setDecks(decks);
-            deckAdapter.notifyDataSetChanged();
+            adapter.updateItems(decks);
         }
-    }
-
-    private DeckAdapter.DeckClickListener createDeckClickListener() {
-        return new DeckAdapter.DeckClickListener() {
-            @Override
-            public void onEditClick(Deck deck) {
-                Intent intent = new Intent(MainActivity.this, EditDeckActivity.class);
-                intent.putExtra("DECK_ID", deck.getId());
-                startActivity(intent);
-            }
-
-            @Override
-            public void onDeleteClick(Deck deck) {
-                deckPersistence.deleteDeck(deck.getId());
-                loadDecks();
-            }
-
-            @Override
-            public void onItemClick(Deck deck) {
-                Intent intent = new Intent(MainActivity.this, DeckDetailActivity.class);
-                intent.putExtra("DECK_ID", deck.getId());
-                startActivity(intent);
-            }
-        };
     }
 }

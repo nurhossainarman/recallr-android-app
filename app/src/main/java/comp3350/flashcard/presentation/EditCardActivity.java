@@ -1,84 +1,109 @@
 package comp3350.flashcard.presentation;
-//Controller for activity_edit_card screen
+
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import comp3350.flashcard.R;
+import comp3350.flashcard.application.Services;
+import comp3350.flashcard.logic.FlashcardManager;
 import comp3350.flashcard.objects.Flashcard;
-import comp3350.flashcard.persistence.FlashcardPersistence;
-import comp3350.flashcard.persistence.stubs.FlashcardPersistenceStub;
 
+/**
+ * Controller for creating a new flashcard or editing a flashcard.
+ */
 public class EditCardActivity extends AppCompatActivity {
-    // UI elements
+
     private TextInputEditText inputCardFront;
     private TextInputEditText inputCardBack;
-    private FlashcardPersistence flashcardPersistence;
+    private FlashcardManager flashcardManager;
     private int deckId = -1;
     private int cardId = -1;
-    /** Called when the activity is first created.
-     * */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_card);
-        // Initialize the persistence layer
-        flashcardPersistence = new FlashcardPersistenceStub();
 
-        //Find the views
+        // Get the card manager for logic/business using helper(Services)
+        flashcardManager = Services.getFlashcardManager();
+        initUI();
+    }
+
+    /**
+     * Initializing the UI.
+     * Finds the input boxes and buttons on the screen.
+     */
+    private void initUI() {
         inputCardFront = findViewById(R.id.inputCardFront);
         inputCardBack = findViewById(R.id.inputCardBack);
         Button btnSaveCard = findViewById(R.id.btnSaveCard);
+        Toolbar toolbar = findViewById(R.id.toolbar);
 
-        // Check if an existing card is being edited
-        if (getIntent().hasExtra("DECK_ID")) {
-            deckId = getIntent().getIntExtra("DECK_ID", -1);
-        }
+        // If intent returns a card ID, we are editing an existing card
+        // Otherwise, we are creating a new card (cardId == -1)
+        deckId = getIntent().getIntExtra("DECK_ID", -1);
+        cardId = getIntent().getIntExtra("CARD_ID", -1);
 
-        if (getIntent().hasExtra("CARD_ID")) {
-            cardId = getIntent().getIntExtra("CARD_ID", -1);
-            Flashcard card = flashcardPersistence.getFlashcardById(cardId);
+        // Setup the mode of screen (adding or editing)
+        setupMode(toolbar, btnSaveCard);
+
+        // Save the card when the button is clicked
+        btnSaveCard.setOnClickListener(v -> handleSave());
+    }
+
+    /**
+     * Sets the text on the toolbar and button depending on if we are adding or editing a card.
+     * @param toolbar The toolbar containing the deck name
+     * @param  saveButton The save button object
+     */
+    private void setupMode(Toolbar toolbar, Button saveButton) {
+        if (cardId != -1) {
+            // Intent returns a valid id, that means we are editing an existing card
+            Flashcard card = flashcardManager.getFlashcard(cardId);
             if (card != null) {
                 inputCardFront.setText(card.getFront());
                 inputCardBack.setText(card.getBack());
                 deckId = card.getDeckId();
+                toolbar.setTitle(R.string.edit_card);
+                saveButton.setText(R.string.save_card);
             }
+        } else {
+            // Intent returns -1, that means we are creating a new card
+            toolbar.setTitle(R.string.add_card);
+            saveButton.setText(R.string.add_card);
         }
-        // Set a click listener for the save button
-        btnSaveCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveCard();
-            }
-        });
     }
 
-    private void saveCard() {
-        // Take input from user
+    /**
+     * Checks if the card has text on both sides and saves it.
+     */
+    private void handleSave() {
         String front = inputCardFront.getText().toString().trim();
         String back = inputCardBack.getText().toString().trim();
-        //TODO: Validate input from logic layer
-        // Check if input is valid
-        if (front.isEmpty() || back.isEmpty()) {
-            Toast.makeText(this, "Both sides are required", Toast.LENGTH_SHORT).show();
+
+        // Manager validates input
+        if (!flashcardManager.validateFlashcard(front, back)) {
+            printToast(R.string.invalid_input_prompt);
             return;
         }
-
+        // Manager creates the card
         if (cardId == -1) {
-            Flashcard newCard = new Flashcard(front, back, deckId);
-            flashcardPersistence.insertFlashcard(newCard);
-            Toast.makeText(this, "Card created", Toast.LENGTH_SHORT).show();
+            flashcardManager.createFlashcard(front, back, deckId);
+            printToast(R.string.card_added_prompt);
         } else {
-            Flashcard existingCard = flashcardPersistence.getFlashcardById(cardId);
-            if (existingCard != null) {
-                existingCard.setFront(front);
-                existingCard.setBack(back);
-                flashcardPersistence.updateFlashcard(existingCard);
-                Toast.makeText(this, "Card updated", Toast.LENGTH_SHORT).show();
-            }
+            flashcardManager.updateFlashcard(cardId, front, back);
+            printToast(R.string.card_updated_prompt);
         }
-        finish();
+        finish(); // Go back to the deck screen
+    }
+
+    /**
+     * Shows a message at the bottom of the screen.
+     */
+    private void printToast(int stringId) {
+        Toast.makeText(this, getString(stringId), Toast.LENGTH_SHORT).show();
     }
 }

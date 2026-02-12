@@ -30,7 +30,7 @@
         tools:listitem="@layout/item_deck" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddDeck"
+        android:id="@+id/btnAddDeck"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"

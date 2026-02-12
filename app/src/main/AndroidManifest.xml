@@ -25,7 +25,7 @@
         <activity
             android:name=".presentation.DeckDetailActivity"
             android:exported="false"
-            android:label="Deck Detail" />
+            android:label="@string/deck_detail" />
 
         <activity
             android:name=".presentation.EditDeckActivity"
@@ -37,10 +37,6 @@
             android:exported="false"
             android:label="@string/edit_card" />
 
-        <activity
-            android:name=".presentation.CardListActivity"
-            android:exported="false"
-            android:label="Deck Cards" />
 
     </application>
 
