@@ -64,7 +64,7 @@ Gradle Wrapper (included)
 
 1. Clone the repository:  
 ```bash
-git clone https://code.cs.umanitoba.ca/comp3350-winter2026/a02-g04-moneytalks
+git clone https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver.git
 ```
 2. Open the project in Android Studio.
 3. Sync Gradle:
