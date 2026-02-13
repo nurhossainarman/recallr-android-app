@@ -113,7 +113,7 @@ classDiagram
 ```
 
 ## Package Structure
-
+This project enforces **strict separation of concerns**.
 ```
 app/src/main/java/comp3350/flashcard/
 ├── application/                    # Application configuration
