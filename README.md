@@ -6,7 +6,7 @@
 
 See the vision statement here :  [Vision Statement](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/blob/main/Documents/Vision_Statement.md?ref_type=heads)
 
-## Architecture
+## Architecture & Package Structure
 
 See our architecture [here](/Documents/ARCHITECTURE.md).
 
@@ -14,6 +14,8 @@ See our architecture [here](/Documents/ARCHITECTURE.md).
 ## Iterations
 
 * [Iteration-1](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/milestones/1#tab-issues)
+
+* [Iteration-2](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/milestones/2#tab-issues)
 
 
 
@@ -25,6 +27,57 @@ See our architecture [here](/Documents/ARCHITECTURE.md).
 ## User Stories
 
 * See the user stories here : [User Stories](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/issues?sort=created_date&state=opened&label_name%5B%5D=user-story&first_page_size=50)
+
+## Team Members
+
+* Arman, Nur Hossain
+* Bhuiyan, M. Tausif Tajwar
+* Francisco, Gerick
+* Maki, Sophie
+
+## SDK & Tooling Requirements
+
+### Android SDK
+
+compileSdk = 36
+
+targetSdk = 36
+
+minSdk = 26
+
+### Java
+
+Java 11
+
+JDK 11 or higher must be installed
+
+Kotlin is not used in this project
+
+### Tools
+Android Studio (current stable)
+
+Android Emulator (Pixel 9 device profile recommended)
+
+Gradle Wrapper (included)
+
+## How to Run
+
+1. Clone the repository:  
+```bash
+git clone https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver.git
+```
+2. Open the project in Android Studio.
+3. Sync Gradle:
+    - Android Studio will should prompt to "Sync Project with Gradle Files."
+4. Build and run the app.
+
+## Running the test Files
+From the project root directory run 
+``` bash
+./gradlew test
+```
+It should give you a link to the report file and show the test coverage. 
+
 
 
 
