@@ -30,26 +30,30 @@ See our architecture [here](/Documents/ARCHITECTURE.md).
 
 ## Team Members
 
-Arman, Nur Hossain
-Bhuiyan, M. Tausif Tajwar
-Francisco, Gerick
-Maki, Sophie
+* Arman, Nur Hossain
+* Bhuiyan, M. Tausif Tajwar
+* Francisco, Gerick
+* Maki, Sophie
 
 ## SDK & Tooling Requirements
 
-###Android SDK
+### Android SDK
+
 compileSdk = 36
 
 targetSdk = 36
 
 minSdk = 26
-###Java
+
+### Java
+
 Java 11
 
 JDK 11 or higher must be installed
 
 Kotlin is not used in this project
-###Tools
+
+### Tools
 Android Studio (current stable)
 
 Android Emulator (Pixel 9 device profile recommended)
