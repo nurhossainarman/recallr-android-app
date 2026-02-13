@@ -6,6 +6,11 @@
 
 See the vision statement here :  [Vision Statement](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/blob/main/Documents/Vision_Statement.md?ref_type=heads)
 
+## Architecture
+
+See our architecture [here](/Documents/ARCHITECTURE.md).
+
+
 ## Iterations
 
 * [Iteration-1](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/milestones/1#tab-issues)

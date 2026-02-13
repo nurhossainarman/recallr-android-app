@@ -55,7 +55,7 @@ public class DeckDetailActivity extends AppCompatActivity {
         setupDeckInfo();
 
         findViewById(R.id.fabAddCard).setOnClickListener(v -> navigateToEditCard(-1));
-        findViewById(R.id.btnStudy).setOnClickListener(v -> Toast.makeText(this, "Starting study...", Toast.LENGTH_SHORT).show());
+        //findViewById(R.id.btnStudy).setOnClickListener(v -> Toast.makeText(this, "Starting study...", Toast.LENGTH_SHORT).show());
 
         loadCards();
     }
