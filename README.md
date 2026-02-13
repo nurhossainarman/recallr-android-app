@@ -71,6 +71,13 @@ git clone https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver.git
     - Android Studio will should prompt to "Sync Project with Gradle Files."
 4. Build and run the app.
 
+## Running the test Files
+From the project root directory run 
+``` bash
+./gradlew test
+```
+It should give you a link to the report file and show the test coverage. 
+
 
 
 
