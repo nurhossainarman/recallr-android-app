@@ -6,7 +6,7 @@
 
 See the vision statement here :  [Vision Statement](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/blob/main/Documents/Vision_Statement.md?ref_type=heads)
 
-## Architecture
+## Architecture & Package Structure
 
 See our architecture [here](/Documents/ARCHITECTURE.md).
 
