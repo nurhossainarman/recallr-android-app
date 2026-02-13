@@ -1,18 +1,19 @@
-# Flash Card Study App - Architecture
+# Recallr (Flash Card Study App) - Architecture
 
 ## Overview
 
-The Flash Card Study App follows a **three-tier layered architecture** that separates concerns into distinct layers: Presentation, Logic (Business), and Data. This architecture promotes testability, maintainability, and allows for future database implementations without affecting other layers.
+Recallr app follows a **three-tier layered architecture** that separates concerns into distinct layers: Presentation, Logic (Business), and Data. This architecture promotes testability, maintainability, and allows for future database implementations without affecting other layers.
 
 ## Architecture Diagram
 
 ```mermaid
 flowchart TB
     subgraph Presentation["PRESENTATION LAYER (Android UI)"]
-        DeckListActivity["DeckListActivity"]
+        MainActivity["MainActivity"]
         DeckDetailActivity["DeckDetailActivity"]
-        CardEditActivity["CardEditActivity"]
-        StudyActivity["StudyActivity"]
+        EditDeckActivity["EditDeckActivity"]
+        EditCardActivity["EditCardActivity"]
+        Adapter["Adapter"]
     end
 
     subgraph Logic["LOGIC LAYER (Business Logic)"]
@@ -20,22 +21,16 @@ flowchart TB
         ─────────────
         + createDeck()
         + getAllDecks()
-        + renameDeck()
-        + deleteDeck()"]
+        + updateDeck()
+        + deleteDeck()
+        + getFlashcardCount()"]
         
         FlashcardManager["FlashcardManager
         ─────────────────
         + createFlashcard()
-        + getFlashcards()
+        + getFlashcardsByDeck()
         + updateFlashcard()
         + deleteFlashcard()"]
-        
-        StudySessionManager["StudySessionManager
-        ───────────────────
-        + startSession()
-        + nextCard()
-        + previousCard()
-        + flipCard()"]
     end
 
     subgraph Data["DATA LAYER (Persistence)"]
@@ -55,53 +50,36 @@ flowchart TB
         ────────
         - id: int
         - name: String
-        - createdAt: Date"]
+        - cardCount: int"]
         
         Flashcard["Flashcard
         ──────────
         - id: int
-        - frontText: String
-        - backText: String
-        - deckId: int
-        - createdAt: Date"]
+        - front: String
+        - back: String
+        - deckId: int"]
     end
 
     %% Presentation to Logic
-    DeckListActivity --> DeckManager
+    MainActivity --> DeckManager
     DeckDetailActivity --> DeckManager
     DeckDetailActivity --> FlashcardManager
-    CardEditActivity --> FlashcardManager
-    StudyActivity --> StudySessionManager
+    EditDeckActivity --> DeckManager
+    EditCardActivity --> FlashcardManager
 
     %% Logic to Data
     DeckManager --> DeckPersistence
     DeckManager --> FlashcardPersistence
     FlashcardManager --> FlashcardPersistence
-    StudySessionManager --> FlashcardPersistence
 
     %% Interface to Implementation
     DeckPersistence -.-> DeckPersistenceStub
     FlashcardPersistence -.-> FlashcardPersistenceStub
-
 ```
 
-### Layer Dependency Diagram
+### High-level overview of how components interact
 
-```mermaid
-flowchart LR
-    subgraph Dependencies
-        P[Presentation] --> L[Logic]
-        L --> D[Data]
-        P -.-> DO[Domain Objects]
-        L -.-> DO
-        D -.-> DO
-    end
-    
-    style P fill:#e1f5fe
-    style L fill:#fff3e0
-    style D fill:#e8f5e9
-    style DO fill:#fce4ec
-```
+![Layer dependency diagram](diagram.png)
 
 ### Domain Class Diagram
 
@@ -158,10 +136,10 @@ app/src/main/java/comp3350/flashcard/
 │   └── StudySessionManager.java
 │
 └── presentation/                   # UI layer (Android Activities)
-    ├── DeckListActivity.java
+    ├── MainActivity.java
     ├── DeckDetailActivity.java
     ├── CardEditActivity.java
-    └── StudyActivity.java
+    └──  Adapter.java
 
 app/src/test/java/comp3350/flashcard/
 ├── objects/                        # Domain object tests
@@ -203,8 +181,8 @@ app/src/test/java/comp3350/flashcard/
 
 ### Creating a Flashcard (Example Flow)
 ```
-1. User enters card text in CardEditActivity
-2. CardEditActivity calls FlashcardManager.createFlashcard()
+1. User enters card text in EditCardActivity
+2. EditCardActivity calls FlashcardManager.createFlashcard()
 3. FlashcardManager validates input (non-empty text)
 4. FlashcardManager calls FlashcardPersistence.insertFlashcard()
 5. FlashcardPersistenceStub adds card to ArrayList
@@ -227,4 +205,6 @@ For Iteration 1:
 - **Persists while app is running** (data survives screen rotations, activity changes)
 - **Resets to default data on app restart**
 - Pre-populated with sample decks and cards for testing
+
+
 
