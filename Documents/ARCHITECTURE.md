@@ -138,7 +138,8 @@ app/src/main/java/comp3350/flashcard/
 └── presentation/                   # UI layer (Android Activities)
     ├── MainActivity.java
     ├── DeckDetailActivity.java
-    ├── CardEditActivity.java
+    ├── EditDeckActivity.java
+    ├── EditCardActivity.java
     └──  Adapter.java
 
 app/src/test/java/comp3350/flashcard/
