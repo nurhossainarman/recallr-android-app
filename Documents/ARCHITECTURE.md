@@ -83,8 +83,6 @@ flowchart TB
     DeckPersistence -.-> DeckPersistenceStub
     FlashcardPersistence -.-> FlashcardPersistenceStub
 
-    %% Domain relationship
-    Deck -- "1" --- "✱" Flashcard
 ```
 
 ### Layer Dependency Diagram
