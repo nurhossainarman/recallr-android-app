@@ -1,9 +1,12 @@
 package comp3350.flashcard.application;
 
+import android.content.Context;
 import comp3350.flashcard.logic.FlashcardManager;
 import comp3350.flashcard.logic.DeckManager;
 import comp3350.flashcard.persistence.FlashcardPersistence;
 import comp3350.flashcard.persistence.DeckPersistence;
+import comp3350.flashcard.persistence.sqlite.DeckPersistenceSQLite;
+import comp3350.flashcard.persistence.sqlite.FlashcardPersistenceSQLite;
 import comp3350.flashcard.persistence.stubs.DeckPersistenceStub;
 import comp3350.flashcard.persistence.stubs.FlashcardPersistenceStub;
 
@@ -16,17 +19,30 @@ public class Services {
     private static DeckManager deckManager;
     private static FlashcardPersistence flashcardPersistence;
     private static DeckPersistence deckPersistence;
+    private static Context appContext;
+
+    public static void setContext(Context context) {
+        appContext = context.getApplicationContext();
+    }
 
     public static FlashcardPersistence getFlashcardPersistence() {
         if (flashcardPersistence == null) {
-            flashcardPersistence = new FlashcardPersistenceStub();
+            if (appContext == null) {
+                flashcardPersistence = new FlashcardPersistenceStub();
+            } else {
+                flashcardPersistence = new FlashcardPersistenceSQLite(appContext);
+            }
         }
         return flashcardPersistence;
     }
 
     public static DeckPersistence getDeckPersistence() {
         if (deckPersistence == null) {
-            deckPersistence = new DeckPersistenceStub();
+            if (appContext == null) {
+                deckPersistence = new DeckPersistenceStub();
+            } else {
+                deckPersistence = new DeckPersistenceSQLite(appContext);
+            }
         }
         return deckPersistence;
     }

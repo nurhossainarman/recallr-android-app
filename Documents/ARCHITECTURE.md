@@ -38,11 +38,16 @@ flowchart TB
         DeckPersistence"/]
         FlashcardPersistence[/"«interface»
         FlashcardPersistence"/]
-        
+
         DeckPersistenceStub["DeckPersistenceStub
         (In-Memory)"]
         FlashcardPersistenceStub["FlashcardPersistenceStub
         (In-Memory)"]
+
+        DeckPersistenceSQLite["DeckPersistenceSQLite
+        (SQLite Database)"]
+        FlashcardPersistenceSQLite["FlashcardPersistenceSQLite
+        (SQLite Database)"]
     end
 
     subgraph Domain["DOMAIN OBJECTS (Shared)"]
@@ -74,7 +79,9 @@ flowchart TB
 
     %% Interface to Implementation
     DeckPersistence -.-> DeckPersistenceStub
+    DeckPersistence -.-> DeckPersistenceSQLite
     FlashcardPersistence -.-> FlashcardPersistenceStub
+    FlashcardPersistence -.-> FlashcardPersistenceSQLite
 ```
 
 ### High-level overview of how components interact
@@ -117,6 +124,7 @@ This project enforces **strict separation of concerns**.
 ```
 app/src/main/java/comp3350/flashcard/
 ├── application/                    # Application configuration
+│   ├── FlashcardApplication.java   # Application class (sets up services)
 │   └── Services.java               # Service locator / dependency injection
 │
 ├── objects/                        # Domain objects (shared across layers)
@@ -126,9 +134,14 @@ app/src/main/java/comp3350/flashcard/
 ├── persistence/                    # Data layer
 │   ├── DeckPersistence.java        # Interface
 │   ├── FlashcardPersistence.java   # Interface
-│   └── stubs/
-│       ├── DeckPersistenceStub.java
-│       └── FlashcardPersistenceStub.java
+│   ├── PersistenceException.java   # Custom exception for persistence errors
+│   ├── stubs/
+│   │   ├── DeckPersistenceStub.java
+│   │   └── FlashcardPersistenceStub.java
+│   └── sqlite/
+│       ├── DatabaseHelper.java
+│       ├── DeckPersistenceSQLite.java
+│       └── FlashcardPersistenceSQLite.java
 │
 ├── logic/                          # Business logic layer
 │   ├── DeckManager.java
@@ -151,6 +164,10 @@ app/src/test/java/comp3350/flashcard/
     ├── DeckManagerTest.java
     ├── FlashcardManagerTest.java
     └── StudySessionManagerTest.java
+
+app/src/androidTest/java/comp3350/flashcard/
+└── persistence/                    # Integration tests
+    └── DataAccessTest.java
 ```
 
 ## Layer Responsibilities
@@ -169,9 +186,10 @@ app/src/test/java/comp3350/flashcard/
 
 ### Data Layer (`persistence/`)
 - Defines interfaces for data operations
-- Stub implementations use in-memory collections
-- Future: Real database implementations (HSQLDB, SQLite)
+- **Stub implementations** use in-memory collections (for testing)
+- **SQLite implementations** use Android's built-in SQLite database (production)
 - Handles data serialization/deserialization
+- Uses dependency injection to switch between implementations
 
 ### Domain Objects (`objects/`)
 - Plain Java objects representing core entities
@@ -186,8 +204,9 @@ app/src/test/java/comp3350/flashcard/
 2. EditCardActivity calls FlashcardManager.createFlashcard()
 3. FlashcardManager validates input (non-empty text)
 4. FlashcardManager calls FlashcardPersistence.insertFlashcard()
-5. FlashcardPersistenceStub adds card to ArrayList
-6. Success flows back up to UI
+5. FlashcardPersistenceSQLite inserts card into database (or stub adds to ArrayList in tests)
+6. New card with auto-generated ID is returned
+7. Success flows back up to UI
 ```
 
 ## Dependency Management
@@ -196,16 +215,67 @@ Dependencies flow downward only:
 - Presentation → Logic → Data
 - All layers can access Domain Objects
 
-The `Services` class acts as a service locator, providing access to manager instances
+The `Services` class acts as a service locator, providing access to manager instances.
+
+### Automatic Persistence Selection
+The application automatically selects the appropriate persistence implementation:
+- **Production app** (Android context available) → Uses SQLite
+- **Unit tests** (no Android context) → Uses stubs
+- **Integration tests** (test context available) → Uses SQLite
+
+This is achieved through dependency injection in the `Services` class, which checks for Android context availability. No code changes are required to switch between implementations.
 
 
-## Stub Database Behavior
+## Database Persistence
 
-For Iteration 1:
-- Data is stored in `ArrayList` collections
-- **Persists while app is running** (data survives screen rotations, activity changes)
-- **Resets to default data on app restart**
-- Pre-populated with sample decks and cards for testing
+### SQLite Implementation (Production)
+**Used in:** Production app, Integration tests
+
+**Database:** `flashcard.db` stored in app's private storage
+
+**Schema:**
+- `decks` table: id, name, description, created_at, last_studied_at
+- `flashcards` table: id, front, back, deck_id, created_at
+- Foreign key constraint with CASCADE DELETE (deleting deck deletes all its flashcards)
+- Index on `deck_id` for faster queries
+- UNIQUE constraint on deck names
+
+**Behavior:**
+- Data persists across app restarts
+- Database survives app updates (upgrade handled by `onUpgrade()`)
+- Pre-populated with 3 sample decks and 7 flashcards on first launch
+- Located in: `/data/data/comp3350.flashcard/databases/flashcard.db`
+
+**Sample Data:**
+- Spanish Vocabulary (3 cards)
+- Java Basics (2 cards)
+- World Capitals (2 cards)
+
+### Stub Implementation (Testing)
+**Used in:** Unit tests
+
+**Behavior:**
+- Data stored in `ArrayList` collections (in-memory)
+- Persists while app is running (survives screen rotations, activity changes)
+- Resets to default data on app restart
+- Same sample data as SQLite for consistency
+- Faster execution for unit tests
+
+## Testing Strategy
+
+### Unit Tests (`app/src/test/`)
+- Test business logic in isolation
+- Use stub persistence (no database)
+- Fast execution
+- Run with: `./gradlew test`
+- Target: >80% code coverage for logic layer
+
+### Integration Tests (`app/src/androidTest/`)
+- Test across architectural seams (Logic → Persistence)
+- Use real SQLite database
+- Fresh database for each test
+- Run with: `./gradlew connectedAndroidTest`
+- Coverage: All CRUD operations, cascade deletes, constraints
 
 
 
