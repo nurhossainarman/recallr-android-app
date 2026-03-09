@@ -2,14 +2,13 @@ package comp3350.flashcard.presentation;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
@@ -29,6 +28,7 @@ public class DeckDetailActivity extends AppCompatActivity {
     private FlashcardManager flashcardManager;
     private int deckId = -1;
     private Toolbar toolbar;
+    private CheckBox cbShuffle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +51,13 @@ public class DeckDetailActivity extends AppCompatActivity {
         rvCards = findViewById(R.id.rvCards);
         rvCards.setLayoutManager(new LinearLayoutManager(this));
 
+        cbShuffle = findViewById(R.id.cbShuffle);
+
         deckId = getIntent().getIntExtra("DECK_ID", -1);
         setupDeckInfo();
 
         findViewById(R.id.fabAddCard).setOnClickListener(v -> navigateToEditCard(-1));
-        //findViewById(R.id.btnStudy).setOnClickListener(v -> Toast.makeText(this, "Starting study...", Toast.LENGTH_SHORT).show());
+        findViewById(R.id.btnStudy).setOnClickListener(v -> startStudySession());
 
         loadCards();
     }
@@ -105,5 +107,21 @@ public class DeckDetailActivity extends AppCompatActivity {
         Intent intent = new Intent(this, EditCardActivity.class).putExtra("DECK_ID", deckId);
         if (cardId != -1) intent.putExtra("CARD_ID", cardId);
         startActivity(intent);
+    }
+
+    /**
+     * Starts the study session by delegating the check for card existence to the logic layer.
+     */
+    private void startStudySession() {
+        // Use the logic layer (DeckManager) to check if the deck has cards
+        if (deckManager.getFlashcardCount(deckId) > 0) {
+            Intent intent = new Intent(this, StudyActivity.class);
+            intent.putExtra("DECK_ID", deckId);
+            intent.putExtra("SHUFFLE", cbShuffle.isChecked());
+            startActivity(intent);
+        } else {
+            // If the manager indicates no cards, provide UI feedback
+            Toast.makeText(this, "Add some cards first!", Toast.LENGTH_SHORT).show();
+        }
     }
 }

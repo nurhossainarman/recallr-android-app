@@ -23,7 +23,10 @@
     <string name="invalid_deck_name">"A valid name is required"</string>
     <string name="deck_name_taken">"This deck name is already taken"</string>
     <string name="deck_detail">"Deck Detail"</string>
-
-
-
+    <string name="shuffle">Shuffle Cards</string>
+    <string name="start_study">Start Study Session</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="finish">Finish</string>
+    <string name="flip">Flip</string>
 </resources>
