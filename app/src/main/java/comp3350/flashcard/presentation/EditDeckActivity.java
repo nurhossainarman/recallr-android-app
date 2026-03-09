@@ -78,26 +78,29 @@ public class EditDeckActivity extends AppCompatActivity {
      */
     private void handleSave() {
         String name = inputDeckName.getText().toString().trim();
-        
-        // Manager validates name
-        if (!deckManager.validateDeck(name)) {
-            printToast(R.string.invalid_deck_name);
-            return;
-        }
-        // Manager validates name is unique
-        if (!deckManager.validateDeckNameUnique(name, deckId)) {
-            printToast(R.string.deck_name_taken);
-            return;
-        }
-        // Manager creates the deck
+        boolean success;
+
         if (deckId == -1) {
-            deckManager.createDeck(name, ""); //For simplicity of UI, no description in this iteration.
-            printToast(R.string.deck_added_prompt);
+            // Manager handles validation
+            success = deckManager.createDeck(name, "") != null;
+            if (success) {
+                printToast(R.string.deck_added_prompt);
+            }
         } else {
-            deckManager.updateDeck(deckId, name, ""); //For simplicity if UI, no description in this iteration.
-            printToast(R.string.deck_updated_prompt);
+            // Manager handles validation
+            success = deckManager.updateDeck(deckId, name, "");
+            if (success) {
+                printToast(R.string.deck_updated_prompt);
+            }
         }
-        finish(); // Go back to the previous screen
+
+        if (success) {
+            finish();
+        }
+        else {
+
+            printToast(R.string.invalid_deck_name); 
+        }
     }
 
     /**
