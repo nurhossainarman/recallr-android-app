@@ -1,6 +1,8 @@
 package comp3350.flashcard.presentation;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -15,7 +17,12 @@ public class StudyActivity extends AppCompatActivity {
 
     private TextView tvProgress;
     private TextView tvContent;
+    private TextView tvContentBack;
+    private FrameLayout cardContainer;
+    private View cardFront;
+    private View cardBack;
     private IStudySession studySession;
+    private boolean isShowingFront = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,25 +43,16 @@ public class StudyActivity extends AppCompatActivity {
 
         tvProgress = findViewById(R.id.tvProgress);
         tvContent = findViewById(R.id.tvContent);
+        tvContentBack = findViewById(R.id.tvContentBack);
+        cardContainer = findViewById(R.id.cardContainer);
+        cardFront = findViewById(R.id.cardFront);
+        cardBack = findViewById(R.id.cardBack);
 
-        findViewById(R.id.btnFlip).setOnClickListener(v -> {
-            studySession.flip();
-            updateUI();
-        });
-        
-        findViewById(R.id.btnNext).setOnClickListener(v -> {
-            studySession.nextCard();
-            if (studySession.isFinished()) {
-                finish();
-            } else {
-                updateUI();
-            }
-        });
-        
-        findViewById(R.id.btnPrevious).setOnClickListener(v -> {
-            studySession.previousCard();
-            updateUI();
-        });
+        cardContainer.setOnClickListener(v -> flipCard());
+
+        findViewById(R.id.btnFlip).setOnClickListener(v -> flipCard());
+        findViewById(R.id.btnNext).setOnClickListener(v -> goToNextCard());
+        findViewById(R.id.btnPrevious).setOnClickListener(v -> goToPreviousCard());
     }
 
     private void startSession() {
@@ -62,17 +60,57 @@ public class StudyActivity extends AppCompatActivity {
         boolean shuffle = getIntent().getBooleanExtra("SHUFFLE", false);
 
         studySession.startSession(deckId, shuffle);
-        
+
         if (studySession.hasCards()) {
+            resetCardToFront();
             updateUI();
         } else {
             finish();
         }
     }
 
+    private void flipCard() {
+        if (isShowingFront) {
+            cardFront.setVisibility(View.GONE);
+            cardBack.setVisibility(View.VISIBLE);
+        } else {
+            cardBack.setVisibility(View.GONE);
+            cardFront.setVisibility(View.VISIBLE);
+        }
+
+        studySession.flip();
+        isShowingFront = !isShowingFront;
+        updateUI();
+    }
+
+    private void goToNextCard() {
+        if (studySession.isFinished()) {
+            return;
+        }
+        studySession.nextCard();
+        if (studySession.isFinished()) {
+            return;
+        }
+        resetCardToFront();
+        updateUI();
+    }
+
+    private void goToPreviousCard() {
+        studySession.previousCard();
+        resetCardToFront();
+        updateUI();
+    }
+
+    private void resetCardToFront() {
+        isShowingFront = true;
+        cardFront.setVisibility(View.VISIBLE);
+        cardBack.setVisibility(View.GONE);
+    }
+
     private void updateUI() {
         tvContent.setText(studySession.getCurrentText());
         tvProgress.setText(studySession.getProgressText());
+        tvContentBack.setText(studySession.getCurrentText());
     }
 
     @Override
