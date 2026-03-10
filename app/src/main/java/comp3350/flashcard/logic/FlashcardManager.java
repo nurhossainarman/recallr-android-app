@@ -184,4 +184,57 @@ public class FlashcardManager {
         }
         return flashcardPersistence.deleteFlashcardsByDeckId(deckId);
     }
+
+    /**
+     * Returns the number of cards marked as known in a deck
+     * @param deckId the ID of the deck
+     * @return the number of known cards, or -1 if unsuccessful
+     */
+    public int getKnownAmount(int deckId) {
+        if (deckId < 0) {
+            return -1;
+        }
+
+        List<Flashcard> cardList = flashcardPersistence.getFlashcardsByDeckId(deckId);
+        if (cardList == null) {
+            return -1;
+        }
+
+        if (cardList.isEmpty()) {
+            return -1;
+        }
+
+        int knownCount = 0;
+        for(Flashcard flashcard : cardList) {
+            if(flashcard.getIsKnown()) {
+                knownCount++;
+            }
+        }
+        return knownCount;
+    }
+
+    /**
+     * Returns a list of cards marked known or unknown, depending on the markedAsKnown parameter
+     * @param deckId the ID of the deck
+     * @param markedAsKnown if true, filters by known, if false, filters by unknown
+     * @return the list of cards marked as known or unknown, or an empty list if unsuccessful
+     */
+    public List <Flashcard> filterByIsKnown(int deckId, boolean markedAsKnown) {
+        List<Flashcard> results = new ArrayList<>();
+        if (deckId < 0) {
+            return results;
+        }
+
+        List<Flashcard> cardList = getFlashcardsByDeck(deckId);
+        if (cardList == null) {
+            return results;
+        }
+
+        for(int i = 0; i < cardList.size(); i++) {
+            if((cardList.get(i)).getIsKnown() == markedAsKnown) {
+                results.add(cardList.get(i));
+            }
+        }
+        return results;
+    }
 }

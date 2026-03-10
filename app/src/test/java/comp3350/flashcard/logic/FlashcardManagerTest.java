@@ -40,6 +40,7 @@ public class FlashcardManagerTest {
         assertEquals("A programming language", c.getBack());
         assertEquals(1, c.getDeckId());
         assertTrue(c.getId() > 0);
+        assertFalse(c.getIsKnown());
     }
 
     @Test
@@ -78,6 +79,7 @@ public class FlashcardManagerTest {
         assertEquals("Capital of France?", fetched.getFront());
         assertEquals("Paris", fetched.getBack());
         assertEquals(1, fetched.getDeckId());
+        assertFalse(fetched.getIsKnown());
     }
 
     @Test
@@ -96,6 +98,7 @@ public class FlashcardManagerTest {
     @Test
     public void updateFlashcard_valid_updatesContent() {
         Flashcard created = create("Old Q", "Old A", 1);
+        created.setIsKnown(true);
 
         assertTrue(manager.updateFlashcard(created.getId(), "New Q", "New A"));
 
@@ -104,6 +107,7 @@ public class FlashcardManagerTest {
         assertEquals("New Q", updated.getFront());
         assertEquals("New A", updated.getBack());
         assertEquals(1, updated.getDeckId()); // deckId unchanged
+        assertTrue(created.getIsKnown()); // isKnown unchanged
     }
 
     @Test
@@ -292,5 +296,50 @@ public class FlashcardManagerTest {
 
         assertEquals(0, manager.deleteFlashcardsByDeck(999));
         assertEquals(0, manager.deleteFlashcardsByDeck(-1));
+    }
+
+    // ---------------- getKnownAmount ----------------
+    @Test
+    public void getKnownAmount_countsPerDeck() {
+        create("Q1", "A1", 1).setIsKnown(true);
+        create("Q2", "A2", 1).setIsKnown(true);
+        create("Q3", "A3", 1);
+        create("Q4", "A4", 2);
+
+        assertEquals(2, manager.getKnownAmount(1));
+        assertEquals(0, manager.getKnownAmount(2));
+        assertEquals(-1, manager.getKnownAmount(999));
+        assertEquals(-1, manager.getKnownAmount(-1));
+    }
+
+    // ---------------- filterByIsKnown ----------------
+    @Test
+    public void filterByIsKnown_listsPerDeck() {
+        Flashcard ca = manager.createFlashcard("Q1", "A1", 1);
+        ca.setIsKnown(true);
+        Flashcard cb = manager.createFlashcard("Q2", "A2", 1);
+        cb.setIsKnown(true);
+        Flashcard cc = manager.createFlashcard("Q3", "A3", 1);
+        Flashcard cd = manager.createFlashcard("Q4", "A4", 2);
+
+        assertEquals(2, manager.filterByIsKnown(1, true).size());
+        assertEquals(ca, manager.filterByIsKnown(1, true).get(0));
+        assertEquals(cb, manager.filterByIsKnown(1, true).get(1));
+
+        assertEquals(1, manager.filterByIsKnown(1, false).size());
+        assertEquals(cc, manager.filterByIsKnown(1, false).get(0));
+
+        assertEquals(1, manager.filterByIsKnown(2, false).size());
+        assertEquals(cd, manager.filterByIsKnown(2, false).get(0));
+
+        assertNotNull(manager.filterByIsKnown(2, true));
+        assertEquals(0, manager.filterByIsKnown(2, true).size());
+
+        //Invalid Inputs
+        assertNotNull(manager.filterByIsKnown(999, false));
+        assertEquals(0, manager.filterByIsKnown(999, false).size());
+
+        assertNotNull(manager.filterByIsKnown(-1, true));
+        assertEquals(0, manager.filterByIsKnown(-1, true).size());
     }
 }
