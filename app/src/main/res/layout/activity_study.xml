@@ -2,6 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -11,7 +12,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:title="Study Session" />
+        app:title="@string/study_session_title" />
 
     <TextView
         android:id="@+id/tvProgress"
@@ -48,11 +49,12 @@
                 android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/tvQLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:text="Q"
+                    android:text="@string/label_question"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="?attr/colorOnPrimaryContainer" />
 
@@ -65,6 +67,51 @@
                     android:padding="16dp"
                     android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
                     android:textColor="?attr/colorOnPrimaryContainer" />
+
+                <TextView
+                    android:id="@+id/tvHintLeft"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/hint_swipe_right"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    android:alpha="0.65"
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="center"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvHintRight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="4dp"
+                    android:text="@string/hint_swipe_left"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    android:alpha="0.65"
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="center"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/hint_tap_to_flip"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    android:alpha="0.65"
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="center"
+                    android:visibility="gone" />
 
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
@@ -89,7 +136,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:text="A"
+                    android:text="@string/label_answer"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="?attr/colorOnSecondaryContainer" />
 
@@ -123,7 +170,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="← Prev" />
+            android:text="@string/btn_prev"
+            tools:ignore="VisualLintButtonSize" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnFlip"
@@ -132,7 +180,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="8dp"
-            android:text="Flip" />
+            android:text="@string/btn_flip"
+            tools:ignore="VisualLintButtonSize" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNext"
@@ -140,7 +189,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:text="Next →" />
+            android:text="@string/btn_next"
+            tools:ignore="VisualLintButtonSize" />
 
     </LinearLayout>
 

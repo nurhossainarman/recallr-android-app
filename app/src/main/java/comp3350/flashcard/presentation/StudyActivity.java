@@ -30,11 +30,15 @@ public class StudyActivity extends AppCompatActivity {
     private TextView tvProgress;
     private TextView tvContent;
     private TextView tvContentBack;
+    private TextView tvHint;
+    private TextView tvHintLeft;
+    private TextView tvHintRight;
     private FrameLayout cardContainer;
     private View cardFront;
     private View cardBack;
     private IStudySession studySession;
     private boolean isShowingFront = true;
+    private boolean isFirstCard = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,9 @@ public class StudyActivity extends AppCompatActivity {
         tvProgress = findViewById(R.id.tvProgress);
         tvContent = findViewById(R.id.tvContent);
         tvContentBack = findViewById(R.id.tvContentBack);
+        tvHint = findViewById(R.id.tvHint);
+        tvHintLeft = findViewById(R.id.tvHintLeft);
+        tvHintRight = findViewById(R.id.tvHintRight);
         cardContainer = findViewById(R.id.cardContainer);
         cardFront = findViewById(R.id.cardFront);
         cardBack = findViewById(R.id.cardBack);
@@ -68,7 +75,7 @@ public class StudyActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public boolean onFling(MotionEvent e1, @NonNull MotionEvent e2,
+                    public boolean onFling(@NonNull MotionEvent e1, @NonNull MotionEvent e2,
                                            float velocityX, float velocityY) {
                         float deltaX = e2.getX() - e1.getX();
                         float deltaY = e2.getY() - e1.getY();
@@ -118,6 +125,7 @@ public class StudyActivity extends AppCompatActivity {
         studySession.startSession(deckId, shuffle);
 
         if (studySession.hasCards()) {
+            isFirstCard = true;
             resetCardToFront();
             updateUI();
         } else {
@@ -154,6 +162,7 @@ public class StudyActivity extends AppCompatActivity {
         }
 
         isShowingFront = !isShowingFront;
+        hideHints();
         tvProgress.setText(studySession.getProgressText());
     }
 
@@ -165,6 +174,7 @@ public class StudyActivity extends AppCompatActivity {
         if (studySession.isFinished()) {
             return;
         }
+        isFirstCard = false;
         slideCardOut(true, () -> {
             resetCardToFront();
             updateUI();
@@ -173,6 +183,7 @@ public class StudyActivity extends AppCompatActivity {
     }
 
     private void goToPreviousCard() {
+        isFirstCard = false;
         studySession.previousCard();
         slideCardOut(false, () -> {
             resetCardToFront();
@@ -226,6 +237,20 @@ public class StudyActivity extends AppCompatActivity {
         cardBack.setVisibility(View.GONE);
         cardFront.setRotationY(0f);
         cardBack.setRotationY(0f);
+
+        if (isFirstCard) {
+            tvHint.setVisibility(View.VISIBLE);
+            tvHintLeft.setVisibility(View.VISIBLE);
+            tvHintRight.setVisibility(View.VISIBLE);
+        } else {
+            hideHints();
+        }
+    }
+
+    private void hideHints() {
+        tvHint.setVisibility(View.GONE);
+        tvHintLeft.setVisibility(View.GONE);
+        tvHintRight.setVisibility(View.GONE);
     }
 
     private void updateUI() {
