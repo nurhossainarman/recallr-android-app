@@ -1,5 +1,7 @@
 package comp3350.flashcard.presentation;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -70,17 +72,35 @@ public class StudyActivity extends AppCompatActivity {
     }
 
     private void flipCard() {
+        AnimatorSet flipOut = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.card_flip_out);
+        AnimatorSet flipIn = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.card_flip_in);
+
         if (isShowingFront) {
-            cardFront.setVisibility(View.GONE);
-            cardBack.setVisibility(View.VISIBLE);
+            flipOut.setTarget(cardFront);
+            flipIn.setTarget(cardBack);
+            flipOut.start();
+            flipIn.start();
+            cardFront.postDelayed(() -> {
+                cardFront.setVisibility(View.GONE);
+                cardBack.setVisibility(View.VISIBLE);
+                studySession.flip();
+                tvContentBack.setText(studySession.getCurrentText());
+            }, 400);
         } else {
-            cardBack.setVisibility(View.GONE);
-            cardFront.setVisibility(View.VISIBLE);
+            flipOut.setTarget(cardBack);
+            flipIn.setTarget(cardFront);
+            flipOut.start();
+            flipIn.start();
+            cardBack.postDelayed(() -> {
+                cardBack.setVisibility(View.GONE);
+                cardFront.setVisibility(View.VISIBLE);
+                studySession.flip();
+                tvContent.setText(studySession.getCurrentText());
+            }, 400);
         }
 
-        studySession.flip();
         isShowingFront = !isShowingFront;
-        updateUI();
+        tvProgress.setText(studySession.getProgressText());
     }
 
     private void goToNextCard() {
@@ -105,6 +125,8 @@ public class StudyActivity extends AppCompatActivity {
         isShowingFront = true;
         cardFront.setVisibility(View.VISIBLE);
         cardBack.setVisibility(View.GONE);
+        cardFront.setRotationY(0f);
+        cardBack.setRotationY(0f);
     }
 
     private void updateUI() {
