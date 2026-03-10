@@ -1,11 +1,18 @@
 package comp3350.flashcard.presentation;
 
+import android.animation.Animator;
 import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import comp3350.flashcard.R;
@@ -16,6 +23,9 @@ import comp3350.flashcard.logic.IStudySession;
  * StudyActivity - UI for studying flashcards in a session.
  */
 public class StudyActivity extends AppCompatActivity {
+
+    private static final int SWIPE_THRESHOLD = 100;
+    private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
     private TextView tvProgress;
     private TextView tvContent;
@@ -50,11 +60,55 @@ public class StudyActivity extends AppCompatActivity {
         cardFront = findViewById(R.id.cardFront);
         cardBack = findViewById(R.id.cardBack);
 
-        cardContainer.setOnClickListener(v -> flipCard());
+        GestureDetector gestureDetector = new GestureDetector(this,
+                new GestureDetector.SimpleOnGestureListener() {
+                    @Override
+                    public boolean onDown(@NonNull MotionEvent e) {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onFling(MotionEvent e1, @NonNull MotionEvent e2,
+                                           float velocityX, float velocityY) {
+                        float deltaX = e2.getX() - e1.getX();
+                        float deltaY = e2.getY() - e1.getY();
+
+                        if (Math.abs(deltaX) > Math.abs(deltaY)
+                                && Math.abs(deltaX) > SWIPE_THRESHOLD
+                                && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                            if (deltaX < 0) {
+                                goToNextCard();
+                            } else {
+                                goToPreviousCard();
+                            }
+                            return true;
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onSingleTapUp(@NonNull MotionEvent e) {
+                        flipCard();
+                        return true;
+                    }
+                });
+
+        setupTouch(gestureDetector);
 
         findViewById(R.id.btnFlip).setOnClickListener(v -> flipCard());
         findViewById(R.id.btnNext).setOnClickListener(v -> goToNextCard());
         findViewById(R.id.btnPrevious).setOnClickListener(v -> goToPreviousCard());
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void setupTouch(GestureDetector gestureDetector) {
+        cardContainer.setOnTouchListener((v, event) -> {
+            gestureDetector.onTouchEvent(event);
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                v.performClick();
+            }
+            return true;
+        });
     }
 
     private void startSession() {
@@ -111,14 +165,59 @@ public class StudyActivity extends AppCompatActivity {
         if (studySession.isFinished()) {
             return;
         }
-        resetCardToFront();
-        updateUI();
+        slideCardOut(true, () -> {
+            resetCardToFront();
+            updateUI();
+            slideCardIn(false);
+        });
     }
 
     private void goToPreviousCard() {
         studySession.previousCard();
-        resetCardToFront();
-        updateUI();
+        slideCardOut(false, () -> {
+            resetCardToFront();
+            updateUI();
+            slideCardIn(true);
+        });
+    }
+
+    private void slideCardOut(boolean toLeft, Runnable onFinish) {
+        float screenWidth = getResources().getDisplayMetrics().widthPixels;
+        float targetX = toLeft ? -screenWidth : screenWidth;
+
+        ObjectAnimator slideX = ObjectAnimator.ofFloat(cardContainer, "translationX", 0f, targetX);
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(cardContainer, "alpha", 1f, 0f);
+        slideX.setDuration(320);
+        fadeOut.setDuration(320);
+
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(slideX, fadeOut);
+        set.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(@NonNull Animator animation) {
+                cardContainer.setTranslationX(0f);
+                cardContainer.setAlpha(1f);
+                if (onFinish != null) onFinish.run();
+            }
+        });
+        set.start();
+    }
+
+    private void slideCardIn(boolean fromLeft) {
+        float screenWidth = getResources().getDisplayMetrics().widthPixels;
+        float startX = fromLeft ? -screenWidth : screenWidth;
+
+        cardContainer.setTranslationX(startX);
+        cardContainer.setAlpha(0f);
+
+        ObjectAnimator slideX = ObjectAnimator.ofFloat(cardContainer, "translationX", startX, 0f);
+        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(cardContainer, "alpha", 0f, 1f);
+        slideX.setDuration(320);
+        fadeIn.setDuration(320);
+
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(slideX, fadeIn);
+        set.start();
     }
 
     private void resetCardToFront() {
