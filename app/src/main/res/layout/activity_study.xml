@@ -14,14 +14,27 @@
         android:layout_height="?attr/actionBarSize"
         app:title="@string/study_session_title" />
 
-    <TextView
-        android:id="@+id/tvProgress"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="12dp"
-        android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-        android:textColor="?attr/colorOnSurfaceVariant" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            android:id="@+id/tvProgress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <CheckBox
+            android:id="@+id/cbKnown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_known" />
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/cardContainer"
@@ -75,7 +88,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="4dp"
-                    android:text="@string/hint_swipe_right"
+                    android:text="@string/hint_swipe_left"
                     android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                     android:textColor="?attr/colorOnPrimaryContainer"
                     android:alpha="0.65"
@@ -90,7 +103,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="4dp"
-                    android:text="@string/hint_swipe_left"
+                    android:text="@string/hint_swipe_right"
                     android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                     android:textColor="?attr/colorOnPrimaryContainer"
                     android:alpha="0.65"

@@ -16,7 +16,7 @@ public class Flashcard implements Serializable {
     private String back;
     private int deckId;
     private long createdAt;
-    private boolean isKnown = false;
+    private boolean isKnown;
     
     // Future fields need to be implemented for Iteration 2 and more
     // private int timesReviewed;
@@ -44,6 +44,7 @@ public class Flashcard implements Serializable {
         setFront(front);
         setBack(back);
         setDeckId(deckId);
+        setIsKnown(false);
     }
 
     /**

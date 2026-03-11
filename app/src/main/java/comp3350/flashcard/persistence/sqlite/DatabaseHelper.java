@@ -6,7 +6,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "flashcard.db";
-    private static final int DATABASE_VERSION = 1;
+    // Incremented the database version to 2 and added the is_known column
+    // to the flashcards table
+    private static final int DATABASE_VERSION = 2;
 
     public static final String TABLE_DECKS = "decks";
     public static final String TABLE_FLASHCARDS = "flashcards";
@@ -22,6 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String FLASHCARD_BACK = "back";
     public static final String FLASHCARD_DECK_ID = "deck_id";
     public static final String FLASHCARD_CREATED_AT = "created_at";
+    public static final String FLASHCARD_IS_KNOWN = "is_known";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -44,6 +47,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 FLASHCARD_BACK + " TEXT NOT NULL, " +
                 FLASHCARD_DECK_ID + " INTEGER NOT NULL, " +
                 FLASHCARD_CREATED_AT + " INTEGER NOT NULL, " +
+                FLASHCARD_IS_KNOWN + " INTEGER DEFAULT 0, " + // New column
                 "FOREIGN KEY(" + FLASHCARD_DECK_ID + ") REFERENCES " +
                 TABLE_DECKS + "(" + DECK_ID + ") ON DELETE CASCADE" +
                 ");";
@@ -72,23 +76,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "(3, 'World Capitals', " +
                 "'Capital cities of countries around the world', " +
                 (now - 259200000) + ", 0);");
+        // TODO:
+        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " (id, front, back, deck_id, created_at, is_known) VALUES " +
+                "(1, 'Hello', 'Hola', 1, " + now + ", 0);");
+        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " (id, front, back, deck_id, created_at, is_known) VALUES " +
+                "(2, 'Goodbye', 'Adiós', 1, " + now + ", 0);");
+        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " (id, front, back, deck_id, created_at, is_known) VALUES " +
+                "(3, 'Thank you', 'Gracias', 1, " + now + ", 0);");
 
-        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " VALUES " +
-                "(1, 'Hello', 'Hola', 1, " + now + ");");
-        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " VALUES " +
-                "(2, 'Goodbye', 'Adiós', 1, " + now + ");");
-        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " VALUES " +
-                "(3, 'Thank you', 'Gracias', 1, " + now + ");");
+        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " (id, front, back, deck_id, created_at, is_known) VALUES " +
+                "(4, 'What is a class?', 'A blueprint for creating objects', 2, " + now + ", 0);");
+        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " (id, front, back, deck_id, created_at, is_known) VALUES " +
+                "(5, 'What is inheritance?', 'A mechanism where a class inherits properties from another class', 2, " + now + ", 0);");
 
-        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " VALUES " +
-                "(4, 'What is a class?', 'A blueprint for creating objects', 2, " + now + ");");
-        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " VALUES " +
-                "(5, 'What is inheritance?', 'A mechanism where a class inherits properties from another class', 2, " + now + ");");
-
-        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " VALUES " +
-                "(6, 'Capital of France', 'Paris', 3, " + now + ");");
-        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " VALUES " +
-                "(7, 'Capital of Japan', 'Tokyo', 3, " + now + ");");
+        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " (id, front, back, deck_id, created_at, is_known) VALUES " +
+                "(6, 'Capital of France', 'Paris', 3, " + now + ", 0);");
+        db.execSQL("INSERT INTO " + TABLE_FLASHCARDS + " (id, front, back, deck_id, created_at, is_known) VALUES " +
+                "(7, 'Capital of Japan', 'Tokyo', 3, " + now + ", 0);");
     }
 
     @Override

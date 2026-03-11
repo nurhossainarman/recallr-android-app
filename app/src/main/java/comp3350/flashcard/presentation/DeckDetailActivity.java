@@ -3,6 +3,7 @@ package comp3350.flashcard.presentation;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.CheckBox;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
 import comp3350.flashcard.logic.DeckManager;
 import comp3350.flashcard.logic.FlashcardManager;
+import comp3350.flashcard.logic.IStudySession;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.objects.Flashcard;
 
@@ -29,6 +31,7 @@ public class DeckDetailActivity extends AppCompatActivity {
     private int deckId = -1;
     private Toolbar toolbar;
     private CheckBox cbShuffle;
+    private RadioGroup rgFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,7 @@ public class DeckDetailActivity extends AppCompatActivity {
         rvCards.setLayoutManager(new LinearLayoutManager(this));
 
         cbShuffle = findViewById(R.id.cbShuffle);
+        rgFilter = findViewById(R.id.rgFilter);
 
         deckId = getIntent().getIntExtra("DECK_ID", -1);
         setupDeckInfo();
@@ -113,14 +117,22 @@ public class DeckDetailActivity extends AppCompatActivity {
      * Starts the study session by delegating the check for card existence to the logic layer.
      */
     private void startStudySession() {
-        // Use the logic layer (DeckManager) to check if the deck has cards
         if (deckManager.getFlashcardCount(deckId) > 0) {
+            IStudySession.FilterMode filterMode = IStudySession.FilterMode.ALL;
+            int checkedId = rgFilter.getCheckedRadioButtonId();
+            
+            if (checkedId == R.id.rbKnown) {
+                filterMode = IStudySession.FilterMode.KNOWN;
+            } else if (checkedId == R.id.rbUnknown) {
+                filterMode = IStudySession.FilterMode.UNKNOWN;
+            }
+
             Intent intent = new Intent(this, StudyActivity.class);
             intent.putExtra("DECK_ID", deckId);
             intent.putExtra("SHUFFLE", cbShuffle.isChecked());
+            intent.putExtra("FILTER_MODE", filterMode.name());
             startActivity(intent);
         } else {
-            // If the manager indicates no cards, provide UI feedback
             Toast.makeText(this, "Add some cards first!", Toast.LENGTH_SHORT).show();
         }
     }

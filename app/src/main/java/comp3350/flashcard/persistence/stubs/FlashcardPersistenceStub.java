@@ -109,6 +109,7 @@ public class FlashcardPersistenceStub implements FlashcardPersistence {
                 flashcard.getDeckId(),
                 System.currentTimeMillis()
         );
+        newCard.setIsKnown(flashcard.getIsKnown());
         flashcards.add(newCard);
         return newCard;
     }
@@ -126,6 +127,7 @@ public class FlashcardPersistenceStub implements FlashcardPersistence {
                         flashcard.getDeckId(),
                         existing.getCreatedAt()
                 );
+                updated.setIsKnown(flashcard.getIsKnown());
                 flashcards.set(i, updated);
                 return true;
             }

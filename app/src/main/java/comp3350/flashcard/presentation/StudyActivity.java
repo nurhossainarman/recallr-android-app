@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -33,6 +34,7 @@ public class StudyActivity extends AppCompatActivity {
     private TextView tvHint;
     private TextView tvHintLeft;
     private TextView tvHintRight;
+    private CheckBox cbKnown;
     private FrameLayout cardContainer;
     private View cardFront;
     private View cardBack;
@@ -63,6 +65,7 @@ public class StudyActivity extends AppCompatActivity {
         tvHint = findViewById(R.id.tvHint);
         tvHintLeft = findViewById(R.id.tvHintLeft);
         tvHintRight = findViewById(R.id.tvHintRight);
+        cbKnown = findViewById(R.id.cbKnown);
         cardContainer = findViewById(R.id.cardContainer);
         cardFront = findViewById(R.id.cardFront);
         cardBack = findViewById(R.id.cardBack);
@@ -105,6 +108,10 @@ public class StudyActivity extends AppCompatActivity {
         findViewById(R.id.btnFlip).setOnClickListener(v -> flipCard());
         findViewById(R.id.btnNext).setOnClickListener(v -> goToNextCard());
         findViewById(R.id.btnPrevious).setOnClickListener(v -> goToPreviousCard());
+        
+        cbKnown.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            studySession.setKnown(isChecked);
+        });
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -121,8 +128,14 @@ public class StudyActivity extends AppCompatActivity {
     private void startSession() {
         int deckId = getIntent().getIntExtra("DECK_ID", -1);
         boolean shuffle = getIntent().getBooleanExtra("SHUFFLE", false);
+        String filterModeStr = getIntent().getStringExtra("FILTER_MODE");
+        IStudySession.FilterMode filterMode = IStudySession.FilterMode.ALL;
+        
+        if (filterModeStr != null) {
+            filterMode = IStudySession.FilterMode.valueOf(filterModeStr);
+        }
 
-        studySession.startSession(deckId, shuffle);
+        studySession.startSession(deckId, shuffle, filterMode);
 
         if (studySession.hasCards()) {
             isFirstCard = true;
@@ -167,11 +180,9 @@ public class StudyActivity extends AppCompatActivity {
     }
 
     private void goToNextCard() {
-        if (studySession.isFinished()) {
-            return;
-        }
         studySession.nextCard();
         if (studySession.isFinished()) {
+            finish();
             return;
         }
         isFirstCard = false;
@@ -257,6 +268,13 @@ public class StudyActivity extends AppCompatActivity {
         tvContent.setText(studySession.getCurrentText());
         tvProgress.setText(studySession.getProgressText());
         tvContentBack.setText(studySession.getCurrentText());
+        
+        // Update the checkbox state without triggering the listener
+        cbKnown.setOnCheckedChangeListener(null);
+        cbKnown.setChecked(studySession.isCurrentCardKnown());
+        cbKnown.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            studySession.setKnown(isChecked);
+        });
     }
 
     @Override

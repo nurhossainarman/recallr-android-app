@@ -29,13 +29,17 @@
     <string name="previous">Previous</string>
     <string name="finish">Finish</string>
     <string name="flip">Flip</string>
+    <string name="filter_all">All</string>
+    <string name="filter_known">Known</string>
+    <string name="filter_unknown">Unknown</string>
+
     <string name="study_session_title">Study Session</string>
-    <string name="label_question">Q</string>
-    <string name="label_answer">A</string>
-    <string name="hint_tap_to_flip">Tap to flip</string>
-    <string name="hint_swipe_right">←\nSwipe\nright\nfor prev</string>
-    <string name="hint_swipe_left">→\nSwipe\nleft\nfor next</string>
-    <string name="btn_prev">← Prev</string>
+    <string name="label_question">Question</string>
+    <string name="label_answer">Answer</string>
+    <string name="hint_swipe_right">Swipe Right\nfor Previous</string>
+    <string name="hint_swipe_left">Swipe Left\nfor Next</string>
+    <string name="hint_tap_to_flip">Tap to Flip</string>
+    <string name="btn_prev">Prev</string>
     <string name="btn_flip">Flip</string>
-    <string name="btn_next">Next →</string>
+    <string name="btn_next">Next</string>
 </resources>

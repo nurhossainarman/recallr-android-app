@@ -113,6 +113,7 @@ public class FlashcardPersistenceSQLite implements FlashcardPersistence {
             values.put(DatabaseHelper.FLASHCARD_BACK, flashcard.getBack());
             values.put(DatabaseHelper.FLASHCARD_DECK_ID, flashcard.getDeckId());
             values.put(DatabaseHelper.FLASHCARD_CREATED_AT, System.currentTimeMillis());
+            values.put(DatabaseHelper.FLASHCARD_IS_KNOWN, flashcard.getIsKnown() ? 1 : 0);
 
             long id = db.insert(DatabaseHelper.TABLE_FLASHCARDS, null, values);
 
@@ -138,6 +139,7 @@ public class FlashcardPersistenceSQLite implements FlashcardPersistence {
             values.put(DatabaseHelper.FLASHCARD_FRONT, flashcard.getFront());
             values.put(DatabaseHelper.FLASHCARD_BACK, flashcard.getBack());
             values.put(DatabaseHelper.FLASHCARD_DECK_ID, flashcard.getDeckId());
+            values.put(DatabaseHelper.FLASHCARD_IS_KNOWN, flashcard.getIsKnown() ? 1 : 0);
 
             int rows = db.update(
                     DatabaseHelper.TABLE_FLASHCARDS,
@@ -244,7 +246,10 @@ public class FlashcardPersistenceSQLite implements FlashcardPersistence {
         String back = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.FLASHCARD_BACK));
         int deckId = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.FLASHCARD_DECK_ID));
         long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.FLASHCARD_CREATED_AT));
+        boolean isKnown = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.FLASHCARD_IS_KNOWN)) == 1;
 
-        return new Flashcard(id, front, back, deckId, createdAt);
+        Flashcard flashcard = new Flashcard(id, front, back, deckId, createdAt);
+        flashcard.setIsKnown(isKnown); //TODO:
+        return flashcard;
     }
 }
