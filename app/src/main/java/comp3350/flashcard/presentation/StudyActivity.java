@@ -22,7 +22,7 @@ import comp3350.flashcard.logic.FilterMode;
 import comp3350.flashcard.logic.IStudySession;
 
 /**
- * StudyActivity - UI for studying flashcards in a session.
+ * Screen for studying flashcards in a session.
  */
 public class StudyActivity extends AppCompatActivity {
 
@@ -48,11 +48,15 @@ public class StudyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_study);
 
+        // Get the session logic from the application services
         studySession = Services.getStudySession();
         initUI();
         startSession();
     }
 
+    /**
+     * Finds UI elements and sets up click and swipe listeners.
+     */
     private void initUI() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -71,6 +75,7 @@ public class StudyActivity extends AppCompatActivity {
         cardFront = findViewById(R.id.cardFront);
         cardBack = findViewById(R.id.cardBack);
 
+        // Setup gestures for swiping and tapping
         GestureDetector gestureDetector = new GestureDetector(this,
                 new GestureDetector.SimpleOnGestureListener() {
                     @Override
@@ -88,9 +93,9 @@ public class StudyActivity extends AppCompatActivity {
                                 && Math.abs(deltaX) > SWIPE_THRESHOLD
                                 && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                             if (deltaX < 0) {
-                                goToNextCard();
+                                goToNextCard(); // Swipe left for next
                             } else {
-                                goToPreviousCard();
+                                goToPreviousCard(); // Swipe right for previous
                             }
                             return true;
                         }
@@ -99,22 +104,27 @@ public class StudyActivity extends AppCompatActivity {
 
                     @Override
                     public boolean onSingleTapUp(@NonNull MotionEvent e) {
-                        flipCard();
+                        flipCard(); // Tap to show the other side
                         return true;
                     }
                 });
 
         setupTouch(gestureDetector);
 
+        // Set button clicks
         findViewById(R.id.btnFlip).setOnClickListener(v -> flipCard());
         findViewById(R.id.btnNext).setOnClickListener(v -> goToNextCard());
         findViewById(R.id.btnPrevious).setOnClickListener(v -> goToPreviousCard());
         
+        // Save the known status when the checkbox changes
         cbKnown.setOnCheckedChangeListener((buttonView, isChecked) -> {
             studySession.setKnown(isChecked);
         });
     }
 
+    /**
+     * Connects touch events to the gesture detector.
+     */
     @SuppressLint("ClickableViewAccessibility")
     private void setupTouch(GestureDetector gestureDetector) {
         cardContainer.setOnTouchListener((v, event) -> {
@@ -126,6 +136,9 @@ public class StudyActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Starts the study session using settings passed in.
+     */
     private void startSession() {
         int deckId = getIntent().getIntExtra("DECK_ID", -1);
         boolean shuffle = getIntent().getBooleanExtra("SHUFFLE", false);
@@ -147,10 +160,13 @@ public class StudyActivity extends AppCompatActivity {
             resetCardToFront();
             updateUI();
         } else {
-            finish();
+            finish(); // Exit if no cards to study
         }
     }
 
+    /**
+     * Animates flipping the card to show front or back.
+     */
     private void flipCard() {
         AnimatorSet flipOut = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.card_flip_out);
         AnimatorSet flipIn = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.card_flip_in);
@@ -184,10 +200,13 @@ public class StudyActivity extends AppCompatActivity {
         tvProgress.setText(studySession.getProgressText());
     }
 
+    /**
+     * Moves to the next card in the list.
+     */
     private void goToNextCard() {
         studySession.nextCard();
         if (studySession.isFinished()) {
-            finish();
+            finish(); // Stop if the session is over
             return;
         }
         isFirstCard = false;
@@ -198,6 +217,9 @@ public class StudyActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Moves back to the previous card.
+     */
     private void goToPreviousCard() {
         isFirstCard = false;
         studySession.previousCard();
@@ -208,6 +230,9 @@ public class StudyActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Animates sliding the card off the screen.
+     */
     private void slideCardOut(boolean toLeft, Runnable onFinish) {
         float screenWidth = getResources().getDisplayMetrics().widthPixels;
         float targetX = toLeft ? -screenWidth : screenWidth;
@@ -230,6 +255,9 @@ public class StudyActivity extends AppCompatActivity {
         set.start();
     }
 
+    /**
+     * Animates sliding a new card onto the screen.
+     */
     private void slideCardIn(boolean fromLeft) {
         float screenWidth = getResources().getDisplayMetrics().widthPixels;
         float startX = fromLeft ? -screenWidth : screenWidth;
@@ -247,6 +275,9 @@ public class StudyActivity extends AppCompatActivity {
         set.start();
     }
 
+    /**
+     * Resets the view to show the front of the card.
+     */
     private void resetCardToFront() {
         isShowingFront = true;
         cardFront.setVisibility(View.VISIBLE);
@@ -254,6 +285,7 @@ public class StudyActivity extends AppCompatActivity {
         cardFront.setRotationY(0f);
         cardBack.setRotationY(0f);
 
+        // Show hints if this is the first card ever seen
         if (isFirstCard) {
             tvHint.setVisibility(View.VISIBLE);
             tvHintLeft.setVisibility(View.VISIBLE);
@@ -263,18 +295,24 @@ public class StudyActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Hides the swipe and tap hints.
+     */
     private void hideHints() {
         tvHint.setVisibility(View.GONE);
         tvHintLeft.setVisibility(View.GONE);
         tvHintRight.setVisibility(View.GONE);
     }
 
+    /**
+     * Updates the screen with information from the logic layer.
+     */
     private void updateUI() {
         tvContent.setText(studySession.getCurrentText());
         tvProgress.setText(studySession.getProgressText());
         tvContentBack.setText(studySession.getCurrentText());
         
-        // Update the checkbox state without triggering the listener
+        // Update checkbox without triggering save logic
         cbKnown.setOnCheckedChangeListener(null);
         cbKnown.setChecked(studySession.isCurrentCardKnown());
         cbKnown.setOnCheckedChangeListener((buttonView, isChecked) -> {
