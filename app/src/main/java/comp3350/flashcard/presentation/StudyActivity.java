@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
+import comp3350.flashcard.logic.FilterMode;
 import comp3350.flashcard.logic.IStudySession;
 
 /**
@@ -129,10 +130,14 @@ public class StudyActivity extends AppCompatActivity {
         int deckId = getIntent().getIntExtra("DECK_ID", -1);
         boolean shuffle = getIntent().getBooleanExtra("SHUFFLE", false);
         String filterModeStr = getIntent().getStringExtra("FILTER_MODE");
-        IStudySession.FilterMode filterMode = IStudySession.FilterMode.ALL;
+        FilterMode filterMode = FilterMode.ALL;
         
         if (filterModeStr != null) {
-            filterMode = IStudySession.FilterMode.valueOf(filterModeStr);
+            try {
+                filterMode = FilterMode.valueOf(filterModeStr);
+            } catch (IllegalArgumentException e) {
+                filterMode = FilterMode.ALL;
+            }
         }
 
         studySession.startSession(deckId, shuffle, filterMode);

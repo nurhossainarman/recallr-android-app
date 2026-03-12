@@ -7,64 +7,58 @@ import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.FlashcardPersistence;
 
 /**
- * StudySessionManager - handles logic for a study session, including shuffling cards and filtering.
+ * Manages a study session, moving between cards, flipping them,
+ * and filtering based on mode.
  */
 public class StudySessionManager implements IStudySession {
 
     private final FlashcardPersistence flashcardPersistence;
+    private final FlashcardManager flashcardManager;
     private List<Flashcard> sessionCards;
     private int currentIndex;
     private boolean showingFront;
 
     public StudySessionManager(FlashcardPersistence flashcardPersistence) {
         this.flashcardPersistence = flashcardPersistence;
+        this.flashcardManager = new FlashcardManager(flashcardPersistence);
         this.sessionCards = new ArrayList<>();
         this.currentIndex = -1;
         this.showingFront = true;
     }
 
+    /**
+     * Starts a study session for a deck.
+     * @param deckId the ID of the deck to study
+     * @param shuffle true/false to shuffle the cards
+     * @param filterMode which cards to include in session (all, known, or unknown)
+     */
     @Override
     public void startSession(int deckId, boolean shuffle, FilterMode filterMode) {
-        List<Flashcard> allCards = flashcardPersistence.getFlashcardsByDeckId(deckId);
+        sessionCards = flashcardManager.getFlashcardsByMode(deckId, filterMode);
         
-        if (allCards == null || allCards.isEmpty()) {
+        if (sessionCards == null || sessionCards.isEmpty()) { // Selected mode has no card
             sessionCards = new ArrayList<>();
             currentIndex = -1;
-        } else {
-            sessionCards = new ArrayList<>();
-            for (Flashcard card : allCards) {
-                if (filterMode == FilterMode.ALL) {
-                    sessionCards.add(card);
-                } else if (filterMode == FilterMode.KNOWN && card.getIsKnown()) {
-                    sessionCards.add(card);
-                } else if (filterMode == FilterMode.UNKNOWN && !card.getIsKnown()) {
-                    sessionCards.add(card);
-                }
-            }
-
+        } else {    // Selected mode has at least one card
+            sessionCards = new ArrayList<>(sessionCards);
             if (shuffle) {
                 Collections.shuffle(sessionCards);
             }
-            
-            if (sessionCards.isEmpty()) {
-                currentIndex = -1;
-            } else {
-                currentIndex = 0;
-            }
+            currentIndex = 0;
         }
         showingFront = true;
     }
-
+    
     @Override
     public void nextCard() {
         if (currentIndex < sessionCards.size() - 1) {
             currentIndex++;
             showingFront = true;
         } else {
-            currentIndex = sessionCards.size(); // Mark as finished
+            currentIndex = sessionCards.size(); 
         }
     }
-
+    
     @Override
     public void previousCard() {
         if (currentIndex > 0) {
@@ -72,7 +66,7 @@ public class StudySessionManager implements IStudySession {
             showingFront = true;
         }
     }
-
+    
     @Override
     public void flip() {
         showingFront = !showingFront;
@@ -98,48 +92,38 @@ public class StudySessionManager implements IStudySession {
 
     @Override
     public String getProgressText() {
-        if (sessionCards.isEmpty()) {
-            return "No cards to display";
-        }
-        // Clamping position for display
-        int displayPos = Math.min(currentIndex + 1, sessionCards.size());
-        return "Card " + displayPos + " of " + sessionCards.size();
+        return StudySessionHelper.formatProgressText(currentIndex, sessionCards.size());
     }
-
+    
     @Override
     public boolean isFinished() {
-        return sessionCards.isEmpty() || currentIndex >= sessionCards.size();
+        return StudySessionHelper.isFinished(currentIndex, sessionCards.size());
     }
-
+    
     @Override
     public boolean hasCards() {
         return !sessionCards.isEmpty() && currentIndex >= 0 && currentIndex < sessionCards.size();
     }
-
+    
     @Override
     public boolean isCurrentCardKnown() {
         Flashcard current = getCurrentCard();
         return current != null && current.getIsKnown();
     }
 
-    @Override
-    public int getPosition() {
-        return currentIndex + 1;
-    }
-
-    @Override
-    public int getTotalCards() {
-        return sessionCards.size();
-    }
-
-    /**
-     * Gets the current card in the session.
-     * @return current flashcard or null if no session active
-     */
     public Flashcard getCurrentCard() {
         if (currentIndex >= 0 && currentIndex < sessionCards.size()) {
             return sessionCards.get(currentIndex);
         }
         return null;
+    }
+
+    // Helper methods for unit tests
+    public int getPosition() {
+        return currentIndex + 1;
+    }
+
+    public int getTotalCards() {
+        return sessionCards.size();
     }
 }

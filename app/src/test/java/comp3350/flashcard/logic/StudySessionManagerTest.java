@@ -32,7 +32,7 @@ public class StudySessionManagerTest {
 
     @Test
     public void startSession_emptyDeck_initializesEmpty() {
-        manager.startSession(1, false, IStudySession.FilterMode.ALL);
+        manager.startSession(1, false, FilterMode.ALL);
         assertNull(manager.getCurrentCard());
         assertEquals(0, manager.getTotalCards());
         assertTrue(manager.isFinished());
@@ -41,7 +41,7 @@ public class StudySessionManagerTest {
     @Test
     public void startSession_withCards_initializesCorrectly() {
         addCards(1, 3);
-        manager.startSession(1, false, IStudySession.FilterMode.ALL);
+        manager.startSession(1, false, FilterMode.ALL);
         
         Flashcard first = manager.getCurrentCard();
         assertNotNull(first);
@@ -54,7 +54,7 @@ public class StudySessionManagerTest {
     @Test
     public void nextCard_traversesList() {
         addCards(1, 3);
-        manager.startSession(1, false, IStudySession.FilterMode.ALL);
+        manager.startSession(1, false, FilterMode.ALL);
         
         manager.nextCard();
         Flashcard second = manager.getCurrentCard();
@@ -67,7 +67,7 @@ public class StudySessionManagerTest {
         assertNotNull(third);
         assertEquals("Front 2", third.getFront());
         assertEquals(3, manager.getPosition());
-
+        
         assertFalse(manager.isFinished());
 
         manager.nextCard(); // Move past last card
@@ -78,7 +78,7 @@ public class StudySessionManagerTest {
     @Test
     public void previousCard_traversesBackwards() {
         addCards(1, 3);
-        manager.startSession(1, false, IStudySession.FilterMode.ALL);
+        manager.startSession(1, false, FilterMode.ALL);
         manager.nextCard(); // Move to second card
         
         manager.previousCard();
@@ -96,7 +96,7 @@ public class StudySessionManagerTest {
         addCards(1, 50); // Use many cards to minimize accidental same-order
         
         // Session 1: No shuffle
-        manager.startSession(1, false, IStudySession.FilterMode.ALL);
+        manager.startSession(1, false, FilterMode.ALL);
         List<Integer> order1 = new ArrayList<>();
         order1.add(manager.getCurrentCard().getId());
         while (!manager.isFinished()) {
@@ -107,7 +107,7 @@ public class StudySessionManagerTest {
         }
 
         // Session 2: Shuffle
-        manager.startSession(1, true, IStudySession.FilterMode.ALL);
+        manager.startSession(1, true, FilterMode.ALL);
         List<Integer> order2 = new ArrayList<>();
         order2.add(manager.getCurrentCard().getId());
         while (!manager.isFinished()) {
@@ -131,7 +131,7 @@ public class StudySessionManagerTest {
         c2.setIsKnown(false);
         persistence.insertFlashcard(c2);
 
-        manager.startSession(1, false, IStudySession.FilterMode.KNOWN);
+        manager.startSession(1, false, FilterMode.KNOWN);
         assertEquals(1, manager.getTotalCards());
         assertEquals("Q1", manager.getCurrentText());
     }
@@ -146,7 +146,7 @@ public class StudySessionManagerTest {
         c2.setIsKnown(false);
         persistence.insertFlashcard(c2);
 
-        manager.startSession(1, false, IStudySession.FilterMode.UNKNOWN);
+        manager.startSession(1, false, FilterMode.UNKNOWN);
         assertEquals(1, manager.getTotalCards());
         assertEquals("Q2", manager.getCurrentText());
     }
@@ -154,7 +154,7 @@ public class StudySessionManagerTest {
     @Test
     public void setKnown_updatesPersistence() {
         addCards(1, 1);
-        manager.startSession(1, false, IStudySession.FilterMode.ALL);
+        manager.startSession(1, false, FilterMode.ALL);
         
         Flashcard card = manager.getCurrentCard();
         assertFalse(card.getIsKnown());
@@ -170,7 +170,7 @@ public class StudySessionManagerTest {
     @Test
     public void flip_changesShowingSide() {
         persistence.insertFlashcard(new Flashcard("Question", "Answer", 1));
-        manager.startSession(1, false, IStudySession.FilterMode.ALL);
+        manager.startSession(1, false, FilterMode.ALL);
         
         assertEquals("Question", manager.getCurrentText());
         manager.flip();

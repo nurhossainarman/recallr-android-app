@@ -69,15 +69,8 @@ public class DeckManager {
      * @return true if update successful, false otherwise
      */
     public boolean updateDeck(int deckId, String name, String description) {
-        if (!validateDeck(name)) {
-            return false;
-        }
-
-        if (!deckExists(deckId)) {
-            return false;
-        }
-
-        if (!validateDeckNameUnique(name, deckId)) {
+        if (!validateDeck(name) || !deckExists(deckId) ||
+                !validateDeckNameUnique(name, deckId)) {
             return false;
         }
 

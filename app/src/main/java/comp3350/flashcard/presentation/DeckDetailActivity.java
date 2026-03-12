@@ -14,8 +14,8 @@ import java.util.List;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
 import comp3350.flashcard.logic.DeckManager;
+import comp3350.flashcard.logic.FilterMode;
 import comp3350.flashcard.logic.FlashcardManager;
-import comp3350.flashcard.logic.IStudySession;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.objects.Flashcard;
 
@@ -118,13 +118,13 @@ public class DeckDetailActivity extends AppCompatActivity {
      */
     private void startStudySession() {
         if (deckManager.getFlashcardCount(deckId) > 0) {
-            IStudySession.FilterMode filterMode = IStudySession.FilterMode.ALL;
+            FilterMode filterMode = FilterMode.ALL;
             int checkedId = rgFilter.getCheckedRadioButtonId();
             
             if (checkedId == R.id.rbKnown) {
-                filterMode = IStudySession.FilterMode.KNOWN;
+                filterMode = FilterMode.KNOWN;
             } else if (checkedId == R.id.rbUnknown) {
-                filterMode = IStudySession.FilterMode.UNKNOWN;
+                filterMode = FilterMode.UNKNOWN;
             }
 
             Intent intent = new Intent(this, StudyActivity.class);

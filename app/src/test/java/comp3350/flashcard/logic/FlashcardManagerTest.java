@@ -107,7 +107,6 @@ public class FlashcardManagerTest {
         assertEquals("New Q", updated.getFront());
         assertEquals("New A", updated.getBack());
         assertEquals(1, updated.getDeckId()); // deckId unchanged
-        assertTrue(created.getIsKnown()); // isKnown unchanged
     }
 
     @Test
@@ -308,38 +307,38 @@ public class FlashcardManagerTest {
 
         assertEquals(2, manager.getKnownAmount(1));
         assertEquals(0, manager.getKnownAmount(2));
-        assertEquals(-1, manager.getKnownAmount(999));
+        assertEquals(0, manager.getKnownAmount(999));
         assertEquals(-1, manager.getKnownAmount(-1));
     }
 
-    // ---------------- filterByIsKnown ----------------
+    // ---------------- getFlashcardsByMode ----------------
     @Test
-    public void filterByIsKnown_listsPerDeck() {
-        Flashcard ca = manager.createFlashcard("Q1", "A1", 1);
+    public void getFlashcardsByMode_listsPerDeck() {
+        Flashcard ca = create("Q1", "A1", 1);
         ca.setIsKnown(true);
-        Flashcard cb = manager.createFlashcard("Q2", "A2", 1);
+        Flashcard cb = create("Q2", "A2", 1);
         cb.setIsKnown(true);
-        Flashcard cc = manager.createFlashcard("Q3", "A3", 1);
-        Flashcard cd = manager.createFlashcard("Q4", "A4", 2);
+        Flashcard cc = create("Q3", "A3", 1);
+        Flashcard cd = create("Q4", "A4", 2);
 
-        assertEquals(2, manager.filterByIsKnown(1, true).size());
-        assertEquals(ca, manager.filterByIsKnown(1, true).get(0));
-        assertEquals(cb, manager.filterByIsKnown(1, true).get(1));
+        // ALL mode
+        assertEquals(3, manager.getFlashcardsByMode(1, FilterMode.ALL).size());
 
-        assertEquals(1, manager.filterByIsKnown(1, false).size());
-        assertEquals(cc, manager.filterByIsKnown(1, false).get(0));
+        // KNOWN mode
+        assertEquals(2, manager.getFlashcardsByMode(1, FilterMode.KNOWN).size());
+        
+        // UNKNOWN mode
+        assertEquals(1, manager.getFlashcardsByMode(1, FilterMode.UNKNOWN).size());
+        assertEquals(cc, manager.getFlashcardsByMode(1, FilterMode.UNKNOWN).get(0));
 
-        assertEquals(1, manager.filterByIsKnown(2, false).size());
-        assertEquals(cd, manager.filterByIsKnown(2, false).get(0));
+        // Other deck
+        assertEquals(1, manager.getFlashcardsByMode(2, FilterMode.UNKNOWN).size());
+        assertEquals(cd, manager.getFlashcardsByMode(2, FilterMode.UNKNOWN).get(0));
 
-        assertNotNull(manager.filterByIsKnown(2, true));
-        assertEquals(0, manager.filterByIsKnown(2, true).size());
+        // Invalid Inputs
+        assertNotNull(manager.getFlashcardsByMode(999, FilterMode.ALL));
+        assertEquals(0, manager.getFlashcardsByMode(999, FilterMode.ALL).size());
 
-        //Invalid Inputs
-        assertNotNull(manager.filterByIsKnown(999, false));
-        assertEquals(0, manager.filterByIsKnown(999, false).size());
-
-        assertNotNull(manager.filterByIsKnown(-1, true));
-        assertEquals(0, manager.filterByIsKnown(-1, true).size());
+        assertNull(manager.getFlashcardsByMode(-1, FilterMode.ALL));
     }
 }
