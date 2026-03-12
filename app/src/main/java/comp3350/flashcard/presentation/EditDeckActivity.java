@@ -37,9 +37,9 @@ public class EditDeckActivity extends AppCompatActivity {
      * Finds the input boxes and buttons on the screen.
      */
     private void initUI() {
-        inputDeckName = findViewById(R.id.inputDeckName); //Find input field for deck name
-        Button btnSaveDeck = findViewById(R.id.btnSaveDeck); //Find save button
-        Toolbar toolbar = findViewById(R.id.toolbar); //Find toolbar(containing deck name)
+        inputDeckName = findViewById(R.id.inputDeckName); 
+        Button btnSaveDeck = findViewById(R.id.btnSaveDeck);
+        Toolbar toolbar = findViewById(R.id.toolbar);
 
         // If intent returns a deck ID, we are editing an existing deck
         // Otherwise, we are creating a new deck (deckId == -1)
