@@ -3,13 +3,13 @@ package comp3350.flashcard.presentation;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.CheckBox;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.chip.ChipGroup;
 import java.util.List;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
@@ -31,7 +31,7 @@ public class DeckDetailActivity extends AppCompatActivity {
     private int deckId = -1;
     private Toolbar toolbar;
     private CheckBox cbShuffle;
-    private RadioGroup rgFilter;
+    private ChipGroup rgFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +119,7 @@ public class DeckDetailActivity extends AppCompatActivity {
     private void startStudySession() {
         if (deckManager.getFlashcardCount(deckId) > 0) {
             FilterMode filterMode = FilterMode.ALL;
-            int checkedId = rgFilter.getCheckedRadioButtonId();
+            int checkedId = rgFilter.getCheckedChipId();
             
             if (checkedId == R.id.rbKnown) {
                 filterMode = FilterMode.KNOWN;

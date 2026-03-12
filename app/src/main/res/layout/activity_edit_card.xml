@@ -8,11 +8,10 @@
     tools:context="comp3350.flashcard.presentation.EditCardActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:backgroundTint="@color/colorPrimary"
+
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
         android:elevation="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:title="Edit Card" />

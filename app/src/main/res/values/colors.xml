@@ -2,6 +2,19 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorPrimary">#4E3697</color>
+    <color name="colorOnPrimary">#E6E6FA</color>
+
+    <!-- Subtle background for deck items -->
+    <color name="study_session_background">#14193F</color>
+    <color name="icon_grey">#FFFEFE</color>
+
+    <!-- Modernization Colors -->
+    <color name="study_session_light">#2E3A55</color>
+    <color name="text_primary">#202124</color>
+    <color name="text_secondary">#FFFFFF</color>
+    <color name="fab_gradient_start">#4A90E2</color>
+    <color name="fab_gradient_end">#357ABD</color>
+
+
 </resources>
