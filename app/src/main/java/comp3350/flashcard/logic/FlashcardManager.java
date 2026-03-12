@@ -1,7 +1,8 @@
 package comp3350.flashcard.logic;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.FlashcardPersistence;
 
@@ -215,8 +216,12 @@ public class FlashcardManager {
      */
     public List<Flashcard> getFlashcardsByMode(int deckId, FilterMode mode) {
         List<Flashcard> allCards = getFlashcardsByDeck(deckId);
-        if (allCards == null || mode == FilterMode.ALL) {
-            return allCards != null ? allCards : new ArrayList<>();
+        if (allCards == null) {
+            return null;
+        }
+
+        if (mode == FilterMode.ALL) {
+            return allCards;
         }
 
         List<Flashcard> results = new ArrayList<>();
