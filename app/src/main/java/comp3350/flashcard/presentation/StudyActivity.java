@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -137,7 +139,7 @@ public class StudyActivity extends AppCompatActivity {
     }
 
     /**
-     * Starts the study session using settings passed in.
+     * Starts the study session.
      */
     private void startSession() {
         int deckId = getIntent().getIntExtra("DECK_ID", -1);
@@ -160,7 +162,9 @@ public class StudyActivity extends AppCompatActivity {
             resetCardToFront();
             updateUI();
         } else {
-            finish(); // Exit if no cards to study
+            String message = studySession.isDeckEmpty(deckId) ? "Add some cards first!" : "No cards match this filter";
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 

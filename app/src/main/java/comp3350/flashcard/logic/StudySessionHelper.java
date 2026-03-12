@@ -1,5 +1,7 @@
 package comp3350.flashcard.logic;
 
+import comp3350.flashcard.application.Services;
+
 /**
  * Helper class for StudySessionManager to handle internal logic and formatting.
  */
@@ -22,4 +24,5 @@ public class StudySessionHelper {
     public static boolean isFinished(int currentIndex, int totalCards) {
         return totalCards == 0 || currentIndex >= totalCards;
     }
+
 }

@@ -3,6 +3,8 @@ package comp3350.flashcard.logic;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import comp3350.flashcard.application.Services;
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.FlashcardPersistence;
 
@@ -110,6 +112,10 @@ public class StudySessionManager implements IStudySession {
         Flashcard current = getCurrentCard();
         return current != null && current.getIsKnown();
     }
+    @Override
+    public boolean isDeckEmpty (int deckId){
+        return deckId != -1 && Services.getFlashcardManager().getFlashcardCount(deckId) == 0;
+    }
 
     public Flashcard getCurrentCard() {
         if (currentIndex >= 0 && currentIndex < sessionCards.size()) {
@@ -117,6 +123,7 @@ public class StudySessionManager implements IStudySession {
         }
         return null;
     }
+
 
     // Helper methods for unit tests
     public int getPosition() {

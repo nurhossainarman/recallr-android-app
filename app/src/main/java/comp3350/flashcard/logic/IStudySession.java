@@ -63,4 +63,6 @@ public interface IStudySession {
      * @return true if the current card is known
      */
     boolean isCurrentCardKnown();
+
+    boolean isDeckEmpty (int deckId);
 }
