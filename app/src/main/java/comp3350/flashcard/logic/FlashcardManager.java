@@ -32,7 +32,7 @@ public class FlashcardManager {
             return null;
         }
 
-        if (deckId <= 0) {
+        if (!isValidDeckId(deckId)) {
             return null;
         }
 
@@ -46,7 +46,7 @@ public class FlashcardManager {
      * @return the flashcard object, or null if not found
      */
     public Flashcard getFlashcard(int flashcardId) {
-        if (flashcardId <= 0) {
+        if (!isValidFlashcardId(flashcardId)) {
             return null;
         }
         return flashcardPersistence.getFlashcardById(flashcardId);
@@ -60,6 +60,10 @@ public class FlashcardManager {
      * @return true if update successful, false otherwise
      */
     public boolean updateFlashcard(int flashcardId, String front, String back) {
+        if (!isValidFlashcardId(flashcardId)) {
+            return false;
+        }
+
         if (!validateFlashcard(front, back)) {
             return false;
         }
@@ -79,7 +83,7 @@ public class FlashcardManager {
      * @return true if deletion successful, false otherwise
      */
     public boolean deleteFlashcard(int flashcardId) {
-        if (flashcardId <= 0) {
+        if (!isValidFlashcardId(flashcardId)) {
             return false;
         }
         return flashcardPersistence.deleteFlashcard(flashcardId);
@@ -91,7 +95,7 @@ public class FlashcardManager {
      * @return list of flashcards in the deck
      */
     public List<Flashcard> getFlashcardsByDeck(int deckId) {
-        if (deckId < 0) {
+        if (!isValidDeckId(deckId)) {
             return null;
         }
         return flashcardPersistence.getFlashcardsByDeckId(deckId);
@@ -119,6 +123,14 @@ public class FlashcardManager {
             return false;
         }
         return true;
+    }
+
+    private boolean isValidFlashcardId(int flashcardId) {
+        return flashcardId > 0;
+    }
+
+    private boolean isValidDeckId(int deckId) {
+        return deckId >= 0;
     }
 
     /**
@@ -167,7 +179,7 @@ public class FlashcardManager {
      * @return number of flashcards in the deck
      */
     public int getFlashcardCount(int deckId) {
-        if (deckId < 0) {
+        if (!isValidDeckId(deckId)) {
             return 0;
         }
         return flashcardPersistence.getFlashcardCountByDeckId(deckId);
@@ -179,7 +191,7 @@ public class FlashcardManager {
      * @return number of flashcards deleted
      */
     public int deleteFlashcardsByDeck(int deckId) {
-        if (deckId < 0) {
+        if (!isValidDeckId(deckId)) {
             return 0;
         }
         return flashcardPersistence.deleteFlashcardsByDeckId(deckId);
@@ -191,7 +203,7 @@ public class FlashcardManager {
      * @return the number of known cards, or -1 if unsuccessful
      */
     public int getKnownAmount(int deckId) {
-        if (deckId < 0) {
+        if (!isValidDeckId(deckId)) {
             return -1;
         }
 
@@ -221,7 +233,7 @@ public class FlashcardManager {
      */
     public List <Flashcard> filterByIsKnown(int deckId, boolean markedAsKnown) {
         List<Flashcard> results = new ArrayList<>();
-        if (deckId < 0) {
+        if (!isValidDeckId(deckId)) {
             return results;
         }
 
