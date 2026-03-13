@@ -112,9 +112,6 @@ public class Deck implements Serializable {
     }
 
     public void setDescription(String description) {
-        if (description != null && description.length() > 500) {
-            throw new IllegalArgumentException("Deck description cannot exceed 500 characters");
-        }
         this.description = description != null ? description.trim() : "";
     }
 

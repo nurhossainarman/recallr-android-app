@@ -65,11 +65,6 @@ public class DeckTest {
         assertEquals(100, newDeck.getName().length());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testSetDescription_TooLong_ThrowsException() {
-        String longDescription = new String(new char[501]).replace('\0', 'A');
-        new Deck("Deck", longDescription);
-    }
 
     @Test
     public void testSetDescription_Null_BecomesEmptyString() {
