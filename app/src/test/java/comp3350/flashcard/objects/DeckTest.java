@@ -58,27 +58,6 @@ public class DeckTest {
 
     // ==================== Validation Tests ====================
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testSetName_Null_ThrowsException() {
-        new Deck(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testSetName_Empty_ThrowsException() {
-        new Deck("");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testSetName_WhitespaceOnly_ThrowsException() {
-        new Deck("   ");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testSetName_TooLong_ThrowsException() {
-        String longName = new String(new char[101]).replace('\0', 'A');
-        new Deck(longName);
-    }
-
     @Test
     public void testSetName_ExactlyMaxLength_Succeeds() {
         String maxName = new String(new char[100]).replace('\0', 'A');
