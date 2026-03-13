@@ -179,9 +179,11 @@ app/src/main/java/comp3350/flashcard/
 │       └── FlashcardPersistenceSQLite.java
 │
 ├── logic/                          # Business logic layer
-│   ├── IStudySession.java          # Interface for study session state/navigation
+│   ├── DeckValidationException.java
+│   ├── FilterMode.java             # Enums for logic
+│   ├── IStudySession.java          # Interface for study session 
 │   ├── DeckManager.java
-│   ├── FlashcardManager.java
+│   ├── FlashcardManager.java       
 │   └── StudySessionManager.java    # Implements IStudySession (shuffle, filter, flip)
 │
 └── presentation/                   # UI layer (Android Activities)
