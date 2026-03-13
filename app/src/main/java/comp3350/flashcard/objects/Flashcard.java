@@ -8,17 +8,17 @@ import java.util.Objects;
  * Flashcards belong to a specific deck identified by deckId.
  */
 public class Flashcard implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private int id;
     private String front;
     private String back;
     private int deckId;
     private long createdAt;
     private boolean isKnown;
-    
-    // Future fields need to be implemented for Iteration 2 and more
+
+    // Future fields need to be implemented for Iteration 3 and more
     // private int timesReviewed;
     // private long lastReviewedAt;
     // private int repetitionInterval;
@@ -121,7 +121,7 @@ public class Flashcard implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public void setIsKnown( boolean isKnown) {
+    public void setIsKnown(boolean isKnown) {
         this.isKnown = isKnown;
     }
 
@@ -149,8 +149,10 @@ public class Flashcard implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Flashcard flashcard = (Flashcard) o;
         return id == flashcard.id;
     }

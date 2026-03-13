@@ -8,20 +8,20 @@ import java.util.Objects;
  * Each deck has a unique name and contains zero or more flashcards.
  */
 public class Deck implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private int id;
     private String name;
     private String description;
     private long createdAt;
     private long lastStudiedAt;
-    
+
     // These are computed fields, not stored directly
     // Will be populated by the logic layer when needed
     private transient int cardCount;
-    
-    // Future fields for Iteration 2 and more 
+
+    // Future fields for Iteration 3 and more
     // private int knownCardCount;
     // private int studySessionCount;
     // private long totalStudyTime;
@@ -180,8 +180,10 @@ public class Deck implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Deck deck = (Deck) o;
         return id == deck.id;
     }
