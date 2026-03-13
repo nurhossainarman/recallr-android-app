@@ -76,21 +76,21 @@ public class FlashcardManager {
     }
 
     /**
-     * Deletes a card from the system.
-     * @param flashcardId the ID of the card to remove
-     * @return true if deleted successfully
+     * Deletes a flashcard
+     * @param flashcardId the ID of the flashcard to delete
+     * @return true if deletion successful, false otherwise
      */
     public boolean deleteFlashcard(int flashcardId) {
-        if (flashcardId <= 0) {
+        if (!isValidFlashcardId(flashcardId)) {
             return false;
         }
         return flashcardPersistence.deleteFlashcard(flashcardId);
     }
 
     /**
-     * Gets all cards in a specific deck.
-     * @param deckId the deck's ID
-     * @return a list of cards
+     * Gets all flashcards in a specific deck
+     * @param deckId the ID of the deck
+     * @return list of flashcards in the deck
      */
     public List<Flashcard> getFlashcardsByDeck(int deckId) {
         if (deckId < 0) {
@@ -100,18 +100,18 @@ public class FlashcardManager {
     }
 
     /**
-     * Gets every flashcard across all decks.
-     * @return a list of all cards
+     * Gets all flashcards across all decks
+     * @return list of all flashcards
      */
     public List<Flashcard> getAllFlashcards() {
         return flashcardPersistence.getAllFlashcards();
     }
 
     /**
-     * Checks if card text is valid (not empty).
-     * @param front the front text
-     * @param back the back text
-     * @return true if valid
+     * Validates flashcard data
+     * @param front the front side text
+     * @param back the back side text
+     * @return true if valid, false otherwise
      */
     public boolean validateFlashcard(String front, String back) {
         if (front == null || front.trim().isEmpty()) {
@@ -121,6 +121,14 @@ public class FlashcardManager {
             return false;
         }
         return true;
+    }
+
+    private boolean isValidFlashcardId(int flashcardId) {
+        return flashcardId > 0;
+    }
+
+    private boolean isValidDeckId(int deckId) {
+        return deckId >= 0;
     }
 
     /**
@@ -136,8 +144,10 @@ public class FlashcardManager {
 
         List<Flashcard> flashcards;
         if (deckId < 0) {
+            // Search all flashcards
             flashcards = flashcardPersistence.getAllFlashcards();
         } else {
+            // Search within specific deck
             flashcards = flashcardPersistence.getFlashcardsByDeckId(deckId);
         }
 
@@ -145,6 +155,7 @@ public class FlashcardManager {
             return null;
         }
 
+        // Filter flashcards that contain the keyword (case-insensitive)
         String lowerKeyword = keyword.toLowerCase().trim();
         List<Flashcard> results = new ArrayList<>();
 
@@ -161,36 +172,36 @@ public class FlashcardManager {
     }
 
     /**
-     * Counts how many cards are in a deck.
-     * @param deckId the ID of the deck
-     * @return the number of cards
+     * Gets the count of flashcards in a specific deck
+     * @param deckId the deck ID
+     * @return number of flashcards in the deck
      */
     public int getFlashcardCount(int deckId) {
-        if (deckId < 0) {
+        if (!isValidDeckId(deckId)) {
             return 0;
         }
         return flashcardPersistence.getFlashcardCountByDeckId(deckId);
     }
 
     /**
-     * Deletes every card inside a deck.
-     * @param deckId the ID of the deck
-     * @return the number of cards deleted
+     * Deletes all flashcards in a specific deck
+     * @param deckId the deck ID
+     * @return number of flashcards deleted
      */
     public int deleteFlashcardsByDeck(int deckId) {
-        if (deckId < 0) {
+        if (!isValidDeckId(deckId)) {
             return 0;
         }
         return flashcardPersistence.deleteFlashcardsByDeckId(deckId);
     }
 
     /**
-     * Counts how many cards are marked as known in a deck.
+     * Returns the number of cards marked as known in a deck
      * @param deckId the ID of the deck
-     * @return the count of known cards
+     * @return the number of known cards, or -1 if unsuccessful
      */
     public int getKnownAmount(int deckId) {
-        if (deckId < 0) {
+        if (!isValidDeckId(deckId)) {
             return -1;
         }
 
@@ -225,6 +236,9 @@ public class FlashcardManager {
         }
 
         List<Flashcard> results = new ArrayList<>();
+        if (!isValidDeckId(deckId)) {
+            return results;
+        }
         boolean wantKnown = (mode == FilterMode.KNOWN);
 
         for (Flashcard card : allCards) {

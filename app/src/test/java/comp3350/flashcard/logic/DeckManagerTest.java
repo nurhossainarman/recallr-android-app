@@ -5,6 +5,7 @@ import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import comp3350.flashcard.logic.DeckValidationException;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.DeckPersistence;
@@ -75,31 +76,23 @@ public class DeckManagerTest {
     }
 
     @Test
-    public void createDeck_invalidName_returnsNull() {
-        // Test with null name
-        assertNull(deckManager.createDeck(null, "Description"));
-
-        // Test with empty name
-        assertNull(deckManager.createDeck("", "Description"));
-
-        // Test with whitespace-only name
-        assertNull(deckManager.createDeck("   ", "Description"));
+    public void createDeck_invalidName_throwsException() {
+        assertThrows(DeckValidationException.class, () -> deckManager.createDeck(null, "Description"));
+        assertThrows(DeckValidationException.class, () -> deckManager.createDeck("", "Description"));
+        assertThrows(DeckValidationException.class, () -> deckManager.createDeck("   ", "Description"));
     }
 
     @Test
-    public void createDeck_duplicateName_returnsNull() {
+    public void createDeck_duplicateName_throwsException() {
         createDeck("Unique Deck", "First deck");
 
-        // Try to create deck with same name
-        Deck duplicateDeck = deckManager.createDeck("Unique Deck", "Duplicate deck");
-        assertNull("Deck with duplicate name should not be created", duplicateDeck);
+        assertThrows(DeckValidationException.class, () -> deckManager.createDeck("Unique Deck", "Duplicate deck"));
     }
 
     @Test
-    public void createDeck_nameTooLong_returnsNull() {
-        // Create a name longer than 100 characters
+    public void createDeck_nameTooLong_throwsException() {
         String longName = "a".repeat(101);
-        assertNull(deckManager.createDeck(longName, "Description"));
+        assertThrows(DeckValidationException.class, () -> deckManager.createDeck(longName, "Description"));
 
         // Test with exactly 100 characters (should be valid)
         String validLongName = "a".repeat(100);
@@ -165,18 +158,17 @@ public class DeckManagerTest {
     }
 
     @Test
-    public void updateDeck_invalidData_fails() {
+    public void updateDeck_invalidData_throwsException() {
         Deck deck = createDeck("Valid Deck", "Description");
+        int id = deck.getId();
 
-        assertFalse(deckManager.updateDeck(deck.getId(), null, "Description"));
-        assertFalse(deckManager.updateDeck(deck.getId(), "", "Description"));
-        assertFalse(deckManager.updateDeck(deck.getId(), "   ", "Description"));
-
-        String tooLong = "a".repeat(101);
-        assertFalse(deckManager.updateDeck(deck.getId(), tooLong, "Description"));
+        assertThrows(DeckValidationException.class, () -> deckManager.updateDeck(id, null, "Description"));
+        assertThrows(DeckValidationException.class, () -> deckManager.updateDeck(id, "", "Description"));
+        assertThrows(DeckValidationException.class, () -> deckManager.updateDeck(id, "   ", "Description"));
+        assertThrows(DeckValidationException.class, () -> deckManager.updateDeck(id, "a".repeat(101), "Description"));
 
         // Verify original deck is unchanged
-        Deck retrieved = deckManager.getDeck(deck.getId());
+        Deck retrieved = deckManager.getDeck(id);
         assertEquals("Valid Deck", retrieved.getName());
     }
 
@@ -249,40 +241,39 @@ public class DeckManagerTest {
     // ---------------- validateDeck ----------------
 
     @Test
-    public void validateDeck_valid_passes() {
-        assertTrue(deckManager.validateDeck("Valid Deck"));
-        assertTrue(deckManager.validateDeck("Valid Deck Name"));
-        assertTrue(deckManager.validateDeck("a".repeat(100))); // Max length
-        assertTrue(deckManager.validateDeck("Deck-123!")); // Special chars
+    public void validateDeck_valid_doesNotThrow() {
+        deckManager.validateDeck("Valid Deck");
+        deckManager.validateDeck("Valid Deck Name");
+        deckManager.validateDeck("a".repeat(100)); // Max length
+        deckManager.validateDeck("Deck-123!"); // Special chars
     }
 
     @Test
-    public void validateDeck_invalid_fails() {
-        assertFalse(deckManager.validateDeck(null));
-        assertFalse(deckManager.validateDeck(""));
-        assertFalse(deckManager.validateDeck("   "));
-        assertFalse(deckManager.validateDeck("a".repeat(101))); // Too long
+    public void validateDeck_invalid_throwsException() {
+        assertThrows(DeckValidationException.class, () -> deckManager.validateDeck(null));
+        assertThrows(DeckValidationException.class, () -> deckManager.validateDeck(""));
+        assertThrows(DeckValidationException.class, () -> deckManager.validateDeck("   "));
+        assertThrows(DeckValidationException.class, () -> deckManager.validateDeck("a".repeat(101)));
     }
 
     // ---------------- validateDeckNameUnique ----------------
 
     @Test
-    public void validateDeckNameUnique_newDeck_checksUniqueness() {
+    public void validateDeckNameUnique_newDeck_throwsOnDuplicate() {
         createDeck("Existing Deck", "Description");
 
-        // Existing name should not be unique for new deck (-1 excludeId)
-        assertFalse(deckManager.validateDeckNameUnique("Existing Deck", -1));
+        assertThrows(DeckValidationException.class, () -> deckManager.validateDeckNameUnique("Existing Deck", -1));
 
-        // New name should be unique
-        assertTrue(deckManager.validateDeckNameUnique("New Unique Deck", -1));
+        // New unique name should not throw
+        deckManager.validateDeckNameUnique("New Unique Deck", -1);
     }
 
     @Test
     public void validateDeckNameUnique_updateDeck_allowsSameName() {
         Deck existing = createDeck("Existing Deck", "Description");
 
-        // Same name should be valid when updating same deck
-        assertTrue(deckManager.validateDeckNameUnique("Existing Deck", existing.getId()));
+        // Same name for the same deck should not throw
+        deckManager.validateDeckNameUnique("Existing Deck", existing.getId());
     }
 
     @Test
@@ -290,15 +281,7 @@ public class DeckManagerTest {
         Deck deck1 = createDeck("Existing Deck", "Description");
         createDeck("Another Deck", "Description");
 
-        // Cannot update deck1 to another deck's name
-        assertFalse(deckManager.validateDeckNameUnique("Another Deck", deck1.getId()));
-    }
-
-    @Test
-    public void validateDeckNameUnique_invalidInput_fails() {
-        assertFalse(deckManager.validateDeckNameUnique(null, -1));
-        assertFalse(deckManager.validateDeckNameUnique("", -1));
-        assertFalse(deckManager.validateDeckNameUnique("   ", -1));
+        assertThrows(DeckValidationException.class, () -> deckManager.validateDeckNameUnique("Another Deck", deck1.getId()));
     }
 
     // ---------------- getFlashcardCount ----------------

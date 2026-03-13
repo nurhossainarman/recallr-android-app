@@ -9,6 +9,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
 import comp3350.flashcard.logic.DeckManager;
+import comp3350.flashcard.logic.DeckValidationException;
 import comp3350.flashcard.objects.Deck;
 
 /**
@@ -78,28 +79,21 @@ public class EditDeckActivity extends AppCompatActivity {
      */
     private void handleSave() {
         String name = inputDeckName.getText().toString().trim();
-        boolean success;
 
-        if (deckId == -1) {
-            // Manager handles validation
-            success = deckManager.createDeck(name, "") != null;
-            if (success) {
-                printToast(R.string.deck_added_prompt);
+        try {
+            if (deckId == -1) {
+                if (deckManager.createDeck(name, "") != null) {
+                    printToast(R.string.deck_added_prompt);
+                    finish();
+                }
+            } else {
+                if (deckManager.updateDeck(deckId, name, "")) {
+                    printToast(R.string.deck_updated_prompt);
+                    finish();
+                }
             }
-        } else {
-            // Manager handles validation
-            success = deckManager.updateDeck(deckId, name, "");
-            if (success) {
-                printToast(R.string.deck_updated_prompt);
-            }
-        }
-
-        if (success) {
-            finish();
-        }
-        else {
-
-            printToast(R.string.invalid_deck_name); 
+        } catch (DeckValidationException e) {
+            printToast(e.getMessage());
         }
     }
 
@@ -108,5 +102,9 @@ public class EditDeckActivity extends AppCompatActivity {
      */
     private void printToast(int stringId) {
         Toast.makeText(this, getString(stringId), Toast.LENGTH_SHORT).show();
+    }
+
+    private void printToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

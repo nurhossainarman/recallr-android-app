@@ -27,13 +27,8 @@ public class DeckManager {
      * @return the created deck, or null if creation failed
      */
     public Deck createDeck(String name, String description) {
-        if (!validateDeck(name)) {
-            return null;
-        }
-
-        if (!validateDeckNameUnique(name, -1)) {
-            return null;
-        }
+        validateDeck(name);
+        validateDeckNameUnique(name, -1);
 
         Deck newDeck = new Deck(name, description);
         return deckPersistence.insertDeck(newDeck);
@@ -69,10 +64,13 @@ public class DeckManager {
      * @return true if update successful, false otherwise
      */
     public boolean updateDeck(int deckId, String name, String description) {
-        if (!validateDeck(name) || !deckExists(deckId) ||
-                !validateDeckNameUnique(name, deckId)) {
+        validateDeck(name);
+
+        if (!deckExists(deckId)) {
             return false;
         }
+
+        validateDeckNameUnique(name, deckId);
 
         Deck existingDeck = deckPersistence.getDeckById(deckId);
         if (existingDeck == null) {
@@ -115,33 +113,25 @@ public class DeckManager {
      * @param name the deck name
      * @return true if valid, false otherwise
      */
-    public boolean validateDeck(String name) {
+    public void validateDeck(String name) {
         if (name == null || name.trim().isEmpty()) {
-            return false;
+            throw new DeckValidationException("Deck name cannot be empty");
         }
-
-        // You can add additional validation rules here
-        // For example: maximum length, allowed characters, etc.
         if (name.trim().length() > 100) {
-            return false;
+            throw new DeckValidationException("Deck name cannot exceed 100 characters");
         }
-
-        return true;
     }
 
     /**
      * Validates that a deck name is unique
      * @param name the deck name to check
      * @param excludeDeckId deck ID to exclude from check (for updates), or -1 for new decks
-     * @return true if name is unique, false if it already exists
+     * @throws DeckValidationException if the name is already taken
      */
-    public boolean validateDeckNameUnique(String name, int excludeDeckId) {
-        if (name == null || name.trim().isEmpty()) {
-            return false;
+    public void validateDeckNameUnique(String name, int excludeDeckId) {
+        if (deckPersistence.deckNameExists(name, excludeDeckId)) {
+            throw new DeckValidationException("A deck with this name already exists");
         }
-
-        // Returns true if name is unique (i.e., does NOT exist)
-        return !deckPersistence.deckNameExists(name, excludeDeckId);
     }
 
     /**

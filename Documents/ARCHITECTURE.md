@@ -13,6 +13,7 @@ flowchart TB
         DeckDetailActivity["DeckDetailActivity"]
         EditDeckActivity["EditDeckActivity"]
         EditCardActivity["EditCardActivity"]
+        StudyActivity["StudyActivity"]
         Adapter["Adapter"]
     end
 
@@ -24,13 +25,28 @@ flowchart TB
         + updateDeck()
         + deleteDeck()
         + getFlashcardCount()"]
-        
+
         FlashcardManager["FlashcardManager
         ─────────────────
         + createFlashcard()
         + getFlashcardsByDeck()
         + updateFlashcard()
         + deleteFlashcard()"]
+
+        IStudySession[/"«interface»
+        IStudySession"/]
+
+        StudySessionManager["StudySessionManager
+        ────────────────────
+        + startSession()
+        + nextCard()
+        + previousCard()
+        + flip()
+        + setKnown()
+        + getCurrentText()
+        + getProgressText()
+        + isFinished()
+        + hasCards()"]
     end
 
     subgraph Data["DATA LAYER (Persistence)"]
@@ -71,11 +87,16 @@ flowchart TB
     DeckDetailActivity --> FlashcardManager
     EditDeckActivity --> DeckManager
     EditCardActivity --> FlashcardManager
+    StudyActivity --> IStudySession
 
     %% Logic to Data
     DeckManager --> DeckPersistence
     DeckManager --> FlashcardPersistence
     FlashcardManager --> FlashcardPersistence
+    StudySessionManager --> FlashcardPersistence
+
+    %% Interface to Implementation (Logic)
+    IStudySession -.-> StudySessionManager
 
     %% Interface to Implementation
     DeckPersistence -.-> DeckPersistenceStub
@@ -95,25 +116,39 @@ classDiagram
     class Deck {
         -int id
         -String name
-        -Date createdAt
+        -String description
+        -long createdAt
+        -long lastStudiedAt
         +getId() int
         +getName() String
         +setName(String)
-        +getCreatedAt() Date
+        +getDescription() String
+        +setDescription(String)
+        +getCreatedAt() long
+        +getLastStudiedAt() long
+        +setLastStudiedAt(long)
+        +markAsStudied()
+        +hasCards() boolean
+        +hasBeenStudied() boolean
     }
-    
+
     class Flashcard {
         -int id
-        -String frontText
-        -String backText
+        -String front
+        -String back
         -int deckId
-        -Date createdAt
+        -long createdAt
+        -boolean isKnown
         +getId() int
-        +getFrontText() String
-        +getBackText() String
+        +getFront() String
+        +getBack() String
         +getDeckId() int
-        +setFrontText(String)
-        +setBackText(String)
+        +getCreatedAt() long
+        +getIsKnown() boolean
+        +setFront(String)
+        +setBack(String)
+        +setIsKnown(boolean)
+        +isPersisted() boolean
     }
     
     Deck "1" -- "*" Flashcard : contains
@@ -144,16 +179,18 @@ app/src/main/java/comp3350/flashcard/
 │       └── FlashcardPersistenceSQLite.java
 │
 ├── logic/                          # Business logic layer
+│   ├── IStudySession.java          # Interface for study session state/navigation
 │   ├── DeckManager.java
 │   ├── FlashcardManager.java
-│   └── StudySessionManager.java
+│   └── StudySessionManager.java    # Implements IStudySession (shuffle, filter, flip)
 │
 └── presentation/                   # UI layer (Android Activities)
     ├── MainActivity.java
     ├── DeckDetailActivity.java
     ├── EditDeckActivity.java
     ├── EditCardActivity.java
-    └──  Adapter.java
+    ├── StudyActivity.java           # Flashcard study UI (swipe, flip, known/unknown)
+    └── Adapter.java
 
 app/src/test/java/comp3350/flashcard/
 ├── objects/                        # Domain object tests
@@ -163,7 +200,7 @@ app/src/test/java/comp3350/flashcard/
 └── logic/                          # Logic layer tests
     ├── DeckManagerTest.java
     ├── FlashcardManagerTest.java
-    └── StudySessionManagerTest.java
+    └── StudySessionManagerTest.java # Tests shuffle, filter modes, flip, setKnown
 
 app/src/androidTest/java/comp3350/flashcard/
 └── persistence/                    # Integration tests

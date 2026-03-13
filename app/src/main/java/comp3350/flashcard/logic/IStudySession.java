@@ -14,6 +14,14 @@ public interface IStudySession {
     void startSession(int deckId, boolean shuffle, FilterMode filterMode);
 
     /**
+     * Checks if a session can be started and returns an error message if not.
+     * @param deckId the ID of the deck to check
+     * @param filterMode the filter to apply
+     * @return null if the session can start, or a specific error message (e.g., "Deck is empty")
+     */
+    String getStartupMessage(int deckId, FilterMode filterMode);
+
+    /**
      * Moves to the next card in the session.
      */
     void nextCard();
@@ -64,5 +72,10 @@ public interface IStudySession {
      */
     boolean isCurrentCardKnown();
 
-    boolean isDeckEmpty (int deckId);
+    /**
+     * Checks if the deck has no cards at all.
+     * @param deckId the ID of the deck
+     * @return true if empty
+     */
+    boolean isDeckEmpty(int deckId);
 }

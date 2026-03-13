@@ -50,6 +50,20 @@ public class StudySessionManager implements IStudySession {
         }
         showingFront = true;
     }
+
+    @Override
+    public String getStartupMessage(int deckId, FilterMode filterMode) {
+        if (isDeckEmpty(deckId)) {
+            return "Add some cards first!";
+        }
+        
+        List<Flashcard> filteredCards = flashcardManager.getFlashcardsByMode(deckId, filterMode);
+        if (filteredCards == null || filteredCards.isEmpty()) {
+            return "No cards match this filter";
+        }
+        
+        return null; // No error
+    }
     
     @Override
     public void nextCard() {
@@ -112,6 +126,7 @@ public class StudySessionManager implements IStudySession {
         Flashcard current = getCurrentCard();
         return current != null && current.getIsKnown();
     }
+
     @Override
     public boolean isDeckEmpty (int deckId){
         return deckId != -1 && Services.getFlashcardManager().getFlashcardCount(deckId) == 0;
@@ -123,7 +138,6 @@ public class StudySessionManager implements IStudySession {
         }
         return null;
     }
-
 
     // Helper methods for unit tests
     public int getPosition() {
