@@ -17,6 +17,8 @@ See our architecture [here](/Documents/ARCHITECTURE.md).
 
 * [Iteration-2](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/milestones/2#tab-issues)
 
+* [Iteration-3](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/milestones/3#tab-issues)
+
 
 
 ## Features
