@@ -25,6 +25,7 @@ public class FlashcardTest {
         long after = System.currentTimeMillis();
 
         assertTrue(card.getCreatedAt() >= before && card.getCreatedAt() <= after);
+        assertFalse(card.getIsKnown());
     }
 
     @Test
@@ -34,6 +35,7 @@ public class FlashcardTest {
         assertEquals("Front", card.getFront());
         assertEquals("Back", card.getBack());
         assertEquals(5, card.getDeckId());
+        assertFalse(card.getIsKnown());
     }
 
     @Test
@@ -46,6 +48,7 @@ public class FlashcardTest {
         assertEquals("A", card.getBack());
         assertEquals(3, card.getDeckId());
         assertEquals(timestamp, card.getCreatedAt());
+        assertFalse(card.getIsKnown());
     }
 
     // ==================== Validation Tests ====================
@@ -114,6 +117,20 @@ public class FlashcardTest {
         assertEquals(10, flashcard.getDeckId());
     }
 
+    @Test
+    public void testSetCreatedAt_UpdatesCreatedAt() {
+        flashcard.setCreatedAt(100000);
+        assertEquals(100000, flashcard.getCreatedAt());
+    }
+
+    @Test
+    public void testSetIsKnown_UpdatesIsKnown() {
+        flashcard.setIsKnown(true);
+        assertTrue(flashcard.getIsKnown());
+        flashcard.setIsKnown(false);
+        assertFalse(flashcard.getIsKnown());
+    }
+
     // ==================== Utility Method Tests ====================
 
     @Test
@@ -176,6 +193,11 @@ public class FlashcardTest {
         assertEquals(card1.hashCode(), card2.hashCode());
     }
 
+    @Test
+    public void testEquals_SameObject_ReturnsTrue() {
+        assertEquals(flashcard, flashcard);
+    }
+
     // ==================== toString Tests ====================
 
     @Test
@@ -187,5 +209,6 @@ public class FlashcardTest {
         assertTrue(result.contains("front='What is 2+2?'"));
         assertTrue(result.contains("back='4'"));
         assertTrue(result.contains("deckId=1"));
+        assertTrue(result.contains("isKnown=false"));
     }
 }

@@ -83,21 +83,28 @@ public class EditCardActivity extends AppCompatActivity {
     private void handleSave() {
         String front = inputCardFront.getText().toString().trim();
         String back = inputCardBack.getText().toString().trim();
+        boolean success;
 
-        // Manager validates input
-        if (!flashcardManager.validateFlashcard(front, back)) {
-            printToast(R.string.invalid_input_prompt);
-            return;
-        }
-        // Manager creates the card
         if (cardId == -1) {
-            flashcardManager.createFlashcard(front, back, deckId);
-            printToast(R.string.card_added_prompt);
+            // Manager handles validation and creation internally
+            success = flashcardManager.createFlashcard(front, back, deckId) != null;
+            if (success) {
+                printToast(R.string.card_added_prompt);
+            }
         } else {
-            flashcardManager.updateFlashcard(cardId, front, back);
-            printToast(R.string.card_updated_prompt);
+            // Manager handles validation and update internally
+            success = flashcardManager.updateFlashcard(cardId, front, back);
+            if (success) {
+                printToast(R.string.card_updated_prompt);
+            }
         }
-        finish(); // Go back to the deck screen
+
+        if (success) {
+            finish();
+        } else {
+            // If failed, we know it's a validation issue based on Manager logic
+            printToast(R.string.invalid_input_prompt);
+        }
     }
 
     /**

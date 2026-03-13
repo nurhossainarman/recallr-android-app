@@ -9,6 +9,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
 import comp3350.flashcard.logic.DeckManager;
+import comp3350.flashcard.logic.DeckValidationException;
 import comp3350.flashcard.objects.Deck;
 
 /**
@@ -37,9 +38,9 @@ public class EditDeckActivity extends AppCompatActivity {
      * Finds the input boxes and buttons on the screen.
      */
     private void initUI() {
-        inputDeckName = findViewById(R.id.inputDeckName); //Find input field for deck name
-        Button btnSaveDeck = findViewById(R.id.btnSaveDeck); //Find save button
-        Toolbar toolbar = findViewById(R.id.toolbar); //Find toolbar(containing deck name)
+        inputDeckName = findViewById(R.id.inputDeckName);
+        Button btnSaveDeck = findViewById(R.id.btnSaveDeck);
+        Toolbar toolbar = findViewById(R.id.toolbar);
 
         // If intent returns a deck ID, we are editing an existing deck
         // Otherwise, we are creating a new deck (deckId == -1)
@@ -78,26 +79,22 @@ public class EditDeckActivity extends AppCompatActivity {
      */
     private void handleSave() {
         String name = inputDeckName.getText().toString().trim();
-        
-        // Manager validates name
-        if (!deckManager.validateDeck(name)) {
-            printToast(R.string.invalid_deck_name);
-            return;
+
+        try {
+            if (deckId == -1) {
+                if (deckManager.createDeck(name, "") != null) {
+                    printToast(R.string.deck_added_prompt);
+                    finish();
+                }
+            } else {
+                if (deckManager.updateDeck(deckId, name, "")) {
+                    printToast(R.string.deck_updated_prompt);
+                    finish();
+                }
+            }
+        } catch (DeckValidationException e) {
+            printToast(e.getMessage());
         }
-        // Manager validates name is unique
-        if (!deckManager.validateDeckNameUnique(name, deckId)) {
-            printToast(R.string.deck_name_taken);
-            return;
-        }
-        // Manager creates the deck
-        if (deckId == -1) {
-            deckManager.createDeck(name, ""); //For simplicity of UI, no description in this iteration.
-            printToast(R.string.deck_added_prompt);
-        } else {
-            deckManager.updateDeck(deckId, name, ""); //For simplicity if UI, no description in this iteration.
-            printToast(R.string.deck_updated_prompt);
-        }
-        finish(); // Go back to the previous screen
     }
 
     /**
@@ -105,5 +102,9 @@ public class EditDeckActivity extends AppCompatActivity {
      */
     private void printToast(int stringId) {
         Toast.makeText(this, getString(stringId), Toast.LENGTH_SHORT).show();
+    }
+
+    private void printToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

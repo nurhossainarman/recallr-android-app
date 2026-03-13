@@ -3,6 +3,8 @@ package comp3350.flashcard.application;
 import android.content.Context;
 import comp3350.flashcard.logic.FlashcardManager;
 import comp3350.flashcard.logic.DeckManager;
+import comp3350.flashcard.logic.IStudySession;
+import comp3350.flashcard.logic.StudySessionManager;
 import comp3350.flashcard.persistence.FlashcardPersistence;
 import comp3350.flashcard.persistence.DeckPersistence;
 import comp3350.flashcard.persistence.sqlite.DeckPersistenceSQLite;
@@ -17,6 +19,7 @@ import comp3350.flashcard.persistence.stubs.FlashcardPersistenceStub;
 public class Services {
     private static FlashcardManager flashcardManager;
     private static DeckManager deckManager;
+    private static IStudySession studySession;
     private static FlashcardPersistence flashcardPersistence;
     private static DeckPersistence deckPersistence;
     private static Context appContext;
@@ -61,16 +64,25 @@ public class Services {
         return deckManager;
     }
 
+    public static IStudySession getStudySession() {
+        if (studySession == null) {
+            studySession = new StudySessionManager(getFlashcardPersistence());
+        }
+        return studySession;
+    }
+
     public static void initialize(DeckPersistence deckPersist, FlashcardPersistence flashcardPersist) {
         deckPersistence = deckPersist;
         flashcardPersistence = flashcardPersist;
         deckManager = new DeckManager(deckPersist, flashcardPersist);
         flashcardManager = new FlashcardManager(flashcardPersist);
+        studySession = new StudySessionManager(flashcardPersist);
     }
 
     public static void cleanup() {
         flashcardManager = null;
         deckManager = null;
+        studySession = null;
         flashcardPersistence = null;
         deckPersistence = null;
     }

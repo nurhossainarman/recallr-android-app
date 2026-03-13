@@ -38,6 +38,11 @@
             android:exported="false"
             android:label="@string/edit_card" />
 
+        <activity
+            android:name=".presentation.StudyActivity"
+            android:exported="false"
+            android:label="@string/study" />
+
 
     </application>
 

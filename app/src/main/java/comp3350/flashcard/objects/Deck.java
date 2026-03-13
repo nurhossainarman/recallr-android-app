@@ -108,13 +108,7 @@ public class Deck implements Serializable {
     }
 
     public void setName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Deck name cannot be null or empty");
-        }
-        if (name.trim().length() > 100) {
-            throw new IllegalArgumentException("Deck name cannot exceed 100 characters");
-        }
-        this.name = name.trim();
+        this.name = (name != null) ? name.trim() : "";
     }
 
     public void setDescription(String description) {

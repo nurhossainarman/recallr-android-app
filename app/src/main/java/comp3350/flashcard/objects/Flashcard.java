@@ -16,9 +16,9 @@ public class Flashcard implements Serializable {
     private String back;
     private int deckId;
     private long createdAt;
+    private boolean isKnown;
     
     // Future fields need to be implemented for Iteration 2 and more
-    // private boolean isKnown;
     // private int timesReviewed;
     // private long lastReviewedAt;
     // private int repetitionInterval;
@@ -44,6 +44,7 @@ public class Flashcard implements Serializable {
         setFront(front);
         setBack(back);
         setDeckId(deckId);
+        setIsKnown(false);
     }
 
     /**
@@ -85,6 +86,10 @@ public class Flashcard implements Serializable {
         return createdAt;
     }
 
+    public boolean getIsKnown() {
+        return isKnown;
+    }
+
     // ==================== Setters ====================
 
     public void setId(int id) {
@@ -114,6 +119,10 @@ public class Flashcard implements Serializable {
 
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public void setIsKnown( boolean isKnown) {
+        this.isKnown = isKnown;
     }
 
     // ==================== Utility Methods ====================
@@ -159,6 +168,7 @@ public class Flashcard implements Serializable {
                 ", back='" + back + '\'' +
                 ", deckId=" + deckId +
                 ", createdAt=" + createdAt +
+                ", isKnown=" + isKnown +
                 '}';
     }
 }

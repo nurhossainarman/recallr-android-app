@@ -40,6 +40,7 @@ public class FlashcardManagerTest {
         assertEquals("A programming language", c.getBack());
         assertEquals(1, c.getDeckId());
         assertTrue(c.getId() > 0);
+        assertFalse(c.getIsKnown());
     }
 
     @Test
@@ -78,6 +79,7 @@ public class FlashcardManagerTest {
         assertEquals("Capital of France?", fetched.getFront());
         assertEquals("Paris", fetched.getBack());
         assertEquals(1, fetched.getDeckId());
+        assertFalse(fetched.getIsKnown());
     }
 
     @Test
@@ -96,6 +98,7 @@ public class FlashcardManagerTest {
     @Test
     public void updateFlashcard_valid_updatesContent() {
         Flashcard created = create("Old Q", "Old A", 1);
+        created.setIsKnown(true);
 
         assertTrue(manager.updateFlashcard(created.getId(), "New Q", "New A"));
 
@@ -292,5 +295,50 @@ public class FlashcardManagerTest {
 
         assertEquals(0, manager.deleteFlashcardsByDeck(999));
         assertEquals(0, manager.deleteFlashcardsByDeck(-1));
+    }
+
+    // ---------------- getKnownAmount ----------------
+    @Test
+    public void getKnownAmount_countsPerDeck() {
+        create("Q1", "A1", 1).setIsKnown(true);
+        create("Q2", "A2", 1).setIsKnown(true);
+        create("Q3", "A3", 1);
+        create("Q4", "A4", 2);
+
+        assertEquals(2, manager.getKnownAmount(1));
+        assertEquals(0, manager.getKnownAmount(2));
+        assertEquals(0, manager.getKnownAmount(999));
+        assertEquals(-1, manager.getKnownAmount(-1));
+    }
+
+    // ---------------- getFlashcardsByMode ----------------
+    @Test
+    public void getFlashcardsByMode_listsPerDeck() {
+        Flashcard ca = create("Q1", "A1", 1);
+        ca.setIsKnown(true);
+        Flashcard cb = create("Q2", "A2", 1);
+        cb.setIsKnown(true);
+        Flashcard cc = create("Q3", "A3", 1);
+        Flashcard cd = create("Q4", "A4", 2);
+
+        // ALL mode
+        assertEquals(3, manager.getFlashcardsByMode(1, FilterMode.ALL).size());
+
+        // KNOWN mode
+        assertEquals(2, manager.getFlashcardsByMode(1, FilterMode.KNOWN).size());
+        
+        // UNKNOWN mode
+        assertEquals(1, manager.getFlashcardsByMode(1, FilterMode.UNKNOWN).size());
+        assertEquals(cc, manager.getFlashcardsByMode(1, FilterMode.UNKNOWN).get(0));
+
+        // Other deck
+        assertEquals(1, manager.getFlashcardsByMode(2, FilterMode.UNKNOWN).size());
+        assertEquals(cd, manager.getFlashcardsByMode(2, FilterMode.UNKNOWN).get(0));
+
+        // Invalid Inputs
+        assertNotNull(manager.getFlashcardsByMode(999, FilterMode.ALL));
+        assertEquals(0, manager.getFlashcardsByMode(999, FilterMode.ALL).size());
+
+        assertNull(manager.getFlashcardsByMode(-1, FilterMode.ALL));
     }
 }
