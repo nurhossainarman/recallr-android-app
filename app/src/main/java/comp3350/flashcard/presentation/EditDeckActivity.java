@@ -8,7 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
-import comp3350.flashcard.logic.DeckManager;
+import comp3350.flashcard.logic.IDeckManager;
 import comp3350.flashcard.logic.DeckValidationException;
 import comp3350.flashcard.objects.Deck;
 
@@ -20,7 +20,7 @@ import comp3350.flashcard.objects.Deck;
 public class EditDeckActivity extends AppCompatActivity {
 
     private TextInputEditText inputDeckName;
-    private DeckManager deckManager;
+    private IDeckManager deckManager;
     private int deckId = -1;
 
     @Override

@@ -3,6 +3,8 @@ package comp3350.flashcard.application;
 import android.content.Context;
 import comp3350.flashcard.logic.FlashcardManager;
 import comp3350.flashcard.logic.DeckManager;
+import comp3350.flashcard.logic.IDeckManager;
+import comp3350.flashcard.logic.IFlashcardManager;
 import comp3350.flashcard.logic.IStudySession;
 import comp3350.flashcard.logic.StudySessionManager;
 import comp3350.flashcard.persistence.FlashcardPersistence;
@@ -17,8 +19,8 @@ import comp3350.flashcard.persistence.stubs.FlashcardPersistenceStub;
  * Implements a simple service locator pattern for dependency management
  */
 public class Services {
-    private static FlashcardManager flashcardManager;
-    private static DeckManager deckManager;
+    private static IFlashcardManager flashcardManager;
+    private static IDeckManager deckManager;
     private static IStudySession studySession;
     private static FlashcardPersistence flashcardPersistence;
     private static DeckPersistence deckPersistence;
@@ -50,14 +52,14 @@ public class Services {
         return deckPersistence;
     }
 
-    public static FlashcardManager getFlashcardManager() {
+    public static IFlashcardManager getFlashcardManager() {
         if (flashcardManager == null) {
             flashcardManager = new FlashcardManager(getFlashcardPersistence());
         }
         return flashcardManager;
     }
 
-    public static DeckManager getDeckManager() {
+    public static IDeckManager getDeckManager() {
         if (deckManager == null) {
             deckManager = new DeckManager(getDeckPersistence(), getFlashcardPersistence());
         }
