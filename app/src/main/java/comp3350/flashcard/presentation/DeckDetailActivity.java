@@ -13,9 +13,9 @@ import com.google.android.material.chip.ChipGroup;
 import java.util.List;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
-import comp3350.flashcard.logic.DeckManager;
+import comp3350.flashcard.logic.IDeckManager;
 import comp3350.flashcard.logic.FilterMode;
-import comp3350.flashcard.logic.FlashcardManager;
+import comp3350.flashcard.logic.IFlashcardManager;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.objects.Flashcard;
 
@@ -26,8 +26,8 @@ public class DeckDetailActivity extends AppCompatActivity {
 
     private RecyclerView rvCards;
     private Adapter adapter;
-    private DeckManager deckManager;
-    private FlashcardManager flashcardManager;
+    private IDeckManager deckManager;
+    private IFlashcardManager flashcardManager;
     private int deckId = -1;
     private Toolbar toolbar;
     private CheckBox cbShuffle;

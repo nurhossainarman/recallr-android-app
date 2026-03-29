@@ -1,11 +1,13 @@
 package comp3350.flashcard.logic;
 
 import java.util.List;
+import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.persistence.DeckPersistence;
 import comp3350.flashcard.persistence.FlashcardPersistence;
+import comp3350.flashcard.utils.StringUtils;
 
-public class DeckManager {
+public class DeckManager implements IDeckManager {
 
     private final DeckPersistence deckPersistence;
     private final FlashcardPersistence flashcardPersistence;
@@ -28,7 +30,7 @@ public class DeckManager {
      */
     public Deck createDeck(String name, String description) {
         validateDeck(name);
-        validateDeckNameUnique(name, -1);
+        validateDeckNameUnique(name, ValidationConstants.INVALID_ID);
 
         Deck newDeck = new Deck(name, description);
         return deckPersistence.insertDeck(newDeck);
@@ -49,7 +51,7 @@ public class DeckManager {
      * @return the deck object, or null if not found
      */
     public Deck getDeckByName(String name) {
-        if (name == null || name.trim().isEmpty()) {
+        if (StringUtils.isNullOrEmpty(name)) {
             return null;
         }
 
@@ -114,18 +116,19 @@ public class DeckManager {
      * @return true if valid, false otherwise
      */
     public void validateDeck(String name) {
-        if (name == null || name.trim().isEmpty()) {
+        if (StringUtils.isNullOrEmpty(name)) {
             throw new DeckValidationException("Deck name cannot be empty");
         }
-        if (name.trim().length() > 100) {
-            throw new DeckValidationException("Deck name cannot exceed 100 characters");
+        if (StringUtils.exceedsLength(name, ValidationConstants.MAX_DECK_NAME_LENGTH)) {
+            throw new DeckValidationException("Deck name cannot exceed " +
+                ValidationConstants.MAX_DECK_NAME_LENGTH + " characters");
         }
     }
 
     /**
      * Validates that a deck name is unique
      * @param name the deck name to check
-     * @param excludeDeckId deck ID to exclude from check (for updates), or -1 for new decks
+     * @param excludeDeckId deck ID to exclude from check (for updates), or ValidationConstants.INVALID_ID for new decks
      * @throws DeckValidationException if the name is already taken
      */
     public void validateDeckNameUnique(String name, int excludeDeckId) {

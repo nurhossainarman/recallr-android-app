@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
+import comp3350.flashcard.constants.DatabaseConstants;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.persistence.DeckPersistence;
 import comp3350.flashcard.persistence.PersistenceException;
@@ -26,10 +27,10 @@ public class DeckPersistenceSQLite implements DeckPersistence {
         try {
             db = dbHelper.getReadableDatabase();
             cursor = db.query(
-                    DatabaseHelper.TABLE_DECKS,
+                    DatabaseConstants.TABLE_DECKS,
                     null,
                     null, null, null, null,
-                    DatabaseHelper.DECK_CREATED_AT + " DESC"
+                    DatabaseConstants.DECK_CREATED_AT + " DESC"
             );
 
             while (cursor.moveToNext()) {
@@ -53,9 +54,9 @@ public class DeckPersistenceSQLite implements DeckPersistence {
         try {
             db = dbHelper.getReadableDatabase();
             cursor = db.query(
-                    DatabaseHelper.TABLE_DECKS,
+                    DatabaseConstants.TABLE_DECKS,
                     null,
-                    DatabaseHelper.DECK_ID + " = ?",
+                    DatabaseConstants.DECK_ID + " = ?",
                     new String[]{String.valueOf(deckId)},
                     null, null, null
             );
@@ -82,9 +83,9 @@ public class DeckPersistenceSQLite implements DeckPersistence {
         try {
             db = dbHelper.getReadableDatabase();
             cursor = db.query(
-                    DatabaseHelper.TABLE_DECKS,
+                    DatabaseConstants.TABLE_DECKS,
                     null,
-                    "LOWER(" + DatabaseHelper.DECK_NAME + ") = LOWER(?)",
+                    "LOWER(" + DatabaseConstants.DECK_NAME + ") = LOWER(?)",
                     new String[]{name.trim()},
                     null, null, null
             );
@@ -108,12 +109,12 @@ public class DeckPersistenceSQLite implements DeckPersistence {
         try {
             db = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
-            values.put(DatabaseHelper.DECK_NAME, deck.getName());
-            values.put(DatabaseHelper.DECK_DESCRIPTION, deck.getDescription());
-            values.put(DatabaseHelper.DECK_CREATED_AT, System.currentTimeMillis());
-            values.put(DatabaseHelper.DECK_LAST_STUDIED_AT, 0);
+            values.put(DatabaseConstants.DECK_NAME, deck.getName());
+            values.put(DatabaseConstants.DECK_DESCRIPTION, deck.getDescription());
+            values.put(DatabaseConstants.DECK_CREATED_AT, System.currentTimeMillis());
+            values.put(DatabaseConstants.DECK_LAST_STUDIED_AT, 0);
 
-            long id = db.insert(DatabaseHelper.TABLE_DECKS, null, values);
+            long id = db.insert(DatabaseConstants.TABLE_DECKS, null, values);
 
             if (id == -1) {
                 throw new PersistenceException("Failed to insert deck");
@@ -134,14 +135,14 @@ public class DeckPersistenceSQLite implements DeckPersistence {
         try {
             db = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
-            values.put(DatabaseHelper.DECK_NAME, deck.getName());
-            values.put(DatabaseHelper.DECK_DESCRIPTION, deck.getDescription());
-            values.put(DatabaseHelper.DECK_LAST_STUDIED_AT, deck.getLastStudiedAt());
+            values.put(DatabaseConstants.DECK_NAME, deck.getName());
+            values.put(DatabaseConstants.DECK_DESCRIPTION, deck.getDescription());
+            values.put(DatabaseConstants.DECK_LAST_STUDIED_AT, deck.getLastStudiedAt());
 
             int rows = db.update(
-                    DatabaseHelper.TABLE_DECKS,
+                    DatabaseConstants.TABLE_DECKS,
                     values,
-                    DatabaseHelper.DECK_ID + " = ?",
+                    DatabaseConstants.DECK_ID + " = ?",
                     new String[]{String.valueOf(deck.getId())}
             );
 
@@ -160,8 +161,8 @@ public class DeckPersistenceSQLite implements DeckPersistence {
         try {
             db = dbHelper.getWritableDatabase();
             int rows = db.delete(
-                    DatabaseHelper.TABLE_DECKS,
-                    DatabaseHelper.DECK_ID + " = ?",
+                    DatabaseConstants.TABLE_DECKS,
+                    DatabaseConstants.DECK_ID + " = ?",
                     new String[]{String.valueOf(deckId)}
             );
 
@@ -181,7 +182,7 @@ public class DeckPersistenceSQLite implements DeckPersistence {
         try {
             db = dbHelper.getReadableDatabase();
             cursor = db.rawQuery(
-                    "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_DECKS,
+                    "SELECT COUNT(*) FROM " + DatabaseConstants.TABLE_DECKS,
                     null
             );
 
@@ -212,10 +213,10 @@ public class DeckPersistenceSQLite implements DeckPersistence {
         try {
             db = dbHelper.getReadableDatabase();
             cursor = db.query(
-                    DatabaseHelper.TABLE_DECKS,
-                    new String[]{DatabaseHelper.DECK_ID},
-                    "LOWER(" + DatabaseHelper.DECK_NAME + ") = LOWER(?) AND " +
-                            DatabaseHelper.DECK_ID + " != ?",
+                    DatabaseConstants.TABLE_DECKS,
+                    new String[]{DatabaseConstants.DECK_ID},
+                    "LOWER(" + DatabaseConstants.DECK_NAME + ") = LOWER(?) AND " +
+                            DatabaseConstants.DECK_ID + " != ?",
                     new String[]{name.trim(), String.valueOf(excludeId)},
                     null, null, null
             );
@@ -235,7 +236,7 @@ public class DeckPersistenceSQLite implements DeckPersistence {
 
         try {
             db = dbHelper.getWritableDatabase();
-            db.delete(DatabaseHelper.TABLE_DECKS, null, null);
+            db.delete(DatabaseConstants.TABLE_DECKS, null, null);
         } catch (Exception e) {
             throw new PersistenceException("Error clearing all decks", e);
         } finally {
@@ -244,11 +245,11 @@ public class DeckPersistenceSQLite implements DeckPersistence {
     }
 
     private Deck deckFromCursor(Cursor cursor) {
-        int id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.DECK_ID));
-        String name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.DECK_NAME));
-        String description = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.DECK_DESCRIPTION));
-        long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.DECK_CREATED_AT));
-        long lastStudiedAt = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.DECK_LAST_STUDIED_AT));
+        int id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.DECK_ID));
+        String name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.DECK_NAME));
+        String description = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.DECK_DESCRIPTION));
+        long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.DECK_CREATED_AT));
+        long lastStudiedAt = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.DECK_LAST_STUDIED_AT));
 
         return new Deck(id, name, description, createdAt, lastStudiedAt);
     }
