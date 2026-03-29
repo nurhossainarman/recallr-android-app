@@ -8,7 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
-import comp3350.flashcard.logic.FlashcardManager;
+import comp3350.flashcard.logic.IFlashcardManager;
 import comp3350.flashcard.objects.Flashcard;
 
 /**
@@ -18,7 +18,7 @@ public class EditCardActivity extends AppCompatActivity {
 
     private TextInputEditText inputCardFront;
     private TextInputEditText inputCardBack;
-    private FlashcardManager flashcardManager;
+    private IFlashcardManager flashcardManager;
     private int deckId = -1;
     private int cardId = -1;
 

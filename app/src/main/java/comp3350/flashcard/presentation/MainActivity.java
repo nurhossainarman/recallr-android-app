@@ -10,7 +10,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
-import comp3350.flashcard.logic.DeckManager;
+import comp3350.flashcard.logic.IDeckManager;
 import comp3350.flashcard.objects.Deck;
 
 /**
@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView rvDecks;
     private Adapter adapter;
-    private DeckManager deckManager;
+    private IDeckManager deckManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

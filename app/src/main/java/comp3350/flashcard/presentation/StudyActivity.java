@@ -20,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
+import comp3350.flashcard.constants.UIConstants;
+import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.FilterMode;
 import comp3350.flashcard.logic.IStudySession;
 
@@ -27,9 +29,6 @@ import comp3350.flashcard.logic.IStudySession;
  * Screen for studying flashcards in a session.
  */
 public class StudyActivity extends AppCompatActivity {
-
-    private static final int SWIPE_THRESHOLD = 100;
-    private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
     private TextView tvProgress;
     private TextView tvContent;
@@ -92,8 +91,8 @@ public class StudyActivity extends AppCompatActivity {
                         float deltaY = e2.getY() - e1.getY();
 
                         if (Math.abs(deltaX) > Math.abs(deltaY)
-                                && Math.abs(deltaX) > SWIPE_THRESHOLD
-                                && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                                && Math.abs(deltaX) > UIConstants.SWIPE_THRESHOLD
+                                && Math.abs(velocityX) > UIConstants.SWIPE_VELOCITY_THRESHOLD) {
                             if (deltaX < 0) {
                                 goToNextCard(); // Swipe left for next
                             } else {
@@ -142,7 +141,7 @@ public class StudyActivity extends AppCompatActivity {
      * Starts the study session.
      */
     private void startSession() {
-        int deckId = getIntent().getIntExtra("DECK_ID", -1);
+        int deckId = getIntent().getIntExtra("DECK_ID", ValidationConstants.INVALID_ID);
         boolean shuffle = getIntent().getBooleanExtra("SHUFFLE", false);
         String filterModeStr = getIntent().getStringExtra("FILTER_MODE");
         FilterMode filterMode = FilterMode.ALL;

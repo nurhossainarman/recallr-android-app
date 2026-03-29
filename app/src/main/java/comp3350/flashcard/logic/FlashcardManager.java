@@ -5,12 +5,13 @@ import java.util.List;
 
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.FlashcardPersistence;
+import comp3350.flashcard.utils.StringUtils;
 
 /**
  * Handles operations related to individual flashcards.
  * Manages creating, retrieving, updating, and searching cards.
  */
-public class FlashcardManager {
+public class FlashcardManager implements IFlashcardManager {
 
     private final FlashcardPersistence flashcardPersistence;
 
@@ -114,10 +115,10 @@ public class FlashcardManager {
      * @return true if valid, false otherwise
      */
     public boolean validateFlashcard(String front, String back) {
-        if (front == null || front.trim().isEmpty()) {
+        if (StringUtils.isNullOrEmpty(front)) {
             return false;
         }
-        if (back == null || back.trim().isEmpty()) {
+        if (StringUtils.isNullOrEmpty(back)) {
             return false;
         }
         return true;
@@ -138,7 +139,7 @@ public class FlashcardManager {
      * @return a list of matching cards
      */
     public List<Flashcard> searchFlashcards(String keyword, int deckId) {
-        if (keyword == null || keyword.trim().isEmpty()) {
+        if (StringUtils.isNullOrEmpty(keyword)) {
             return null;
         }
 
