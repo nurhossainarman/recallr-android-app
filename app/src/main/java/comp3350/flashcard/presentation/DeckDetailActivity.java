@@ -2,6 +2,7 @@ package comp3350.flashcard.presentation;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,6 +14,7 @@ import com.google.android.material.chip.ChipGroup;
 import java.util.List;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
+import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.IDeckManager;
 import comp3350.flashcard.logic.FilterMode;
 import comp3350.flashcard.logic.IFlashcardManager;
@@ -25,10 +27,10 @@ import comp3350.flashcard.objects.Flashcard;
 public class DeckDetailActivity extends AppCompatActivity {
 
     private RecyclerView rvCards;
-    private Adapter adapter;
+    private Adapter<Flashcard> adapter;
     private IDeckManager deckManager;
     private IFlashcardManager flashcardManager;
-    private int deckId = -1;
+    private int deckId = ValidationConstants.INVALID_ID;
     private Toolbar toolbar;
     private CheckBox cbShuffle;
     private ChipGroup rgFilter;
@@ -57,19 +59,27 @@ public class DeckDetailActivity extends AppCompatActivity {
         cbShuffle = findViewById(R.id.cbShuffle);
         rgFilter = findViewById(R.id.rgFilter);
 
-        deckId = getIntent().getIntExtra("DECK_ID", -1);
+        deckId = getIntent().getIntExtra("DECK_ID", ValidationConstants.INVALID_ID);
         setupDeckInfo();
 
-        findViewById(R.id.fabAddCard).setOnClickListener(v -> navigateToEditCard(-1));
+        findViewById(R.id.fabAddCard).setOnClickListener(v -> navigateToEditCard(ValidationConstants.INVALID_ID));
         findViewById(R.id.btnStudy).setOnClickListener(v -> startStudySession());
+
+        // Initialize adapter once
+        adapter = new Adapter<>(null, R.layout.item_card, this::bindCardItem);
+        rvCards.setAdapter(adapter);
 
         loadCards();
     }
 
     private void setupDeckInfo() {
-        Deck deck = deckManager.getDeck(deckId);
-        if (deck != null) {
-            toolbar.setTitle(deck.getName());
+        try {
+            Deck deck = deckManager.getDeck(deckId);
+            if (deck != null) {
+                toolbar.setTitle(deck.getName());
+            }
+        } catch (Exception e) {
+            printToast(e.getMessage());
         }
     }
 
@@ -86,54 +96,58 @@ public class DeckDetailActivity extends AppCompatActivity {
     }
 
     private void loadCards() {
-        List<Flashcard> cards = flashcardManager.getFlashcardsByDeck(deckId);
-        
-        if (adapter == null) {
-            // Setup the generic adapter for Flashcards
-            adapter = new Adapter(cards, R.layout.item_card, (view, item) -> {
-                Flashcard card = (Flashcard) item;
-                ((TextView) view.findViewById(R.id.tvCardFront)).setText(card.getFront());
-                ((TextView) view.findViewById(R.id.tvCardBack)).setText(card.getBack());
-
-                view.findViewById(R.id.btnEditCard).setOnClickListener(v -> navigateToEditCard(card.getId()));
-                view.findViewById(R.id.btnDeleteCard).setOnClickListener(v -> {
-                    flashcardManager.deleteFlashcard(card.getId());
-                    loadCards();
-                });
-            });
-            rvCards.setAdapter(adapter);
-        } else {
+        try {
+            List<Flashcard> cards = flashcardManager.getFlashcardsByDeck(deckId);
             adapter.updateItems(cards);
+        } catch (Exception e) {
+            printToast(e.getMessage());
         }
+    }
+
+    private void bindCardItem(View view, Flashcard card) {
+        ((TextView) view.findViewById(R.id.tvCardFront)).setText(card.getFront());
+        ((TextView) view.findViewById(R.id.tvCardBack)).setText(card.getBack());
+
+        view.findViewById(R.id.btnEditCard).setOnClickListener(v -> navigateToEditCard(card.getId()));
+        view.findViewById(R.id.btnDeleteCard).setOnClickListener(v -> {
+            try {
+                flashcardManager.deleteFlashcard(card.getId());
+                loadCards();
+            } catch (Exception e) {
+                printToast(e.getMessage());
+            }
+        });
     }
 
     private void navigateToEditCard(int cardId) {
         Intent intent = new Intent(this, EditCardActivity.class).putExtra("DECK_ID", deckId);
-        if (cardId != -1) intent.putExtra("CARD_ID", cardId);
+        if (cardId != ValidationConstants.INVALID_ID) intent.putExtra("CARD_ID", cardId);
         startActivity(intent);
     }
 
     /**
-     * Starts the study session by delegating the check for card existence to the logic layer.
+     * Starts the study session. Logic layer handles validation of card existence.
      */
     private void startStudySession() {
-        if (deckManager.getFlashcardCount(deckId) > 0) {
-            FilterMode filterMode = FilterMode.ALL;
-            int checkedId = rgFilter.getCheckedChipId();
-            
-            if (checkedId == R.id.rbKnown) {
-                filterMode = FilterMode.KNOWN;
-            } else if (checkedId == R.id.rbUnknown) {
-                filterMode = FilterMode.UNKNOWN;
-            }
+        FilterMode filterMode = FilterMode.ALL;
+        int checkedId = rgFilter.getCheckedChipId();
 
-            Intent intent = new Intent(this, StudyActivity.class);
-            intent.putExtra("DECK_ID", deckId);
-            intent.putExtra("SHUFFLE", cbShuffle.isChecked());
-            intent.putExtra("FILTER_MODE", filterMode.name());
-            startActivity(intent);
-        } else {
-            Toast.makeText(this, "Add some cards first!", Toast.LENGTH_SHORT).show();
+        if (checkedId == R.id.rbKnown) {
+            filterMode = FilterMode.KNOWN;
+        } else if (checkedId == R.id.rbUnknown) {
+            filterMode = FilterMode.UNKNOWN;
+        }
+
+        Intent intent = new Intent(this, StudyActivity.class);
+        intent.putExtra("DECK_ID", deckId);
+        intent.putExtra("SHUFFLE", cbShuffle.isChecked());
+        intent.putExtra("FILTER_MODE", filterMode.name());
+        startActivity(intent);
+    }
+
+    private void printToast(String message) {
+        if (message != null && !message.isEmpty()) {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         }
     }
 }
