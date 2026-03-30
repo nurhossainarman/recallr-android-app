@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
+import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.IDeckManager;
 import comp3350.flashcard.logic.DeckValidationException;
 import comp3350.flashcard.objects.Deck;
@@ -21,14 +22,13 @@ public class EditDeckActivity extends AppCompatActivity {
 
     private TextInputEditText inputDeckName;
     private IDeckManager deckManager;
-    private int deckId = -1;
+    private int deckId = ValidationConstants.INVALID_ID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_deck);
 
-        // Get the deck manager for logic/business using helper(Services)
         deckManager = Services.getDeckManager();
         initUI();
     }
@@ -43,13 +43,11 @@ public class EditDeckActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
 
         // If intent returns a deck ID, we are editing an existing deck
-        // Otherwise, we are creating a new deck (deckId == -1)
-        this.deckId = getIntent().getIntExtra("DECK_ID", -1);
+        // Otherwise, we are creating a new deck
+        this.deckId = getIntent().getIntExtra("DECK_ID", ValidationConstants.INVALID_ID);
 
-        //Setup the mode of screen (adding or editing)
         setupMode(toolbar, btnSaveDeck);
 
-        // Save name when the button is clicked
         btnSaveDeck.setOnClickListener(v -> handleSave());
     }
 
@@ -59,7 +57,7 @@ public class EditDeckActivity extends AppCompatActivity {
      * @param  saveButton The save button object
      */
     private void setupMode(Toolbar toolbar, Button saveButton) {
-        if (this.deckId != -1) {
+        if (this.deckId != ValidationConstants.INVALID_ID) {
             // Intent returns a valid id, that means we are editing an existing deck
             Deck deck = deckManager.getDeck(deckId);
             if (deck != null) {
@@ -68,27 +66,27 @@ public class EditDeckActivity extends AppCompatActivity {
                 saveButton.setText(R.string.save_deck);
             }
         } else {
-            // Intent returns -1, that means we are creating a new deck
+            // Intent returns INVALID_ID, that means we are creating a new deck
             toolbar.setTitle(R.string.create_deck);
             saveButton.setText(R.string.create_deck);
         }
     }
 
     /**
-     * Checks if the name is valid and saves the deck.
+     * Saves the deck using the logic layer, which handles validation.
      */
     private void handleSave() {
         String name = inputDeckName.getText().toString().trim();
 
         try {
-            if (deckId == -1) {
+            if (deckId == ValidationConstants.INVALID_ID) {
                 if (deckManager.createDeck(name, "") != null) {
-                    printToast(R.string.deck_added_prompt);
+                    printToast(getString(R.string.deck_added_prompt));
                     finish();
                 }
             } else {
                 if (deckManager.updateDeck(deckId, name, "")) {
-                    printToast(R.string.deck_updated_prompt);
+                    printToast(getString(R.string.deck_updated_prompt));
                     finish();
                 }
             }
@@ -100,10 +98,6 @@ public class EditDeckActivity extends AppCompatActivity {
     /**
      * Shows a quick message at the bottom of the screen.
      */
-    private void printToast(int stringId) {
-        Toast.makeText(this, getString(stringId), Toast.LENGTH_SHORT).show();
-    }
-
     private void printToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
