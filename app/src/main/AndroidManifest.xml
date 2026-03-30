@@ -15,7 +15,7 @@
         android:theme="@style/Theme.Recallr">
 
         <activity
-            android:name=".presentation.MainActivity"
+            android:name=".presentation.deck.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,22 +24,22 @@
         </activity>
 
         <activity
-            android:name=".presentation.DeckDetailActivity"
+            android:name=".presentation.deck.DeckDetailActivity"
             android:exported="false"
             android:label="@string/deck_detail" />
 
         <activity
-            android:name=".presentation.EditDeckActivity"
+            android:name=".presentation.deck.EditDeckActivity"
             android:exported="false"
             android:label="@string/edit_deck" />
 
         <activity
-            android:name=".presentation.EditCardActivity"
+            android:name=".presentation.card.EditCardActivity"
             android:exported="false"
             android:label="@string/edit_card" />
 
         <activity
-            android:name=".presentation.StudyActivity"
+            android:name=".presentation.study.StudyActivity"
             android:exported="false"
             android:label="@string/study" />
 

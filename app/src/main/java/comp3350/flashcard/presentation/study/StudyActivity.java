@@ -1,4 +1,4 @@
-package comp3350.flashcard.presentation;
+package comp3350.flashcard.presentation.study;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
@@ -24,6 +24,7 @@ import comp3350.flashcard.constants.UIConstants;
 import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.FilterMode;
 import comp3350.flashcard.logic.IStudySession;
+import comp3350.flashcard.presentation.StudyGestureListener;
 
 /**
  * Screen for studying flashcards in a session.

@@ -1,4 +1,4 @@
-package comp3350.flashcard.presentation;
+package comp3350.flashcard.presentation.deck;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
 import comp3350.flashcard.logic.IDeckManager;
 import comp3350.flashcard.objects.Deck;
+import comp3350.flashcard.presentation.Adapter;
 import comp3350.flashcard.presentation.viewmodel.DeckViewModel;
 
 /**

@@ -1,4 +1,4 @@
-package comp3350.flashcard.presentation;
+package comp3350.flashcard.presentation.card;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -52,6 +52,7 @@ public class EditCardActivity extends AppCompatActivity {
         // Setup the mode of screen (adding or editing)
         setupMode(toolbar, btnSaveCard);
 
+        // Save the card when the button is clicked
         btnSaveCard.setOnClickListener(v -> handleSave());
     }
 
@@ -87,11 +88,13 @@ public class EditCardActivity extends AppCompatActivity {
 
         try {
             if (this.cardId == ValidationConstants.INVALID_ID) {
+                // Manager handles validation and creation internally
                 if (flashcardManager.createFlashcard(front, back, deckId) != null) {
                     printToast(getString(R.string.card_added_prompt));
                     finish();
                 }
             } else {
+                // Manager handles validation and update internally
                 if (flashcardManager.updateFlashcard(cardId, front, back)) {
                     printToast(getString(R.string.card_updated_prompt));
                     finish();

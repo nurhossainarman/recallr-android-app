@@ -1,4 +1,4 @@
-package comp3350.flashcard.presentation;
+package comp3350.flashcard.presentation.deck;
 
 import android.os.Bundle;
 import android.widget.Button;

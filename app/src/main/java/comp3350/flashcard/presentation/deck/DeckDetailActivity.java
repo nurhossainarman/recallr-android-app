@@ -1,4 +1,4 @@
-package comp3350.flashcard.presentation;
+package comp3350.flashcard.presentation.deck;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +20,9 @@ import comp3350.flashcard.logic.FilterMode;
 import comp3350.flashcard.logic.IFlashcardManager;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.objects.Flashcard;
+import comp3350.flashcard.presentation.Adapter;
+import comp3350.flashcard.presentation.card.EditCardActivity;
+import comp3350.flashcard.presentation.study.StudyActivity;
 
 /**
  * DeckDetailActivity - Displays all cards inside a specific deck.
