@@ -44,7 +44,10 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton btnAddDeck = findViewById(R.id.btnAddDeck);
         btnAddDeck.setOnClickListener(v -> startActivity(new Intent(this, EditDeckActivity.class)));
 
-        setupAdapter();
+        // Initialize adapter once with an empty list and the binder method
+        adapter = new Adapter<>(new ArrayList<>(), R.layout.item_deck, this::bindDeckItem);
+        rvDecks.setAdapter(adapter);
+
         loadDecks();
     }
 
@@ -54,16 +57,7 @@ public class MainActivity extends AppCompatActivity {
         loadDecks();
     }
 
-    private void setupAdapter() {
-        adapter = new Adapter<>(new ArrayList<>(), R.layout.item_deck, this::bindDeckItem);
-        rvDecks.setAdapter(adapter);
-    }
-
     private void loadDecks() {
-        adapter.updateItems(fetchViewModels());
-    }
-
-    private List<DeckViewModel> fetchViewModels() {
         List<Deck> decks = deckManager.getAllDecks();
         List<DeckViewModel> viewModels = new ArrayList<>();
 
@@ -71,11 +65,12 @@ public class MainActivity extends AppCompatActivity {
             int count = deckManager.getFlashcardCount(deck.getId());
             viewModels.add(new DeckViewModel(deck, count));
         }
-        return viewModels;
+
+        adapter.updateItems(viewModels);
     }
 
     /**
-     * Binds a DeckViewModel to its UI representation in the list.
+     * Binds a DeckViewModel to its UI representation.
      */
     private void bindDeckItem(View view, DeckViewModel deckVM) {
         ((TextView) view.findViewById(R.id.tvDeckTitle)).setText(deckVM.getName());
