@@ -1,4 +1,4 @@
-package comp3350.flashcard.logic.validation;
+package comp3350.flashcard.logic.validators;
 
 public class ValidationResult {
 
