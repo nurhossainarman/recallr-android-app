@@ -5,6 +5,9 @@ import org.junit.Test;
 
 import java.util.List;
 
+import comp3350.flashcard.logic.exceptions.FlashcardValidationException;
+import comp3350.flashcard.logic.validators.FlashcardValidator;
+import comp3350.flashcard.logic.validators.IFlashcardValidator;
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.FlashcardPersistence;
 import comp3350.flashcard.persistence.stubs.FlashcardPersistenceStub;
@@ -19,7 +22,8 @@ public class FlashcardManagerTest {
     public void setUp() {
         FlashcardPersistence persistence = new FlashcardPersistenceStub();
         persistence.clearAll();
-        manager = new FlashcardManager(persistence);
+        IFlashcardValidator validator = new FlashcardValidator();
+        manager = new FlashcardManager(persistence, validator);
     }
 
     // ---------------- Helpers ----------------
@@ -44,27 +48,27 @@ public class FlashcardManagerTest {
     }
 
     @Test
-    public void createFlashcard_invalidFront_returnsNull() {
-        assertNull(manager.createFlashcard(null, "A", 1));
-        assertNull(manager.createFlashcard("", "A", 1));
-        assertNull(manager.createFlashcard("   ", "A", 1));
+    public void createFlashcard_invalidFront_throwsException() {
+        assertThrows(FlashcardValidationException.class, () -> manager.createFlashcard(null, "A", 1));
+        assertThrows(FlashcardValidationException.class, () -> manager.createFlashcard("", "A", 1));
+        assertThrows(FlashcardValidationException.class, () -> manager.createFlashcard("   ", "A", 1));
     }
 
     @Test
-    public void createFlashcard_invalidBack_returnsNull() {
-        assertNull(manager.createFlashcard("Q", null, 1));
-        assertNull(manager.createFlashcard("Q", "", 1));
-        assertNull(manager.createFlashcard("Q", "   ", 1));
+    public void createFlashcard_invalidBack_throwsException() {
+        assertThrows(FlashcardValidationException.class, () -> manager.createFlashcard("Q", null, 1));
+        assertThrows(FlashcardValidationException.class, () -> manager.createFlashcard("Q", "", 1));
+        assertThrows(FlashcardValidationException.class, () -> manager.createFlashcard("Q", "   ", 1));
     }
 
     @Test
-    public void createFlashcard_deckIdZero_returnsNull() {
-        assertNull(manager.createFlashcard("Q", "A", 0));
+    public void createFlashcard_deckIdZero_throwsException() {
+        assertThrows(FlashcardValidationException.class, () -> manager.createFlashcard("Q", "A", 0));
     }
 
     @Test
-    public void createFlashcard_negativeDeckId_returnsNull() {
-        assertNull(manager.createFlashcard("Q", "A", -1));
+    public void createFlashcard_negativeDeckId_throwsException() {
+        assertThrows(FlashcardValidationException.class, () -> manager.createFlashcard("Q", "A", -1));
     }
 
     // ---------------- getFlashcard ----------------
@@ -110,13 +114,13 @@ public class FlashcardManagerTest {
     }
 
     @Test
-    public void updateFlashcard_invalidContent_fails() {
+    public void updateFlashcard_invalidContent_throwsException() {
         Flashcard created = create("Q", "A", 1);
 
-        assertFalse(manager.updateFlashcard(created.getId(), null, "A"));
-        assertFalse(manager.updateFlashcard(created.getId(), "Q", ""));
-        assertFalse(manager.updateFlashcard(created.getId(), "   ", "A"));
-        assertFalse(manager.updateFlashcard(created.getId(), "Q", "   "));
+        assertThrows(FlashcardValidationException.class, () -> manager.updateFlashcard(created.getId(), null, "A"));
+        assertThrows(FlashcardValidationException.class, () -> manager.updateFlashcard(created.getId(), "Q", ""));
+        assertThrows(FlashcardValidationException.class, () -> manager.updateFlashcard(created.getId(), "   ", "A"));
+        assertThrows(FlashcardValidationException.class, () -> manager.updateFlashcard(created.getId(), "Q", "   "));
     }
 
     @Test
@@ -196,28 +200,6 @@ public class FlashcardManagerTest {
         List<Flashcard> all = manager.getAllFlashcards();
         assertNotNull(all);
         assertEquals(4, all.size());
-    }
-
-    // ---------------- validateFlashcard ----------------
-
-    @Test
-    public void validateFlashcard_valid_passes() {
-        assertTrue(manager.validateFlashcard("Question", "Answer"));
-        assertTrue(manager.validateFlashcard("  Question  ", "  Answer  "));
-    }
-
-    @Test
-    public void validateFlashcard_invalidFront_fails() {
-        assertFalse(manager.validateFlashcard(null, "A"));
-        assertFalse(manager.validateFlashcard("", "A"));
-        assertFalse(manager.validateFlashcard("   ", "A"));
-    }
-
-    @Test
-    public void validateFlashcard_invalidBack_fails() {
-        assertFalse(manager.validateFlashcard("Q", null));
-        assertFalse(manager.validateFlashcard("Q", ""));
-        assertFalse(manager.validateFlashcard("Q", "   "));
     }
 
     // ---------------- searchFlashcards ----------------
