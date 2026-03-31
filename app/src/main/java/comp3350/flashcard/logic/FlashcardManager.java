@@ -2,7 +2,9 @@ package comp3350.flashcard.logic;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import comp3350.flashcard.logic.exceptions.FlashcardValidationException;
+import comp3350.flashcard.logic.validators.IFlashcardValidator;
+import comp3350.flashcard.logic.validators.ValidationResult;
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.FlashcardPersistence;
 import comp3350.flashcard.utils.StringUtils;
@@ -14,13 +16,16 @@ import comp3350.flashcard.utils.StringUtils;
 public class FlashcardManager implements IFlashcardManager {
 
     private final FlashcardPersistence flashcardPersistence;
+    private final IFlashcardValidator validator;
 
     /**
      * Creates a new flashcard manager.
      * @param flashcardPersistence the storage for flashcards
+     * @param validator the strategy used to validate flashcard data
      */
-    public FlashcardManager(FlashcardPersistence flashcardPersistence) {
+    public FlashcardManager(FlashcardPersistence flashcardPersistence, IFlashcardValidator validator) {
         this.flashcardPersistence = flashcardPersistence;
+        this.validator = validator;
     }
 
     /**
@@ -28,15 +33,17 @@ public class FlashcardManager implements IFlashcardManager {
      * @param front the text on the front side
      * @param back the text on the back side
      * @param deckId the ID of the deck it belongs to
-     * @return the new card, or null if it couldn't be created
+     * @return the new card
+     * @throws FlashcardValidationException if the front or back is blank, or the deck ID is invalid
      */
     public Flashcard createFlashcard(String front, String back, int deckId) {
-        if (!validateFlashcard(front, back)) {
-            return null;
+        ValidationResult result = validator.validate(front, back);
+        if (!result.isValid()) {
+            throw new FlashcardValidationException(result.getErrorMessage());
         }
 
         if (deckId <= 0) {
-            return null;
+            throw new FlashcardValidationException("Deck ID must be a positive integer");
         }
 
         Flashcard flashcard = new Flashcard(front, back, deckId);
@@ -61,10 +68,12 @@ public class FlashcardManager implements IFlashcardManager {
      * @param front the new front text
      * @param back the new back text
      * @return true if updated successfully
+     * @throws FlashcardValidationException if the front or back is blank
      */
     public boolean updateFlashcard(int flashcardId, String front, String back) {
-        if (!validateFlashcard(front, back)) {
-            return false;
+        ValidationResult result = validator.validate(front, back);
+        if (!result.isValid()) {
+            throw new FlashcardValidationException(result.getErrorMessage());
         }
 
         Flashcard existingFlashcard = flashcardPersistence.getFlashcardById(flashcardId);
@@ -106,22 +115,6 @@ public class FlashcardManager implements IFlashcardManager {
      */
     public List<Flashcard> getAllFlashcards() {
         return flashcardPersistence.getAllFlashcards();
-    }
-
-    /**
-     * Validates flashcard data
-     * @param front the front side text
-     * @param back the back side text
-     * @return true if valid, false otherwise
-     */
-    public boolean validateFlashcard(String front, String back) {
-        if (StringUtils.isNullOrEmpty(front)) {
-            return false;
-        }
-        if (StringUtils.isNullOrEmpty(back)) {
-            return false;
-        }
-        return true;
     }
 
     private boolean isValidFlashcardId(int flashcardId) {

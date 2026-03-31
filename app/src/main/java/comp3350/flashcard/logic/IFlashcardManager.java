@@ -16,7 +16,8 @@ public interface IFlashcardManager {
      * @param front the text on the front side
      * @param back the text on the back side
      * @param deckId the ID of the deck it belongs to
-     * @return the new card, or null if it couldn't be created
+     * @return the new card
+     * @throws comp3350.flashcard.logic.exceptions.FlashcardValidationException if the data is invalid
      */
     Flashcard createFlashcard(String front, String back, int deckId);
 
@@ -35,6 +36,7 @@ public interface IFlashcardManager {
      * @param front the new front text
      * @param back the new back text
      * @return true if updated successfully
+     * @throws comp3350.flashcard.logic.exceptions.FlashcardValidationException if the data is invalid
      */
     boolean updateFlashcard(int flashcardId, String front, String back);
 
@@ -60,15 +62,6 @@ public interface IFlashcardManager {
      * @return list of all flashcards
      */
     List<Flashcard> getAllFlashcards();
-
-    /**
-     * Validates flashcard data.
-     *
-     * @param front the front side text
-     * @param back the back side text
-     * @return true if valid, false otherwise
-     */
-    boolean validateFlashcard(String front, String back);
 
     /**
      * Searches for cards containing a specific keyword.
