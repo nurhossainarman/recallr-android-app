@@ -22,7 +22,7 @@ public class StudySessionManager implements IStudySession {
 
     public StudySessionManager(FlashcardPersistence flashcardPersistence) {
         this.flashcardPersistence = flashcardPersistence;
-        this.flashcardManager = new FlashcardManager(flashcardPersistence);
+        this.flashcardManager = (FlashcardManager) Services.getFlashcardManager();
         this.sessionCards = new ArrayList<>();
         this.currentIndex = -1;
         this.showingFront = true;
@@ -37,7 +37,7 @@ public class StudySessionManager implements IStudySession {
     @Override
     public void startSession(int deckId, boolean shuffle, FilterMode filterMode) {
         sessionCards = flashcardManager.getFlashcardsByMode(deckId, filterMode);
-        
+
         if (sessionCards == null || sessionCards.isEmpty()) { // Selected mode has no card
             sessionCards = new ArrayList<>();
             currentIndex = -1;
@@ -56,25 +56,25 @@ public class StudySessionManager implements IStudySession {
         if (isDeckEmpty(deckId)) {
             return "Add some cards first!";
         }
-        
+
         List<Flashcard> filteredCards = flashcardManager.getFlashcardsByMode(deckId, filterMode);
         if (filteredCards == null || filteredCards.isEmpty()) {
             return "No cards match this filter";
         }
-        
+
         return null; // No error
     }
-    
+
     @Override
     public void nextCard() {
         if (currentIndex < sessionCards.size() - 1) {
             currentIndex++;
             showingFront = true;
         } else {
-            currentIndex = sessionCards.size(); 
+            currentIndex = sessionCards.size();
         }
     }
-    
+
     @Override
     public void previousCard() {
         if (currentIndex > 0) {
@@ -82,7 +82,7 @@ public class StudySessionManager implements IStudySession {
             showingFront = true;
         }
     }
-    
+
     @Override
     public void flip() {
         showingFront = !showingFront;
@@ -110,17 +110,17 @@ public class StudySessionManager implements IStudySession {
     public String getProgressText() {
         return StudySessionHelper.formatProgressText(currentIndex, sessionCards.size());
     }
-    
+
     @Override
     public boolean isFinished() {
         return StudySessionHelper.isFinished(currentIndex, sessionCards.size());
     }
-    
+
     @Override
     public boolean hasCards() {
         return !sessionCards.isEmpty() && currentIndex >= 0 && currentIndex < sessionCards.size();
     }
-    
+
     @Override
     public boolean isCurrentCardKnown() {
         Flashcard current = getCurrentCard();

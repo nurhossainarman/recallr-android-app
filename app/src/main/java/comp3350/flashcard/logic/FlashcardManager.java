@@ -121,10 +121,6 @@ public class FlashcardManager implements IFlashcardManager {
         return flashcardId > 0;
     }
 
-    private boolean isValidDeckId(int deckId) {
-        return deckId >= 0;
-    }
-
     /**
      * Searches for cards containing a specific keyword.
      * @param keyword the text to look for
@@ -171,7 +167,7 @@ public class FlashcardManager implements IFlashcardManager {
      * @return number of flashcards in the deck
      */
     public int getFlashcardCount(int deckId) {
-        if (!isValidDeckId(deckId)) {
+        if (deckId < 0) {
             return 0;
         }
         return flashcardPersistence.getFlashcardCountByDeckId(deckId);
@@ -183,7 +179,7 @@ public class FlashcardManager implements IFlashcardManager {
      * @return number of flashcards deleted
      */
     public int deleteFlashcardsByDeck(int deckId) {
-        if (!isValidDeckId(deckId)) {
+        if (deckId < 0) {
             return 0;
         }
         return flashcardPersistence.deleteFlashcardsByDeckId(deckId);
@@ -195,7 +191,7 @@ public class FlashcardManager implements IFlashcardManager {
      * @return the number of known cards, or -1 if unsuccessful
      */
     public int getKnownAmount(int deckId) {
-        if (!isValidDeckId(deckId)) {
+        if (deckId < 0) {
             return -1;
         }
 
@@ -230,7 +226,7 @@ public class FlashcardManager implements IFlashcardManager {
         }
 
         List<Flashcard> results = new ArrayList<>();
-        if (!isValidDeckId(deckId)) {
+        if (deckId < 0) {
             return results;
         }
         boolean wantKnown = (mode == FilterMode.KNOWN);
