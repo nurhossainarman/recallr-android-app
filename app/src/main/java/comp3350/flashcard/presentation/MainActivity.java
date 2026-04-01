@@ -52,16 +52,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadDecks() {
         List<Deck> decks = deckManager.getAllDecks();
-        for (Deck deck : decks) {
-            deck.setCardCount(deckManager.getFlashcardCount(deck.getId()));
-        }
 
         if (adapter == null) {
             // Setup the generic adapter for Decks
             adapter = new Adapter(decks, R.layout.item_deck, (view, item) -> {
                 Deck deck = (Deck) item;
+                int cardCount = deckManager.getFlashcardCount(deck.getId());
                 ((TextView) view.findViewById(R.id.tvDeckTitle)).setText(deck.getName());
-                ((TextView) view.findViewById(R.id.tvCardCount)).setText(deck.getCardCount() + " cards");
+                ((TextView) view.findViewById(R.id.tvCardCount)).setText(cardCount + " cards");
                 
                 view.findViewById(R.id.btnEditDeck).setOnClickListener(v -> 
                     startActivity(new Intent(this, EditDeckActivity.class).putExtra("DECK_ID", deck.getId())));

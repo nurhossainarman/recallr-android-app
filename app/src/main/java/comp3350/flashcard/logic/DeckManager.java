@@ -32,7 +32,7 @@ public class DeckManager implements IDeckManager {
         validateDeck(name);
         validateDeckNameUnique(name, ValidationConstants.INVALID_ID);
 
-        Deck newDeck = new Deck(name, description);
+        Deck newDeck = Deck.createNew(name, description);
         return deckPersistence.insertDeck(newDeck);
     }
 

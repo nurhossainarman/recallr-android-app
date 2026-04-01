@@ -39,7 +39,7 @@ public class FlashcardManager implements IFlashcardManager {
             return null;
         }
 
-        Flashcard flashcard = new Flashcard(front, back, deckId);
+        Flashcard flashcard = Flashcard.createNew(front, back, deckId);
         return flashcardPersistence.insertFlashcard(flashcard);
     }
 
