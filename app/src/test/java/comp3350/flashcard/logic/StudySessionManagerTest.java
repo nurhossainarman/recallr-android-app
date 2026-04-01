@@ -32,7 +32,7 @@ public class StudySessionManagerTest {
     private List<Flashcard> createMockCards(int count) {
         List<Flashcard> cards = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
-            cards.add(new Flashcard(i, "Front " + i, "Back " + i, 1, 0));
+            cards.add(Flashcard.fromPersistence(i, "Front " + i, "Back " + i, 1, 0, false));
         }
         return cards;
     }
