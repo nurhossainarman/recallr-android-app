@@ -22,4 +22,14 @@ public final class UIConstants {
      * Minimum velocity (in pixels per second) required for a swipe gesture to be recognized.
      */
     public static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+    /**
+     * Duration for card flip animations in milliseconds.
+     */
+    public static final int ANIMATION_DURATION_FLIP = 400;
+
+    /**
+     * Duration for card slide animations in milliseconds.
+     */
+    public static final int ANIMATION_DURATION_SLIDE = 320;
 }

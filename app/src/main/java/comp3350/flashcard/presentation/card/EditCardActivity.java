@@ -1,4 +1,4 @@
-package comp3350.flashcard.presentation;
+package comp3350.flashcard.presentation.card;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -8,7 +8,9 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
+import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.IFlashcardManager;
+import comp3350.flashcard.logic.exceptions.FlashcardValidationException;
 import comp3350.flashcard.objects.Flashcard;
 
 /**
@@ -19,8 +21,8 @@ public class EditCardActivity extends AppCompatActivity {
     private TextInputEditText inputCardFront;
     private TextInputEditText inputCardBack;
     private IFlashcardManager flashcardManager;
-    private int deckId = -1;
-    private int cardId = -1;
+    private int deckId = ValidationConstants.INVALID_ID;
+    private int cardId = ValidationConstants.INVALID_ID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +45,9 @@ public class EditCardActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
 
         // If intent returns a card ID, we are editing an existing card
-        // Otherwise, we are creating a new card (cardId == -1)
-        deckId = getIntent().getIntExtra("DECK_ID", -1);
-        cardId = getIntent().getIntExtra("CARD_ID", -1);
+        // Otherwise, we are creating a new card
+        this.deckId = getIntent().getIntExtra("DECK_ID", ValidationConstants.INVALID_ID);
+        this.cardId = getIntent().getIntExtra("CARD_ID", ValidationConstants.INVALID_ID);
 
         // Setup the mode of screen (adding or editing)
         setupMode(toolbar, btnSaveCard);
@@ -60,18 +62,18 @@ public class EditCardActivity extends AppCompatActivity {
      * @param  saveButton The save button object
      */
     private void setupMode(Toolbar toolbar, Button saveButton) {
-        if (cardId != -1) {
+        if (this.cardId != ValidationConstants.INVALID_ID) {
             // Intent returns a valid id, that means we are editing an existing card
             Flashcard card = flashcardManager.getFlashcard(cardId);
             if (card != null) {
                 inputCardFront.setText(card.getFront());
                 inputCardBack.setText(card.getBack());
-                deckId = card.getDeckId();
+                this.deckId = card.getDeckId();
                 toolbar.setTitle(R.string.edit_card);
                 saveButton.setText(R.string.save_card);
             }
         } else {
-            // Intent returns -1, that means we are creating a new card
+            // Intent returns INVALID_ID, that means we are creating a new card
             toolbar.setTitle(R.string.add_card);
             saveButton.setText(R.string.add_card);
         }
@@ -83,34 +85,30 @@ public class EditCardActivity extends AppCompatActivity {
     private void handleSave() {
         String front = inputCardFront.getText().toString().trim();
         String back = inputCardBack.getText().toString().trim();
-        boolean success;
 
-        if (cardId == -1) {
-            // Manager handles validation and creation internally
-            success = flashcardManager.createFlashcard(front, back, deckId) != null;
-            if (success) {
-                printToast(R.string.card_added_prompt);
+        try {
+            if (this.cardId == ValidationConstants.INVALID_ID) {
+                // Manager handles validation and creation internally
+                if (flashcardManager.createFlashcard(front, back, deckId) != null) {
+                    printToast(getString(R.string.card_added_prompt));
+                    finish();
+                }
+            } else {
+                // Manager handles validation and update internally
+                if (flashcardManager.updateFlashcard(cardId, front, back)) {
+                    printToast(getString(R.string.card_updated_prompt));
+                    finish();
+                }
             }
-        } else {
-            // Manager handles validation and update internally
-            success = flashcardManager.updateFlashcard(cardId, front, back);
-            if (success) {
-                printToast(R.string.card_updated_prompt);
-            }
-        }
-
-        if (success) {
-            finish();
-        } else {
-            // If failed, we know it's a validation issue based on Manager logic
-            printToast(R.string.invalid_input_prompt);
+        } catch (FlashcardValidationException e) {
+            printToast(e.getMessage());
         }
     }
 
     /**
      * Shows a message at the bottom of the screen.
      */
-    private void printToast(int stringId) {
-        Toast.makeText(this, getString(stringId), Toast.LENGTH_SHORT).show();
+    private void printToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

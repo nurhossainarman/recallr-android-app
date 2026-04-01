@@ -2,6 +2,8 @@ package comp3350.flashcard.logic;
 
 import java.util.List;
 import comp3350.flashcard.constants.ValidationConstants;
+import comp3350.flashcard.logic.validators.IDeckValidator;
+import comp3350.flashcard.logic.validators.ValidationResult;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.persistence.DeckPersistence;
 import comp3350.flashcard.persistence.FlashcardPersistence;
@@ -11,26 +13,32 @@ public class DeckManager implements IDeckManager {
 
     private final DeckPersistence deckPersistence;
     private final FlashcardPersistence flashcardPersistence;
+    private final IDeckValidator validator;
 
     /**
      * Constructor with dependency injection
      * @param deckPersistence the persistence layer for decks
      * @param flashcardPersistence the persistence layer for flashcards
+     * @param validator the strategy used to validate deck data
      */
-    public DeckManager(DeckPersistence deckPersistence, FlashcardPersistence flashcardPersistence) {
+    public DeckManager(DeckPersistence deckPersistence, FlashcardPersistence flashcardPersistence, IDeckValidator validator) {
         this.deckPersistence = deckPersistence;
         this.flashcardPersistence = flashcardPersistence;
+        this.validator = validator;
     }
 
     /**
      * Creates a new deck
      * @param name the name of the deck
      * @param description optional description of the deck
-     * @return the created deck, or null if creation failed
+     * @return the created deck
+     * @throws DeckValidationException if the name is invalid or already taken
      */
     public Deck createDeck(String name, String description) {
-        validateDeck(name);
-        validateDeckNameUnique(name, ValidationConstants.INVALID_ID);
+        ValidationResult result = validator.validate(name, ValidationConstants.INVALID_ID);
+        if (!result.isValid()) {
+            throw new DeckValidationException(result.getErrorMessage());
+        }
 
         Deck newDeck = Deck.createNew(name, description);
         return deckPersistence.insertDeck(newDeck);
@@ -64,15 +72,17 @@ public class DeckManager implements IDeckManager {
      * @param name the new name
      * @param description the new description
      * @return true if update successful, false otherwise
+     * @throws DeckValidationException if the name is invalid or already taken by another deck
      */
     public boolean updateDeck(int deckId, String name, String description) {
-        validateDeck(name);
+        ValidationResult result = validator.validate(name, deckId);
+        if (!result.isValid()) {
+            throw new DeckValidationException(result.getErrorMessage());
+        }
 
         if (!deckExists(deckId)) {
             return false;
         }
-
-        validateDeckNameUnique(name, deckId);
 
         Deck existingDeck = deckPersistence.getDeckById(deckId);
         if (existingDeck == null) {
@@ -108,33 +118,6 @@ public class DeckManager implements IDeckManager {
      */
     public List<Deck> getAllDecks() {
         return deckPersistence.getAllDecks();
-    }
-
-    /**
-     * Validates deck data
-     * @param name the deck name
-     * @return true if valid, false otherwise
-     */
-    public void validateDeck(String name) {
-        if (StringUtils.isNullOrEmpty(name)) {
-            throw new DeckValidationException("Deck name cannot be empty");
-        }
-        if (StringUtils.exceedsLength(name, ValidationConstants.MAX_DECK_NAME_LENGTH)) {
-            throw new DeckValidationException("Deck name cannot exceed " +
-                ValidationConstants.MAX_DECK_NAME_LENGTH + " characters");
-        }
-    }
-
-    /**
-     * Validates that a deck name is unique
-     * @param name the deck name to check
-     * @param excludeDeckId deck ID to exclude from check (for updates), or ValidationConstants.INVALID_ID for new decks
-     * @throws DeckValidationException if the name is already taken
-     */
-    public void validateDeckNameUnique(String name, int excludeDeckId) {
-        if (deckPersistence.deckNameExists(name, excludeDeckId)) {
-            throw new DeckValidationException("A deck with this name already exists");
-        }
     }
 
     /**
