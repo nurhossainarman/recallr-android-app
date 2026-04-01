@@ -171,8 +171,8 @@ public class FlashcardManagerIntegrationTest {
         Flashcard retrieved = flashcardPersistence.getFlashcardById(created.getId());
         assertNotNull(retrieved);
         // The content should be stored as-is (validator checks it's not empty after trimming)
-        assertEquals("Question", retrieved.getFront());
-        assertEquals("Answer", retrieved.getBack());
+        assertEquals("  Question  ", retrieved.getFront());
+        assertEquals("  Answer  ", retrieved.getBack());
     }
 
     // ---------------- Test update flashcard → verify changes in SQLite ----------------
