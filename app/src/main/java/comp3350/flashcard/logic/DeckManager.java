@@ -40,7 +40,7 @@ public class DeckManager implements IDeckManager {
             throw new DeckValidationException(result.getErrorMessage());
         }
 
-        Deck newDeck = new Deck(name, description);
+        Deck newDeck = Deck.createNew(name, description);
         return deckPersistence.insertDeck(newDeck);
     }
 

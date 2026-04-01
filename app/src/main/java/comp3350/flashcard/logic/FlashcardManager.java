@@ -46,7 +46,7 @@ public class FlashcardManager implements IFlashcardManager {
             throw new FlashcardValidationException("Deck ID must be a positive integer");
         }
 
-        Flashcard flashcard = new Flashcard(front, back, deckId);
+        Flashcard flashcard = Flashcard.createNew(front, back, deckId);
         return flashcardPersistence.insertFlashcard(flashcard);
     }
 

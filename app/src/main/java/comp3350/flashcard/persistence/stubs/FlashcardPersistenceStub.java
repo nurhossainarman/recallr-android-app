@@ -69,7 +69,7 @@ public class FlashcardPersistenceStub implements FlashcardPersistence {
      */
     private void addSampleFlashcard(String front, String back, int deckId, long createdAt) {
         int id = nextId.getAndIncrement();
-        Flashcard card = new Flashcard(id, front, back, deckId, createdAt);
+        Flashcard card = Flashcard.fromPersistence(id, front, back, deckId, createdAt, false);
         flashcards.add(card);
     }
 
@@ -102,14 +102,14 @@ public class FlashcardPersistenceStub implements FlashcardPersistence {
     @Override
     public Flashcard insertFlashcard(Flashcard flashcard) {
         int id = nextId.getAndIncrement();
-        Flashcard newCard = new Flashcard(
+        Flashcard newCard = Flashcard.fromPersistence(
                 id,
                 flashcard.getFront(),
                 flashcard.getBack(),
                 flashcard.getDeckId(),
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
+                flashcard.getIsKnown()
         );
-        newCard.setIsKnown(flashcard.getIsKnown());
         flashcards.add(newCard);
         return newCard;
     }
@@ -120,14 +120,14 @@ public class FlashcardPersistenceStub implements FlashcardPersistence {
             if (flashcards.get(i).getId() == flashcard.getId()) {
                 // Create updated flashcard preserving original creation time
                 Flashcard existing = flashcards.get(i);
-                Flashcard updated = new Flashcard(
+                Flashcard updated = Flashcard.fromPersistence(
                         flashcard.getId(),
                         flashcard.getFront(),
                         flashcard.getBack(),
                         flashcard.getDeckId(),
-                        existing.getCreatedAt()
+                        existing.getCreatedAt(),
+                        flashcard.getIsKnown()
                 );
-                updated.setIsKnown(flashcard.getIsKnown());
                 flashcards.set(i, updated);
                 return true;
             }

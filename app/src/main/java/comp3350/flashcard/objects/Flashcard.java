@@ -3,22 +3,27 @@ package comp3350.flashcard.objects;
 import java.io.Serializable;
 import java.util.Objects;
 
+import comp3350.flashcard.constants.ValidationConstants;
+
 /**
  * Represents a single flashcard with a front (question) and back (answer) side.
  * Flashcards belong to a specific deck identified by deckId.
+ *
+ * This class follows immutability principles for core fields (id, deckId, createdAt).
+ * Use factory methods to create instances and withUpdatedContent() to modify.
  */
 public class Flashcard implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private int id;
+    private final int id;
     private String front;
     private String back;
-    private int deckId;
-    private long createdAt;
+    private final int deckId;
+    private final long createdAt;
     private boolean isKnown;
 
-    // Future fields need to be implemented for Iteration 3 and more
+    // Future fields need to be implemented for Iteration 2 and more
     // private int timesReviewed;
     // private long lastReviewedAt;
     // private int repetitionInterval;
@@ -26,42 +31,60 @@ public class Flashcard implements Serializable {
     // private long nextReviewDate;
 
     /**
-     * Default constructor required for certain frameworks and testing.
-     */
-    public Flashcard() {
-        this.createdAt = System.currentTimeMillis();
-    }
-
-    /**
-     * Creates a new flashcard without an ID (for new cards before persistence).
-     *
-     * @param front  The question or front side of the card
-     * @param back   The answer or back side of the card
-     * @param deckId The ID of the deck this card belongs to
-     */
-    public Flashcard(String front, String back, int deckId) {
-        this();
-        setFront(front);
-        setBack(back);
-        setDeckId(deckId);
-        setIsKnown(false);
-    }
-
-    /**
-     * Creates a flashcard with all fields specified (for loading from persistence).
+     * Package-private constructor - only persistence layer can call directly.
+     * Use factory methods createNew() or fromPersistence() instead.
      *
      * @param id        The unique identifier for this card
      * @param front     The question or front side of the card
      * @param back      The answer or back side of the card
      * @param deckId    The ID of the deck this card belongs to
      * @param createdAt The timestamp when this card was created
+     * @param isKnown   Whether this card is marked as known
      */
-    public Flashcard(int id, String front, String back, int deckId, long createdAt) {
+    Flashcard(int id, String front, String back, int deckId, long createdAt, boolean isKnown) {
         this.id = id;
-        setFront(front);
-        setBack(back);
-        setDeckId(deckId);
+        this.front = front;
+        this.back = back;
+        this.deckId = deckId;
         this.createdAt = createdAt;
+        this.isKnown = isKnown;
+    }
+
+    /**
+     * Public factory for creating new (unpersisted) flashcards.
+     * ID will be INVALID_ID until persisted.
+     *
+     * @param front  The question or front side of the card
+     * @param back   The answer or back side of the card
+     * @param deckId The ID of the deck this card belongs to
+     * @return A new Flashcard instance ready to be persisted
+     */
+    public static Flashcard createNew(String front, String back, int deckId) {
+        return new Flashcard(
+            ValidationConstants.INVALID_ID,
+            front,
+            back,
+            deckId,
+            System.currentTimeMillis(),
+            false
+        );
+    }
+
+    /**
+     * Public factory for reconstructing flashcards from persistence.
+     * Only the persistence layer should call this method.
+     *
+     * @param id        The unique identifier for this card
+     * @param front     The question or front side of the card
+     * @param back      The answer or back side of the card
+     * @param deckId    The ID of the deck this card belongs to
+     * @param createdAt The timestamp when this card was created
+     * @param isKnown   Whether this card is marked as known
+     * @return A Flashcard instance loaded from persistence
+     */
+    public static Flashcard fromPersistence(int id, String front, String back,
+                                            int deckId, long createdAt, boolean isKnown) {
+        return new Flashcard(id, front, back, deckId, createdAt, isKnown);
     }
 
     // ==================== Getters ====================
@@ -90,37 +113,27 @@ public class Flashcard implements Serializable {
         return isKnown;
     }
 
-    // ==================== Setters ====================
+    // ==================== Setters (Limited - prefer immutable updates) ====================
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
+    /**
+     * Sets the front content. Only use for internal updates.
+     * Prefer withUpdatedContent() for creating modified copies.
+     */
     public void setFront(String front) {
-        if (front == null || front.trim().isEmpty()) {
-            throw new IllegalArgumentException("Front side of flashcard cannot be null or empty");
-        }
-        this.front = front.trim();
+        this.front = front;
     }
 
+    /**
+     * Sets the back content. Only use for internal updates.
+     * Prefer withUpdatedContent() for creating modified copies.
+     */
     public void setBack(String back) {
-        if (back == null || back.trim().isEmpty()) {
-            throw new IllegalArgumentException("Back side of flashcard cannot be null or empty");
-        }
-        this.back = back.trim();
+        this.back = back;
     }
 
-    public void setDeckId(int deckId) {
-        if (deckId < 0) {
-            throw new IllegalArgumentException("Deck ID cannot be negative");
-        }
-        this.deckId = deckId;
-    }
-
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
-    }
-
+    /**
+     * Updates the known status of this flashcard.
+     */
     public void setIsKnown(boolean isKnown) {
         this.isKnown = isKnown;
     }
@@ -137,14 +150,14 @@ public class Flashcard implements Serializable {
     }
 
     /**
-     * Creates a copy of this flashcard with updated content.
+     * Creates a copy of this flashcard with updated content (immutable update).
      *
      * @param newFront The new front side content
      * @param newBack  The new back side content
      * @return A new Flashcard instance with updated content
      */
     public Flashcard withUpdatedContent(String newFront, String newBack) {
-        return new Flashcard(this.id, newFront, newBack, this.deckId, this.createdAt);
+        return new Flashcard(this.id, newFront, newBack, this.deckId, this.createdAt, this.isKnown);
     }
 
     @Override

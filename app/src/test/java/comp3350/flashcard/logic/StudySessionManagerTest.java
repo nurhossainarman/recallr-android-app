@@ -35,7 +35,7 @@ public class StudySessionManagerTest {
     private List<Flashcard> createMockCards(int count) {
         List<Flashcard> cards = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
-            cards.add(new Flashcard(i, "Front " + i, "Back " + i, 1, 0));
+            cards.add(Flashcard.fromPersistence(i, "Front " + i, "Back " + i, 1, 0, false));
         }
         return cards;
     }
@@ -81,10 +81,8 @@ public class StudySessionManagerTest {
 
     @Test
     public void startSession_filterKnown_onlyReturnsKnown() {
-        Flashcard known = new Flashcard(1, "Q1", "A1", 1, 0);
-        known.setIsKnown(true);
-        Flashcard unknown = new Flashcard(2, "Q2", "A2", 1, 0);
-        unknown.setIsKnown(false);
+        Flashcard known = Flashcard.fromPersistence(1, "Q1", "A1", 1, 0, true);
+        Flashcard unknown = Flashcard.fromPersistence(2, "Q2", "A2", 1, 0, false);
 
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.KNOWN)).thenReturn(Arrays.asList(known));
 
@@ -96,10 +94,8 @@ public class StudySessionManagerTest {
 
     @Test
     public void startSession_filterUnknown_onlyReturnsUnknown() {
-        Flashcard known = new Flashcard(1, "Q1", "A1", 1, 0);
-        known.setIsKnown(true);
-        Flashcard unknown = new Flashcard(2, "Q2", "A2", 1, 0);
-        unknown.setIsKnown(false);
+        Flashcard known = Flashcard.fromPersistence(1, "Q1", "A1", 1, 0, true);
+        Flashcard unknown = Flashcard.fromPersistence(2, "Q2", "A2", 1, 0, false);
 
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.UNKNOWN)).thenReturn(Arrays.asList(unknown));
 
@@ -161,7 +157,7 @@ public class StudySessionManagerTest {
 
     @Test
     public void flip_changesShowingSide() {
-        Flashcard card = new Flashcard(1, "Question", "Answer", 1, 0);
+        Flashcard card = Flashcard.fromPersistence(1, "Question", "Answer", 1, 0, false);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(Collections.singletonList(card));
 
         manager.startSession(1, false, FilterMode.ALL);
@@ -175,8 +171,7 @@ public class StudySessionManagerTest {
 
     @Test
     public void setKnown_updatesPersistence() {
-        Flashcard card = new Flashcard(1, "Q", "A", 1, 0);
-        card.setIsKnown(false);
+        Flashcard card = Flashcard.fromPersistence(1, "Q", "A", 1, 0, false);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(Collections.singletonList(card));
         when(persistence.updateFlashcard(any(Flashcard.class))).thenReturn(true);
 
