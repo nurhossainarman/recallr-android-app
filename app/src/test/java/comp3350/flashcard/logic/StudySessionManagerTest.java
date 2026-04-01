@@ -78,10 +78,8 @@ public class StudySessionManagerTest {
 
     @Test
     public void startSession_filterKnown_onlyReturnsKnown() {
-        Flashcard known = new Flashcard(1, "Q1", "A1", 1, 0);
-        known.setIsKnown(true);
-        Flashcard unknown = new Flashcard(2, "Q2", "A2", 1, 0);
-        unknown.setIsKnown(false);
+        Flashcard known = Flashcard.fromPersistence(1, "Q1", "A1", 1, 0, true);
+        Flashcard unknown = Flashcard.fromPersistence(2, "Q2", "A2", 1, 0, false);
 
         when(persistence.getFlashcardsByDeckId(1)).thenReturn(Arrays.asList(known, unknown));
 
@@ -93,10 +91,8 @@ public class StudySessionManagerTest {
 
     @Test
     public void startSession_filterUnknown_onlyReturnsUnknown() {
-        Flashcard known = new Flashcard(1, "Q1", "A1", 1, 0);
-        known.setIsKnown(true);
-        Flashcard unknown = new Flashcard(2, "Q2", "A2", 1, 0);
-        unknown.setIsKnown(false);
+        Flashcard known = Flashcard.fromPersistence(1, "Q1", "A1", 1, 0, true);
+        Flashcard unknown = Flashcard.fromPersistence(2, "Q2", "A2", 1, 0, false);
 
         when(persistence.getFlashcardsByDeckId(1)).thenReturn(Arrays.asList(known, unknown));
 
@@ -158,7 +154,7 @@ public class StudySessionManagerTest {
 
     @Test
     public void flip_changesShowingSide() {
-        Flashcard card = new Flashcard(1, "Question", "Answer", 1, 0);
+        Flashcard card = Flashcard.fromPersistence(1, "Question", "Answer", 1, 0, false);
         when(persistence.getFlashcardsByDeckId(1)).thenReturn(Collections.singletonList(card));
 
         manager.startSession(1, false, FilterMode.ALL);
@@ -172,8 +168,7 @@ public class StudySessionManagerTest {
 
     @Test
     public void setKnown_updatesPersistence() {
-        Flashcard card = new Flashcard(1, "Q", "A", 1, 0);
-        card.setIsKnown(false);
+        Flashcard card = Flashcard.fromPersistence(1, "Q", "A", 1, 0, false);
         when(persistence.getFlashcardsByDeckId(1)).thenReturn(Collections.singletonList(card));
         when(persistence.updateFlashcard(any(Flashcard.class))).thenReturn(true);
 

@@ -53,7 +53,7 @@ public class DeckManagerTest {
 
     private void addFlashcardsToDeck(int deckId, int count) {
         for (int i = 1; i <= count; i++) {
-            Flashcard card = new Flashcard("Front " + i, "Back " + i, deckId);
+            Flashcard card = Flashcard.createNew("Front " + i, "Back " + i, deckId);
             flashcardPersistence.insertFlashcard(card);
         }
     }

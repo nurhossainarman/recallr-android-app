@@ -116,7 +116,7 @@ public class Deck implements Serializable {
      * Prefer withUpdatedDescription() for creating modified copies.
      */
     public void setDescription(String description) {
-        this.description = description;
+        this.description = description != null ? description : "";
     }
 
     /**
