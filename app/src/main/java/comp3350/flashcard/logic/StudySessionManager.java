@@ -15,14 +15,18 @@ import comp3350.flashcard.persistence.FlashcardPersistence;
 public class StudySessionManager implements IStudySession {
 
     private final FlashcardPersistence flashcardPersistence;
-    private final FlashcardManager flashcardManager;
+    private final IFlashcardManager flashcardManager;
     private List<Flashcard> sessionCards;
     private int currentIndex;
     private boolean showingFront;
 
     public StudySessionManager(FlashcardPersistence flashcardPersistence) {
+        this(flashcardPersistence, new FlashcardManager(flashcardPersistence, Services.getFlashcardValidator()));
+    }
+
+    public StudySessionManager(FlashcardPersistence flashcardPersistence, IFlashcardManager flashcardManager) {
         this.flashcardPersistence = flashcardPersistence;
-        this.flashcardManager = (FlashcardManager) Services.getFlashcardManager();
+        this.flashcardManager = flashcardManager;
         this.sessionCards = new ArrayList<>();
         this.currentIndex = -1;
         this.showingFront = true;
@@ -129,7 +133,7 @@ public class StudySessionManager implements IStudySession {
 
     @Override
     public boolean isDeckEmpty (int deckId){
-        return deckId != -1 && Services.getFlashcardManager().getFlashcardCount(deckId) == 0;
+        return deckId != -1 && flashcardManager.getFlashcardCount(deckId) == 0;
     }
 
     public Flashcard getCurrentCard() {

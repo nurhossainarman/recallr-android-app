@@ -23,10 +23,13 @@ public class StudySessionManagerTest {
     @Mock
     private FlashcardPersistence persistence;
 
+    @Mock
+    private IFlashcardManager flashcardManager;
+
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        manager = new StudySessionManager(persistence);
+        manager = new StudySessionManager(persistence, flashcardManager);
     }
 
     private List<Flashcard> createMockCards(int count) {
@@ -41,7 +44,7 @@ public class StudySessionManagerTest {
 
     @Test
     public void startSession_emptyDeck_initializesEmpty() {
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(Collections.emptyList());
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(Collections.emptyList());
 
         manager.startSession(1, false, FilterMode.ALL);
 
@@ -53,7 +56,7 @@ public class StudySessionManagerTest {
     @Test
     public void startSession_withCards_initializesCorrectly() {
         List<Flashcard> cards = createMockCards(3);
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(cards);
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
 
         manager.startSession(1, false, FilterMode.ALL);
 
@@ -68,10 +71,10 @@ public class StudySessionManagerTest {
     @Test
     public void startSession_withShuffle_changesOrder() {
         List<Flashcard> cards = createMockCards(50);
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(new ArrayList<>(cards));
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(new ArrayList<>(cards));
 
         manager.startSession(1, true, FilterMode.ALL);
-        
+
         assertEquals(50, manager.getTotalCards());
         assertFalse(manager.isFinished());
     }
@@ -83,10 +86,10 @@ public class StudySessionManagerTest {
         Flashcard unknown = new Flashcard(2, "Q2", "A2", 1, 0);
         unknown.setIsKnown(false);
 
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(Arrays.asList(known, unknown));
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.KNOWN)).thenReturn(Arrays.asList(known));
 
         manager.startSession(1, false, FilterMode.KNOWN);
-        
+
         assertEquals(1, manager.getTotalCards());
         assertEquals("Q1", manager.getCurrentText());
     }
@@ -98,10 +101,10 @@ public class StudySessionManagerTest {
         Flashcard unknown = new Flashcard(2, "Q2", "A2", 1, 0);
         unknown.setIsKnown(false);
 
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(Arrays.asList(known, unknown));
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.UNKNOWN)).thenReturn(Arrays.asList(unknown));
 
         manager.startSession(1, false, FilterMode.UNKNOWN);
-        
+
         assertEquals(1, manager.getTotalCards());
         assertEquals("Q2", manager.getCurrentText());
     }
@@ -109,7 +112,7 @@ public class StudySessionManagerTest {
     @Test
     public void startSession_resetsProgress() {
         List<Flashcard> cards = createMockCards(3);
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(cards);
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
 
         manager.startSession(1, false, FilterMode.ALL);
         manager.nextCard();
@@ -124,10 +127,10 @@ public class StudySessionManagerTest {
     @Test
     public void nextCard_traversesList() {
         List<Flashcard> cards = createMockCards(2);
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(cards);
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
 
         manager.startSession(1, false, FilterMode.ALL);
-        
+
         manager.nextCard();
         Flashcard second = manager.getCurrentCard();
         assertNotNull(second);
@@ -142,11 +145,11 @@ public class StudySessionManagerTest {
     @Test
     public void previousCard_traversesBackwards() {
         List<Flashcard> cards = createMockCards(2);
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(cards);
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
 
         manager.startSession(1, false, FilterMode.ALL);
         manager.nextCard(); // Move to second card
-        
+
         manager.previousCard();
         Flashcard first = manager.getCurrentCard();
         assertNotNull(first);
@@ -159,10 +162,10 @@ public class StudySessionManagerTest {
     @Test
     public void flip_changesShowingSide() {
         Flashcard card = new Flashcard(1, "Question", "Answer", 1, 0);
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(Collections.singletonList(card));
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(Collections.singletonList(card));
 
         manager.startSession(1, false, FilterMode.ALL);
-        
+
         assertEquals("Question", manager.getCurrentText());
         manager.flip();
         assertEquals("Answer", manager.getCurrentText());
@@ -174,7 +177,7 @@ public class StudySessionManagerTest {
     public void setKnown_updatesPersistence() {
         Flashcard card = new Flashcard(1, "Q", "A", 1, 0);
         card.setIsKnown(false);
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(Collections.singletonList(card));
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(Collections.singletonList(card));
         when(persistence.updateFlashcard(any(Flashcard.class))).thenReturn(true);
 
         manager.startSession(1, false, FilterMode.ALL);
@@ -189,11 +192,11 @@ public class StudySessionManagerTest {
     @Test
     public void getProgressText_formatsCorrectly() {
         List<Flashcard> cards = createMockCards(2);
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(cards);
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
 
         manager.startSession(1, false, FilterMode.ALL);
         assertEquals("Card 1 of 2", manager.getProgressText());
-        
+
         manager.nextCard();
         assertEquals("Card 2 of 2", manager.getProgressText());
 
@@ -203,15 +206,15 @@ public class StudySessionManagerTest {
 
     @Test
     public void hasCards_checksState() {
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(Collections.emptyList());
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(Collections.emptyList());
         manager.startSession(1, false, FilterMode.ALL);
         assertFalse(manager.hasCards());
 
         List<Flashcard> cards = createMockCards(1);
-        when(persistence.getFlashcardsByDeckId(1)).thenReturn(cards);
+        when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
         manager.startSession(1, false, FilterMode.ALL);
         assertTrue(manager.hasCards());
-        
+
         manager.nextCard();
         assertFalse(manager.hasCards());
     }
