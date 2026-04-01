@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import comp3350.flashcard.application.Services;
+import comp3350.flashcard.logic.exceptions.StudySessionException;
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.FlashcardPersistence;
 
@@ -37,36 +38,33 @@ public class StudySessionManager implements IStudySession {
      * @param deckId the ID of the deck to study
      * @param shuffle true/false to shuffle the cards
      * @param filterMode which cards to include in session (all, known, or unknown)
+     * @throws StudySessionException if the session cannot start (e.g., no cards)
      */
     @Override
-    public void startSession(int deckId, boolean shuffle, FilterMode filterMode) {
+    public void startSession(int deckId, boolean shuffle, FilterMode filterMode) throws StudySessionException {
+        validateSession(deckId, filterMode);
+        
         sessionCards = flashcardManager.getFlashcardsByMode(deckId, filterMode);
-
-        if (sessionCards == null || sessionCards.isEmpty()) { // Selected mode has no card
-            sessionCards = new ArrayList<>();
-            currentIndex = -1;
-        } else {    // Selected mode has at least one card
-            sessionCards = new ArrayList<>(sessionCards);
-            if (shuffle) {
-                Collections.shuffle(sessionCards);
-            }
-            currentIndex = 0;
+        sessionCards = new ArrayList<>(sessionCards);
+        
+        if (shuffle) {
+            Collections.shuffle(sessionCards);
         }
+        
+        currentIndex = 0;
         showingFront = true;
     }
 
     @Override
-    public String getStartupMessage(int deckId, FilterMode filterMode) {
+    public void validateSession(int deckId, FilterMode filterMode) throws StudySessionException {
         if (isDeckEmpty(deckId)) {
-            return "Add some cards first!";
+            throw new StudySessionException("Add some cards first!");
         }
 
         List<Flashcard> filteredCards = flashcardManager.getFlashcardsByMode(deckId, filterMode);
         if (filteredCards == null || filteredCards.isEmpty()) {
-            return "No cards match this filter";
+            throw new StudySessionException("No cards match this filter");
         }
-
-        return null; // No error
     }
 
     @Override

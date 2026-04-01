@@ -2,7 +2,6 @@ package comp3350.flashcard.presentation.deck;
 
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -12,6 +11,7 @@ import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.IDeckManager;
 import comp3350.flashcard.logic.DeckValidationException;
 import comp3350.flashcard.objects.Deck;
+import comp3350.flashcard.presentation.Messages;
 
 /**
  * Controls create a deck screen and edit an existing deck screen.
@@ -64,6 +64,10 @@ public class EditDeckActivity extends AppCompatActivity {
                 inputDeckName.setText(deck.getName());
                 toolbar.setTitle(R.string.edit_deck);
                 saveButton.setText(R.string.save_deck);
+            } else {
+                // Handle the case where the deck ID is valid but the deck doesn't exist
+                Messages.show(this, "Error: Deck not found");
+                finish();
             }
         } else {
             // Intent returns INVALID_ID, that means we are creating a new deck
@@ -81,24 +85,17 @@ public class EditDeckActivity extends AppCompatActivity {
         try {
             if (deckId == ValidationConstants.INVALID_ID) {
                 if (deckManager.createDeck(name, "") != null) {
-                    printToast(getString(R.string.deck_added_prompt));
+                    Messages.show(this, getString(R.string.deck_added_prompt));
                     finish();
                 }
             } else {
                 if (deckManager.updateDeck(deckId, name, "")) {
-                    printToast(getString(R.string.deck_updated_prompt));
+                    Messages.show(this, getString(R.string.deck_updated_prompt));
                     finish();
                 }
             }
         } catch (DeckValidationException e) {
-            printToast(e.getMessage());
+            Messages.show(this, e.getMessage());
         }
-    }
-
-    /**
-     * Shows a quick message at the bottom of the screen.
-     */
-    private void printToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

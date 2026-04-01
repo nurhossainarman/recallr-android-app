@@ -2,7 +2,6 @@ package comp3350.flashcard.presentation.card;
 
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -12,6 +11,7 @@ import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.IFlashcardManager;
 import comp3350.flashcard.logic.exceptions.FlashcardValidationException;
 import comp3350.flashcard.objects.Flashcard;
+import comp3350.flashcard.presentation.Messages;
 
 /**
  * Controller for creating a new flashcard or editing a flashcard.
@@ -90,25 +90,18 @@ public class EditCardActivity extends AppCompatActivity {
             if (this.cardId == ValidationConstants.INVALID_ID) {
                 // Manager handles validation and creation internally
                 if (flashcardManager.createFlashcard(front, back, deckId) != null) {
-                    printToast(getString(R.string.card_added_prompt));
+                    Messages.show(this, getString(R.string.card_added_prompt));
                     finish();
                 }
             } else {
                 // Manager handles validation and update internally
                 if (flashcardManager.updateFlashcard(cardId, front, back)) {
-                    printToast(getString(R.string.card_updated_prompt));
+                    Messages.show(this, getString(R.string.card_updated_prompt));
                     finish();
                 }
             }
         } catch (FlashcardValidationException e) {
-            printToast(e.getMessage());
+            Messages.show(this, e.getMessage());
         }
-    }
-
-    /**
-     * Shows a message at the bottom of the screen.
-     */
-    private void printToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

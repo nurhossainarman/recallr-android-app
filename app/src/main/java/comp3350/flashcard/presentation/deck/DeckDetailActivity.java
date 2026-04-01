@@ -18,6 +18,8 @@ import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.IDeckManager;
 import comp3350.flashcard.logic.FilterMode;
 import comp3350.flashcard.logic.IFlashcardManager;
+import comp3350.flashcard.logic.IStudySession;
+import comp3350.flashcard.logic.exceptions.StudySessionException;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.presentation.Adapter;
@@ -33,6 +35,7 @@ public class DeckDetailActivity extends AppCompatActivity {
     private Adapter<Flashcard> adapter;
     private IDeckManager deckManager;
     private IFlashcardManager flashcardManager;
+    private IStudySession studySession;
     private int deckId = ValidationConstants.INVALID_ID;
     private Toolbar toolbar;
     private CheckBox cbShuffle;
@@ -45,6 +48,7 @@ public class DeckDetailActivity extends AppCompatActivity {
 
         deckManager = Services.getDeckManager();
         flashcardManager = Services.getFlashcardManager();
+        studySession = Services.getStudySession();
 
         initUI();
     }
@@ -141,11 +145,19 @@ public class DeckDetailActivity extends AppCompatActivity {
             filterMode = FilterMode.UNKNOWN;
         }
 
-        Intent intent = new Intent(this, StudyActivity.class);
-        intent.putExtra("DECK_ID", deckId);
-        intent.putExtra("SHUFFLE", cbShuffle.isChecked());
-        intent.putExtra("FILTER_MODE", filterMode.name());
-        startActivity(intent);
+        try {
+            // Validation occurs in logic layer
+            studySession.validateSession(deckId, filterMode);
+            
+            Intent intent = new Intent(this, StudyActivity.class);
+            intent.putExtra("DECK_ID", deckId);
+            intent.putExtra("SHUFFLE", cbShuffle.isChecked());
+            intent.putExtra("FILTER_MODE", filterMode.name());
+            startActivity(intent);
+        } catch (StudySessionException e) {
+            // Error is a result of catching an exception from logic
+            printToast(e.getMessage());
+        }
     }
 
     private void printToast(String message) {

@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +23,8 @@ import comp3350.flashcard.constants.UIConstants;
 import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.FilterMode;
 import comp3350.flashcard.logic.IStudySession;
+import comp3350.flashcard.logic.exceptions.StudySessionException;
+import comp3350.flashcard.presentation.Messages;
 import comp3350.flashcard.presentation.StudyGestureListener;
 
 /**
@@ -106,14 +107,15 @@ public class StudyActivity extends AppCompatActivity implements StudyGestureList
         String filterModeStr = getIntent().getStringExtra("FILTER_MODE");
         
         FilterMode filterMode = parseFilterMode(filterModeStr);
-        studySession.startSession(deckId, shuffle, filterMode);
-
-        if (studySession.hasCards()) {
+        
+        try {
+            studySession.startSession(deckId, shuffle, filterMode);
             isFirstCard = true;
             resetCardToFront();
             updateUI();
-        } else {
-            handleEmptySession(deckId);
+        } catch (StudySessionException e) {
+            Messages.show(this, e.getMessage());
+            finish();
         }
     }
 
@@ -124,12 +126,6 @@ public class StudyActivity extends AppCompatActivity implements StudyGestureList
             } catch (IllegalArgumentException ignored) {}
         }
         return FilterMode.ALL;
-    }
-
-    private void handleEmptySession(int deckId) {
-        String message = studySession.isDeckEmpty(deckId) ? "Add some cards first!" : "No cards match this filter";
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-        finish();
     }
 
     private void flipCard() {
