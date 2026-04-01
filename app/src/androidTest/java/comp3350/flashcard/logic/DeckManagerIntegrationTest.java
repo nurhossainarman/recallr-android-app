@@ -239,8 +239,8 @@ public class DeckManagerIntegrationTest {
         int deckId = deck.getId();
 
         // Add flashcards to the deck
-        flashcardPersistence.insertFlashcard(new comp3350.flashcard.objects.Flashcard("Front 1", "Back 1", deckId));
-        flashcardPersistence.insertFlashcard(new comp3350.flashcard.objects.Flashcard("Front 2", "Back 2", deckId));
+        flashcardPersistence.insertFlashcard(comp3350.flashcard.objects.Flashcard.createNew("Front 1", "Back 1", deckId));
+        flashcardPersistence.insertFlashcard(comp3350.flashcard.objects.Flashcard.createNew("Front 2", "Back 2", deckId));
 
         // Verify flashcards exist
         assertEquals(2, flashcardPersistence.getFlashcardCountByDeckId(deckId));
@@ -291,9 +291,9 @@ public class DeckManagerIntegrationTest {
         int deckId = deck.getId();
 
         // Act: Add flashcards directly to persistence
-        flashcardPersistence.insertFlashcard(new comp3350.flashcard.objects.Flashcard("Q1", "A1", deckId));
-        flashcardPersistence.insertFlashcard(new comp3350.flashcard.objects.Flashcard("Q2", "A2", deckId));
-        flashcardPersistence.insertFlashcard(new comp3350.flashcard.objects.Flashcard("Q3", "A3", deckId));
+        flashcardPersistence.insertFlashcard(comp3350.flashcard.objects.Flashcard.createNew("Q1", "A1", deckId));
+        flashcardPersistence.insertFlashcard(comp3350.flashcard.objects.Flashcard.createNew("Q2", "A2", deckId));
+        flashcardPersistence.insertFlashcard(comp3350.flashcard.objects.Flashcard.createNew("Q3", "A3", deckId));
 
         // Assert: Manager's getFlashcardCount queries SQLite correctly
         int count = deckManager.getFlashcardCount(deckId);

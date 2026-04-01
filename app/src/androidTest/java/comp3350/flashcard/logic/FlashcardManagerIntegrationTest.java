@@ -49,7 +49,7 @@ public class FlashcardManagerIntegrationTest {
         flashcardManager = new FlashcardManager(flashcardPersistence, flashcardValidator);
 
         // Create a test deck to use in tests
-        Deck testDeck = new Deck("Test Deck", "For flashcard testing");
+        Deck testDeck = Deck.createNew("Test Deck", "For flashcard testing");
         Deck inserted = deckPersistence.insertDeck(testDeck);
         testDeckId = inserted.getId();
     }
@@ -296,7 +296,7 @@ public class FlashcardManagerIntegrationTest {
     @Test
     public void testSearchFlashcards_allDecks() {
         // Arrange: Create another deck
-        Deck deck2 = deckPersistence.insertDeck(new Deck("Second Deck", ""));
+        Deck deck2 = deckPersistence.insertDeck(Deck.createNew("Second Deck", ""));
         int deck2Id = deck2.getId();
 
         // Create flashcards in both decks
@@ -491,7 +491,7 @@ public class FlashcardManagerIntegrationTest {
         flashcardManager.createFlashcard("Q1", "A1", testDeckId);
         flashcardManager.createFlashcard("Q2", "A2", testDeckId);
 
-        Deck deck2 = deckPersistence.insertDeck(new Deck("Deck 2", ""));
+        Deck deck2 = deckPersistence.insertDeck(Deck.createNew("Deck 2", ""));
         flashcardManager.createFlashcard("Q3", "A3", deck2.getId());
 
         // Act: Get all flashcards
