@@ -11,6 +11,7 @@ import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.IDeckManager;
 import comp3350.flashcard.logic.DeckValidationException;
 import comp3350.flashcard.objects.Deck;
+import comp3350.flashcard.presentation.ActivityHelper;
 import comp3350.flashcard.presentation.Messages;
 
 /**
@@ -57,7 +58,7 @@ public class EditDeckActivity extends AppCompatActivity {
      * @param  saveButton The save button object
      */
     private void setupMode(Toolbar toolbar, Button saveButton) {
-        if (this.deckId != ValidationConstants.INVALID_ID) {
+        if (!ActivityHelper.isNew(this.deckId)) {
             // Intent returns a valid id, that means we are editing an existing deck
             Deck deck = deckManager.getDeck(deckId);
             if (deck != null) {
@@ -83,7 +84,8 @@ public class EditDeckActivity extends AppCompatActivity {
         String name = inputDeckName.getText().toString().trim();
 
         try {
-            if (deckId == ValidationConstants.INVALID_ID) {
+            //Check if the deck is new or not
+            if (ActivityHelper.isNew(deckId)) {
                 if (deckManager.createDeck(name, "") != null) {
                     Messages.show(this, getString(R.string.deck_added_prompt));
                     finish();
