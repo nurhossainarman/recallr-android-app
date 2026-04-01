@@ -6,6 +6,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import comp3350.flashcard.logic.DeckValidationException;
+import comp3350.flashcard.logic.validators.DeckValidator;
+import comp3350.flashcard.logic.validators.IDeckValidator;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.DeckPersistence;
@@ -32,7 +34,8 @@ public class DeckManagerTest {
         deckPersistence.clearAll();
         flashcardPersistence.clearAll();
 
-        deckManager = new DeckManager(deckPersistence, flashcardPersistence);
+        IDeckValidator validator = new DeckValidator(deckPersistence);
+        deckManager = new DeckManager(deckPersistence, flashcardPersistence, validator);
     }
 
     @After
@@ -236,52 +239,6 @@ public class DeckManagerTest {
 
         assertNotNull(allDecks);
         assertEquals(0, allDecks.size());
-    }
-
-    // ---------------- validateDeck ----------------
-
-    @Test
-    public void validateDeck_valid_doesNotThrow() {
-        deckManager.validateDeck("Valid Deck");
-        deckManager.validateDeck("Valid Deck Name");
-        deckManager.validateDeck("a".repeat(100)); // Max length
-        deckManager.validateDeck("Deck-123!"); // Special chars
-    }
-
-    @Test
-    public void validateDeck_invalid_throwsException() {
-        assertThrows(DeckValidationException.class, () -> deckManager.validateDeck(null));
-        assertThrows(DeckValidationException.class, () -> deckManager.validateDeck(""));
-        assertThrows(DeckValidationException.class, () -> deckManager.validateDeck("   "));
-        assertThrows(DeckValidationException.class, () -> deckManager.validateDeck("a".repeat(101)));
-    }
-
-    // ---------------- validateDeckNameUnique ----------------
-
-    @Test
-    public void validateDeckNameUnique_newDeck_throwsOnDuplicate() {
-        createDeck("Existing Deck", "Description");
-
-        assertThrows(DeckValidationException.class, () -> deckManager.validateDeckNameUnique("Existing Deck", -1));
-
-        // New unique name should not throw
-        deckManager.validateDeckNameUnique("New Unique Deck", -1);
-    }
-
-    @Test
-    public void validateDeckNameUnique_updateDeck_allowsSameName() {
-        Deck existing = createDeck("Existing Deck", "Description");
-
-        // Same name for the same deck should not throw
-        deckManager.validateDeckNameUnique("Existing Deck", existing.getId());
-    }
-
-    @Test
-    public void validateDeckNameUnique_updateDeck_preventsOtherDeckNames() {
-        Deck deck1 = createDeck("Existing Deck", "Description");
-        createDeck("Another Deck", "Description");
-
-        assertThrows(DeckValidationException.class, () -> deckManager.validateDeckNameUnique("Another Deck", deck1.getId()));
     }
 
     // ---------------- getFlashcardCount ----------------
