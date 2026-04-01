@@ -63,23 +63,6 @@ public interface IDeckManager {
     List<Deck> getAllDecks();
 
     /**
-     * Validates deck data.
-     *
-     * @param name the deck name
-     * @throws DeckValidationException if the deck data is invalid
-     */
-    void validateDeck(String name);
-
-    /**
-     * Validates that a deck name is unique.
-     *
-     * @param name the deck name to check
-     * @param excludeDeckId deck ID to exclude from check (for updates), or -1 for new decks
-     * @throws DeckValidationException if the name is already taken
-     */
-    void validateDeckNameUnique(String name, int excludeDeckId);
-
-    /**
      * Gets the count of flashcards in a deck.
      *
      * @param deckId the ID of the deck

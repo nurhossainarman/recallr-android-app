@@ -7,6 +7,10 @@ import comp3350.flashcard.logic.IDeckManager;
 import comp3350.flashcard.logic.IFlashcardManager;
 import comp3350.flashcard.logic.IStudySession;
 import comp3350.flashcard.logic.StudySessionManager;
+import comp3350.flashcard.logic.validators.DeckValidator;
+import comp3350.flashcard.logic.validators.FlashcardValidator;
+import comp3350.flashcard.logic.validators.IDeckValidator;
+import comp3350.flashcard.logic.validators.IFlashcardValidator;
 import comp3350.flashcard.persistence.FlashcardPersistence;
 import comp3350.flashcard.persistence.DeckPersistence;
 import comp3350.flashcard.persistence.sqlite.DeckPersistenceSQLite;
@@ -24,6 +28,8 @@ public class Services {
     private static IStudySession studySession;
     private static FlashcardPersistence flashcardPersistence;
     private static DeckPersistence deckPersistence;
+    private static IDeckValidator deckValidator;
+    private static IFlashcardValidator flashcardValidator;
     private static Context appContext;
 
     public static void setContext(Context context) {
@@ -52,16 +58,30 @@ public class Services {
         return deckPersistence;
     }
 
+    public static IDeckValidator getDeckValidator() {
+        if (deckValidator == null) {
+            deckValidator = new DeckValidator(getDeckPersistence());
+        }
+        return deckValidator;
+    }
+
+    public static IFlashcardValidator getFlashcardValidator() {
+        if (flashcardValidator == null) {
+            flashcardValidator = new FlashcardValidator();
+        }
+        return flashcardValidator;
+    }
+
     public static IFlashcardManager getFlashcardManager() {
         if (flashcardManager == null) {
-            flashcardManager = new FlashcardManager(getFlashcardPersistence());
+            flashcardManager = new FlashcardManager(getFlashcardPersistence(), getFlashcardValidator());
         }
         return flashcardManager;
     }
 
     public static IDeckManager getDeckManager() {
         if (deckManager == null) {
-            deckManager = new DeckManager(getDeckPersistence(), getFlashcardPersistence());
+            deckManager = new DeckManager(getDeckPersistence(), getFlashcardPersistence(), getDeckValidator());
         }
         return deckManager;
     }
@@ -76,8 +96,10 @@ public class Services {
     public static void initialize(DeckPersistence deckPersist, FlashcardPersistence flashcardPersist) {
         deckPersistence = deckPersist;
         flashcardPersistence = flashcardPersist;
-        deckManager = new DeckManager(deckPersist, flashcardPersist);
-        flashcardManager = new FlashcardManager(flashcardPersist);
+        deckValidator = new DeckValidator(deckPersist);
+        flashcardValidator = new FlashcardValidator();
+        deckManager = new DeckManager(deckPersist, flashcardPersist, deckValidator);
+        flashcardManager = new FlashcardManager(flashcardPersist, flashcardValidator);
         studySession = new StudySessionManager(flashcardPersist);
     }
 
@@ -87,5 +109,7 @@ public class Services {
         studySession = null;
         flashcardPersistence = null;
         deckPersistence = null;
+        deckValidator = null;
+        flashcardValidator = null;
     }
 }

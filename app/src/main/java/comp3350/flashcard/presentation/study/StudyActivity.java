@@ -1,4 +1,4 @@
-package comp3350.flashcard.presentation;
+package comp3350.flashcard.presentation.study;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
@@ -24,11 +24,13 @@ import comp3350.flashcard.constants.UIConstants;
 import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.FilterMode;
 import comp3350.flashcard.logic.IStudySession;
+import comp3350.flashcard.presentation.StudyGestureListener;
 
 /**
  * Screen for studying flashcards in a session.
+ * Handles the UI interactions, animations, and delegates session logic to IStudySession.
  */
-public class StudyActivity extends AppCompatActivity {
+public class StudyActivity extends AppCompatActivity implements StudyGestureListener.Actions {
 
     private TextView tvProgress;
     private TextView tvContent;
@@ -40,6 +42,7 @@ public class StudyActivity extends AppCompatActivity {
     private FrameLayout cardContainer;
     private View cardFront;
     private View cardBack;
+    
     private IStudySession studySession;
     private boolean isShowingFront = true;
     private boolean isFirstCard = true;
@@ -49,15 +52,11 @@ public class StudyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_study);
 
-        // Get the session logic from the application services
         studySession = Services.getStudySession();
         initUI();
         startSession();
     }
 
-    /**
-     * Finds UI elements and sets up click and swipe listeners.
-     */
     private void initUI() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -76,56 +75,20 @@ public class StudyActivity extends AppCompatActivity {
         cardFront = findViewById(R.id.cardFront);
         cardBack = findViewById(R.id.cardBack);
 
-        // Setup gestures for swiping and tapping
-        GestureDetector gestureDetector = new GestureDetector(this,
-                new GestureDetector.SimpleOnGestureListener() {
-                    @Override
-                    public boolean onDown(@NonNull MotionEvent e) {
-                        return true;
-                    }
+        setupGestures();
 
-                    @Override
-                    public boolean onFling(@NonNull MotionEvent e1, @NonNull MotionEvent e2,
-                                           float velocityX, float velocityY) {
-                        float deltaX = e2.getX() - e1.getX();
-                        float deltaY = e2.getY() - e1.getY();
-
-                        if (Math.abs(deltaX) > Math.abs(deltaY)
-                                && Math.abs(deltaX) > UIConstants.SWIPE_THRESHOLD
-                                && Math.abs(velocityX) > UIConstants.SWIPE_VELOCITY_THRESHOLD) {
-                            if (deltaX < 0) {
-                                goToNextCard(); // Swipe left for next
-                            } else {
-                                goToPreviousCard(); // Swipe right for previous
-                            }
-                            return true;
-                        }
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onSingleTapUp(@NonNull MotionEvent e) {
-                        flipCard(); // Tap to show the other side
-                        return true;
-                    }
-                });
-
-        setupTouch(gestureDetector);
-
-        // Set button clicks
         findViewById(R.id.btnFlip).setOnClickListener(v -> flipCard());
         findViewById(R.id.btnNext).setOnClickListener(v -> goToNextCard());
         findViewById(R.id.btnPrevious).setOnClickListener(v -> goToPreviousCard());
         
-        // Save the known status when the checkbox changes
-        cbKnown.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            studySession.setKnown(isChecked);
-        });
+        cbKnown.setOnCheckedChangeListener((buttonView, isChecked) -> studySession.setKnown(isChecked));
     }
 
-    /**
-     * Connects touch events to the gesture detector.
-     */
+    private void setupGestures() {
+        GestureDetector gestureDetector = new GestureDetector(this, new StudyGestureListener(this));
+        setupTouch(gestureDetector);
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private void setupTouch(GestureDetector gestureDetector) {
         cardContainer.setOnTouchListener((v, event) -> {
@@ -137,23 +100,12 @@ public class StudyActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Starts the study session.
-     */
     private void startSession() {
         int deckId = getIntent().getIntExtra("DECK_ID", ValidationConstants.INVALID_ID);
         boolean shuffle = getIntent().getBooleanExtra("SHUFFLE", false);
         String filterModeStr = getIntent().getStringExtra("FILTER_MODE");
-        FilterMode filterMode = FilterMode.ALL;
         
-        if (filterModeStr != null) {
-            try {
-                filterMode = FilterMode.valueOf(filterModeStr);
-            } catch (IllegalArgumentException e) {
-                filterMode = FilterMode.ALL;
-            }
-        }
-
+        FilterMode filterMode = parseFilterMode(filterModeStr);
         studySession.startSession(deckId, shuffle, filterMode);
 
         if (studySession.hasCards()) {
@@ -161,55 +113,54 @@ public class StudyActivity extends AppCompatActivity {
             resetCardToFront();
             updateUI();
         } else {
-            String message = studySession.isDeckEmpty(deckId) ? "Add some cards first!" : "No cards match this filter";
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-            finish();
+            handleEmptySession(deckId);
         }
     }
 
-    /**
-     * Animates flipping the card to show front or back.
-     */
+    private FilterMode parseFilterMode(String filterModeStr) {
+        if (filterModeStr != null) {
+            try {
+                return FilterMode.valueOf(filterModeStr);
+            } catch (IllegalArgumentException ignored) {}
+        }
+        return FilterMode.ALL;
+    }
+
+    private void handleEmptySession(int deckId) {
+        String message = studySession.isDeckEmpty(deckId) ? "Add some cards first!" : "No cards match this filter";
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
     private void flipCard() {
         AnimatorSet flipOut = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.card_flip_out);
         AnimatorSet flipIn = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.card_flip_in);
 
-        if (isShowingFront) {
-            flipOut.setTarget(cardFront);
-            flipIn.setTarget(cardBack);
-            flipOut.start();
-            flipIn.start();
-            cardFront.postDelayed(() -> {
-                cardFront.setVisibility(View.GONE);
-                cardBack.setVisibility(View.VISIBLE);
-                studySession.flip();
-                tvContentBack.setText(studySession.getCurrentText());
-            }, 400);
-        } else {
-            flipOut.setTarget(cardBack);
-            flipIn.setTarget(cardFront);
-            flipOut.start();
-            flipIn.start();
-            cardBack.postDelayed(() -> {
-                cardBack.setVisibility(View.GONE);
-                cardFront.setVisibility(View.VISIBLE);
-                studySession.flip();
-                tvContent.setText(studySession.getCurrentText());
-            }, 400);
-        }
+        final View targetOut = isShowingFront ? cardFront : cardBack;
+        final View targetIn = isShowingFront ? cardBack : cardFront;
+        final TextView contentTarget = isShowingFront ? tvContentBack : tvContent;
+
+        flipOut.setTarget(targetOut);
+        flipIn.setTarget(targetIn);
+        flipOut.start();
+        flipIn.start();
+
+        targetOut.postDelayed(() -> {
+            targetOut.setVisibility(View.GONE);
+            targetIn.setVisibility(View.VISIBLE);
+            studySession.flip();
+            contentTarget.setText(studySession.getCurrentText());
+        }, UIConstants.ANIMATION_DURATION_FLIP);
 
         isShowingFront = !isShowingFront;
         hideHints();
         tvProgress.setText(studySession.getProgressText());
     }
 
-    /**
-     * Moves to the next card in the list.
-     */
     private void goToNextCard() {
         studySession.nextCard();
         if (studySession.isFinished()) {
-            finish(); // Stop if the session is over
+            finish();
             return;
         }
         isFirstCard = false;
@@ -220,9 +171,6 @@ public class StudyActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Moves back to the previous card.
-     */
     private void goToPreviousCard() {
         isFirstCard = false;
         studySession.previousCard();
@@ -233,17 +181,14 @@ public class StudyActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Animates sliding the card off the screen.
-     */
     private void slideCardOut(boolean toLeft, Runnable onFinish) {
         float screenWidth = getResources().getDisplayMetrics().widthPixels;
         float targetX = toLeft ? -screenWidth : screenWidth;
 
         ObjectAnimator slideX = ObjectAnimator.ofFloat(cardContainer, "translationX", 0f, targetX);
         ObjectAnimator fadeOut = ObjectAnimator.ofFloat(cardContainer, "alpha", 1f, 0f);
-        slideX.setDuration(320);
-        fadeOut.setDuration(320);
+        slideX.setDuration(UIConstants.ANIMATION_DURATION_SLIDE);
+        fadeOut.setDuration(UIConstants.ANIMATION_DURATION_SLIDE);
 
         AnimatorSet set = new AnimatorSet();
         set.playTogether(slideX, fadeOut);
@@ -258,9 +203,6 @@ public class StudyActivity extends AppCompatActivity {
         set.start();
     }
 
-    /**
-     * Animates sliding a new card onto the screen.
-     */
     private void slideCardIn(boolean fromLeft) {
         float screenWidth = getResources().getDisplayMetrics().widthPixels;
         float startX = fromLeft ? -screenWidth : screenWidth;
@@ -270,17 +212,14 @@ public class StudyActivity extends AppCompatActivity {
 
         ObjectAnimator slideX = ObjectAnimator.ofFloat(cardContainer, "translationX", startX, 0f);
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(cardContainer, "alpha", 0f, 1f);
-        slideX.setDuration(320);
-        fadeIn.setDuration(320);
+        slideX.setDuration(UIConstants.ANIMATION_DURATION_SLIDE);
+        fadeIn.setDuration(UIConstants.ANIMATION_DURATION_SLIDE);
 
         AnimatorSet set = new AnimatorSet();
         set.playTogether(slideX, fadeIn);
         set.start();
     }
 
-    /**
-     * Resets the view to show the front of the card.
-     */
     private void resetCardToFront() {
         isShowingFront = true;
         cardFront.setVisibility(View.VISIBLE);
@@ -288,7 +227,6 @@ public class StudyActivity extends AppCompatActivity {
         cardFront.setRotationY(0f);
         cardBack.setRotationY(0f);
 
-        // Show hints if this is the first card ever seen
         if (isFirstCard) {
             tvHint.setVisibility(View.VISIBLE);
             tvHintLeft.setVisibility(View.VISIBLE);
@@ -298,34 +236,41 @@ public class StudyActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Hides the swipe and tap hints.
-     */
     private void hideHints() {
         tvHint.setVisibility(View.GONE);
         tvHintLeft.setVisibility(View.GONE);
         tvHintRight.setVisibility(View.GONE);
     }
 
-    /**
-     * Updates the screen with information from the logic layer.
-     */
     private void updateUI() {
         tvContent.setText(studySession.getCurrentText());
         tvProgress.setText(studySession.getProgressText());
         tvContentBack.setText(studySession.getCurrentText());
         
-        // Update checkbox without triggering save logic
         cbKnown.setOnCheckedChangeListener(null);
         cbKnown.setChecked(studySession.isCurrentCardKnown());
-        cbKnown.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            studySession.setKnown(isChecked);
-        });
+        cbKnown.setOnCheckedChangeListener((buttonView, isChecked) -> studySession.setKnown(isChecked));
     }
 
     @Override
     public boolean onSupportNavigateUp() {
         finish();
         return true;
+    }
+
+    // Callbacks from StudyGestureListener
+    @Override
+    public void onSwipeLeft() {
+        goToNextCard();
+    }
+
+    @Override
+    public void onSwipeRight() {
+        goToPreviousCard();
+    }
+
+    @Override
+    public void onTap() {
+        flipCard();
     }
 }
