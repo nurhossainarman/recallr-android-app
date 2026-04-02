@@ -35,6 +35,7 @@ public class DeckManager implements IDeckManager {
      * @param description optional description of the deck
      * @return the created deck
      * @throws DeckValidationException if the name is invalid or already taken
+     * @throws NullPointerException if the database fails to insert the deck
      */
     public Deck createDeck(String name, String description) {
         ValidationResult result = validator.validate(name, ValidationConstants.INVALID_ID);
@@ -79,6 +80,7 @@ public class DeckManager implements IDeckManager {
      * @param description the new description
      * @return true if update successful, false otherwise
      * @throws DeckValidationException if the name is invalid or already taken by another deck
+     * @throws NullPointerException if the deck does not exist or update fails
      */
     public boolean updateDeck(int deckId, String name, String description) {
         ValidationResult result = validator.validate(name, deckId);

@@ -96,7 +96,7 @@ public class EditCardActivity extends AppCompatActivity {
                 Messages.show(this, getString(R.string.card_updated_prompt));
             }
             finish();
-        } catch (FlashcardValidationException e) {
+        } catch (FlashcardValidationException | NullPointerException e) {
             Messages.show(this, e.getMessage());
         }
     }

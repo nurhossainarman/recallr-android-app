@@ -93,7 +93,7 @@ public class EditDeckActivity extends AppCompatActivity {
                 Messages.show(this, getString(R.string.deck_updated_prompt));
             }
             finish();
-        } catch (DeckValidationException e) {
+        } catch (DeckValidationException | NullPointerException e) {
             Messages.show(this, e.getMessage());
         }
     }
