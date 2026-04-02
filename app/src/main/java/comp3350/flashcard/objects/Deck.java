@@ -8,7 +8,6 @@ import comp3350.flashcard.constants.ValidationConstants;
 /**
  * Represents a collection of flashcards organized by subject or topic.
  * Each deck has a unique name and contains zero or more flashcards.
- *
  * This class follows immutability principles for core fields (id, createdAt).
  * Use factory methods to create instances and withUpdated*() methods to modify.
  */
@@ -22,10 +21,6 @@ public class Deck implements Serializable {
     private final long createdAt;
     private long lastStudiedAt;
 
-    // Future fields for Iteration 2 and more
-    // private int knownCardCount;
-    // private int studySessionCount;
-    // private long totalStudyTime;
 
     /**
      * Package-private constructor - only persistence layer can call directly.
@@ -103,25 +98,15 @@ public class Deck implements Serializable {
 
     // ==================== Setters (Limited - prefer immutable updates) ====================
 
-    /**
-     * Sets the name. Only use for internal updates.
-     * Prefer withUpdatedName() for creating modified copies.
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * Sets the description. Only use for internal updates.
-     * Prefer withUpdatedDescription() for creating modified copies.
-     */
+
     public void setDescription(String description) {
         this.description = description != null ? description : "";
     }
 
-    /**
-     * Updates the last studied timestamp.
-     */
     public void setLastStudiedAt(long lastStudiedAt) {
         this.lastStudiedAt = lastStudiedAt;
     }

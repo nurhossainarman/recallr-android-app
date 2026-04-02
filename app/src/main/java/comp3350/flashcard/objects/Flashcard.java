@@ -23,13 +23,6 @@ public class Flashcard implements Serializable {
     private final long createdAt;
     private boolean isKnown;
 
-    // Future fields need to be implemented for Iteration 2 and more
-    // private int timesReviewed;
-    // private long lastReviewedAt;
-    // private int repetitionInterval;
-    // private double easeFactor;
-    // private long nextReviewDate;
-
     /**
      * Package-private constructor - only persistence layer can call directly.
      * Use factory methods createNew() or fromPersistence() instead.
@@ -115,25 +108,14 @@ public class Flashcard implements Serializable {
 
     // ==================== Setters (Limited - prefer immutable updates) ====================
 
-    /**
-     * Sets the front content. Only use for internal updates.
-     * Prefer withUpdatedContent() for creating modified copies.
-     */
     public void setFront(String front) {
         this.front = front;
     }
 
-    /**
-     * Sets the back content. Only use for internal updates.
-     * Prefer withUpdatedContent() for creating modified copies.
-     */
     public void setBack(String back) {
         this.back = back;
     }
 
-    /**
-     * Updates the known status of this flashcard.
-     */
     public void setIsKnown(boolean isKnown) {
         this.isKnown = isKnown;
     }

@@ -64,15 +64,6 @@ public interface IFlashcardManager {
     List<Flashcard> getAllFlashcards();
 
     /**
-     * Searches for cards containing a specific keyword.
-     *
-     * @param keyword the text to look for
-     * @param deckId the ID of the deck to search, or -1 for all decks
-     * @return a list of matching cards
-     */
-    List<Flashcard> searchFlashcards(String keyword, int deckId);
-
-    /**
      * Gets the count of flashcards in a specific deck.
      *
      * @param deckId the deck ID
@@ -80,21 +71,6 @@ public interface IFlashcardManager {
      */
     int getFlashcardCount(int deckId);
 
-    /**
-     * Deletes all flashcards in a specific deck.
-     *
-     * @param deckId the deck ID
-     * @return number of flashcards deleted
-     */
-    int deleteFlashcardsByDeck(int deckId);
-
-    /**
-     * Returns the number of cards marked as known in a deck.
-     *
-     * @param deckId the ID of the deck
-     * @return the number of known cards, or -1 if unsuccessful
-     */
-    int getKnownAmount(int deckId);
 
     /**
      * Gets a list of cards filtered by their known status.

@@ -202,50 +202,6 @@ public class FlashcardManagerTest {
         assertEquals(4, all.size());
     }
 
-    // ---------------- searchFlashcards ----------------
-
-    @Test
-    public void searchFlashcards_allDecks_caseInsensitiveContains() {
-        create("What is Java?", "A programming language", 1);
-        create("What is Python?", "Another programming language", 1);
-        create("Capital of France?", "Paris", 2);
-        create("What is JavaScript?", "Web programming language", 2);
-
-        List<Flashcard> java = manager.searchFlashcards("java", -1);
-        assertNotNull(java);
-        assertEquals(2, java.size()); // Java + JavaScript
-
-        List<Flashcard> prog = manager.searchFlashcards("PROGRAMMING", -1);
-        assertNotNull(prog);
-        assertEquals(3, prog.size()); // Java, Python, JavaScript
-    }
-
-    @Test
-    public void searchFlashcards_deckFilter_applies() {
-        create("Java Question", "Java Answer", 1);
-        create("Python Question", "Python Answer", 2);
-        create("JavaScript Question", "JavaScript Answer", 2);
-
-        List<Flashcard> results = manager.searchFlashcards("Java", 2);
-        assertNotNull(results);
-        assertEquals(1, results.size());
-        assertEquals(2, results.get(0).getDeckId());
-        assertTrue(results.get(0).getFront().contains("JavaScript"));
-    }
-
-    @Test
-    public void searchFlashcards_emptyDeck_returnsEmptyList() {
-        List<Flashcard> results = manager.searchFlashcards("anything", 999);
-        assertNotNull(results);
-        assertTrue(results.isEmpty());
-    }
-
-    @Test
-    public void searchFlashcards_invalidKeyword_returnsNull() {
-        assertNull(manager.searchFlashcards(null, -1));
-        assertNull(manager.searchFlashcards("", -1));
-        assertNull(manager.searchFlashcards("   ", -1));
-    }
 
     // ---------------- getFlashcardCount ----------------
 
@@ -261,37 +217,7 @@ public class FlashcardManagerTest {
         assertEquals(0, manager.getFlashcardCount(999));
         assertEquals(0, manager.getFlashcardCount(-1));
     }
-
-    // ---------------- deleteFlashcardsByDeck ----------------
-
-    @Test
-    public void deleteFlashcardsByDeck_deletesOnlyThatDeck() {
-        create("Q1", "A1", 1);
-        create("Q2", "A2", 1);
-        create("Q3", "A3", 1);
-        create("Q4", "A4", 2);
-
-        assertEquals(3, manager.deleteFlashcardsByDeck(1));
-        assertTrue(manager.getFlashcardsByDeck(1).isEmpty());
-        assertEquals(1, manager.getFlashcardsByDeck(2).size());
-
-        assertEquals(0, manager.deleteFlashcardsByDeck(999));
-        assertEquals(0, manager.deleteFlashcardsByDeck(-1));
-    }
-
-    // ---------------- getKnownAmount ----------------
-    @Test
-    public void getKnownAmount_countsPerDeck() {
-        create("Q1", "A1", 1).setIsKnown(true);
-        create("Q2", "A2", 1).setIsKnown(true);
-        create("Q3", "A3", 1);
-        create("Q4", "A4", 2);
-
-        assertEquals(2, manager.getKnownAmount(1));
-        assertEquals(0, manager.getKnownAmount(2));
-        assertEquals(0, manager.getKnownAmount(999));
-        assertEquals(-1, manager.getKnownAmount(-1));
-    }
+    
 
     // ---------------- getFlashcardsByMode ----------------
     @Test

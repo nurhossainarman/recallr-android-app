@@ -6,6 +6,7 @@ import java.util.List;
 
 import comp3350.flashcard.application.Services;
 import comp3350.flashcard.constants.AppErrors;
+import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.exceptions.StudySessionException;
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.FlashcardPersistence;
@@ -132,7 +133,7 @@ public class StudySessionManager implements IStudySession {
 
     @Override
     public boolean isDeckEmpty (int deckId){
-        return deckId != -1 && flashcardManager.getFlashcardCount(deckId) == 0;
+        return deckId != ValidationConstants.INVALID_ID && flashcardManager.getFlashcardCount(deckId) == 0;
     }
 
     public Flashcard getCurrentCard() {
