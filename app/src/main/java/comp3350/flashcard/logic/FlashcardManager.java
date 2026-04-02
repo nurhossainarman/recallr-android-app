@@ -2,6 +2,7 @@ package comp3350.flashcard.logic;
 
 import java.util.ArrayList;
 import java.util.List;
+import comp3350.flashcard.constants.AppErrors;
 import comp3350.flashcard.logic.exceptions.FlashcardValidationException;
 import comp3350.flashcard.logic.validators.IFlashcardValidator;
 import comp3350.flashcard.logic.validators.ValidationResult;
@@ -39,19 +40,18 @@ public class FlashcardManager implements IFlashcardManager {
      */
     @Override
     public Flashcard createFlashcard(String front, String back, int deckId) {
-        // Validate input
         ValidationResult result = validator.validate(front, back);
         if (!result.isValid()) {
             throw new FlashcardValidationException(result.getErrorMessage());
         }
         if (deckId <= 0) {
-            throw new FlashcardValidationException("Deck not found");
+            throw new FlashcardValidationException(AppErrors.DECK_NOT_FOUND);
         }
-        // Create
+
         Flashcard flashcard = Flashcard.createNew(front, back, deckId);
         Flashcard inserted = flashcardPersistence.insertFlashcard(flashcard);
         if (inserted == null) {
-            throw new NullPointerException("Failed to create flashcard");
+            throw new NullPointerException(AppErrors.FAILED_CREATE_FLASHCARD);
         }
         return inserted;
     }
@@ -80,20 +80,19 @@ public class FlashcardManager implements IFlashcardManager {
      */
     @Override
     public boolean updateFlashcard(int flashcardId, String front, String back) {
-        // Validate input
         ValidationResult result = validator.validate(front, back);
         if (!result.isValid()) {
             throw new FlashcardValidationException(result.getErrorMessage());
         }
-        // Get the card
+
         Flashcard existingFlashcard = flashcardPersistence.getFlashcardById(flashcardId);
         if (existingFlashcard == null) {
-            throw new FlashcardValidationException("Flashcard not found");
+            throw new FlashcardValidationException(AppErrors.FLASHCARD_NOT_FOUND);
         }
-        // Update
+
         Flashcard updatedFlashcard = existingFlashcard.withUpdatedContent(front, back);
         if (!flashcardPersistence.updateFlashcard(updatedFlashcard)) {
-            throw new NullPointerException("Failed to update flashcard");
+            throw new NullPointerException(AppErrors.FAILED_UPDATE_FLASHCARD);
         }
         return true;
     }
@@ -107,7 +106,7 @@ public class FlashcardManager implements IFlashcardManager {
     @Override
     public boolean deleteFlashcard(int flashcardId) {
         if (!flashcardPersistence.flashcardExists(flashcardId)) {
-            throw new FlashcardValidationException("Flashcard not found");
+            throw new FlashcardValidationException(AppErrors.FLASHCARD_NOT_FOUND);
         }
         return flashcardPersistence.deleteFlashcard(flashcardId);
     }

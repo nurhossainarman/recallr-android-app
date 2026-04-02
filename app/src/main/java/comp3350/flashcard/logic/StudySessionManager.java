@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import comp3350.flashcard.application.Services;
+import comp3350.flashcard.constants.AppErrors;
 import comp3350.flashcard.logic.exceptions.StudySessionException;
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.FlashcardPersistence;
@@ -58,12 +59,12 @@ public class StudySessionManager implements IStudySession {
     @Override
     public void validateSession(int deckId, FilterMode filterMode) throws StudySessionException {
         if (isDeckEmpty(deckId)) {
-            throw new StudySessionException("Add some cards first!");
+            throw new StudySessionException(AppErrors.NO_CARDS_FOR_SESSION);
         }
 
         List<Flashcard> filteredCards = flashcardManager.getFlashcardsByMode(deckId, filterMode);
         if (filteredCards == null || filteredCards.isEmpty()) {
-            throw new StudySessionException("No cards match this filter");
+            throw new StudySessionException(AppErrors.NO_MATCHING_CARDS_FILTER);
         }
     }
 

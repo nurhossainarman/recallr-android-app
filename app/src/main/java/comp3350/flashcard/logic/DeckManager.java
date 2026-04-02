@@ -2,6 +2,7 @@ package comp3350.flashcard.logic;
 
 import java.util.List;
 import comp3350.flashcard.logic.exceptions.DeckValidationException;
+import comp3350.flashcard.constants.AppErrors;
 import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.validators.IDeckValidator;
 import comp3350.flashcard.logic.validators.ValidationResult;
@@ -44,7 +45,7 @@ public class DeckManager implements IDeckManager {
         Deck newDeck = Deck.createNew(name, description);
         Deck insert = deckPersistence.insertDeck(newDeck);
         if (insert == null) {
-            throw new NullPointerException("Failed to create new deck");
+            throw new NullPointerException(AppErrors.FAILED_CREATE_DECK);
         }
         return insert;
     }
@@ -84,14 +85,13 @@ public class DeckManager implements IDeckManager {
         if (!result.isValid()) {
             throw new DeckValidationException(result.getErrorMessage());
         }
-
         if (!deckExists(deckId)) {
-            throw new DeckValidationException("Deck not found");
+            throw new DeckValidationException(AppErrors.DECK_NOT_FOUND);
         }
 
         Deck existingDeck = deckPersistence.getDeckById(deckId);
         if (existingDeck == null) {
-            throw new NullPointerException("Failed to create deck.");
+            throw new NullPointerException(AppErrors.FAILED_UPDATE_DECK);
         }
 
         existingDeck.setName(name);
@@ -107,7 +107,7 @@ public class DeckManager implements IDeckManager {
      */
     public boolean deleteDeck(int deckId) {
         if (!deckExists(deckId)) {
-            throw new DeckValidationException("Deck not found");
+            throw new DeckValidationException(AppErrors.DECK_NOT_FOUND);
         }
 
         // Delete all flashcards in the deck first
@@ -162,12 +162,12 @@ public class DeckManager implements IDeckManager {
      */
     public boolean markDeckAsStudied(int deckId) {
         if (!deckExists(deckId)) {
-            throw new DeckValidationException("Deck not found");
+            throw new DeckValidationException(AppErrors.DECK_NOT_FOUND);
         }
 
         Deck deck = deckPersistence.getDeckById(deckId);
         if (deck == null) {
-            throw new NullPointerException("Deck not found");
+            throw new NullPointerException(AppErrors.DECK_NOT_FOUND);
         }
 
         deck.setLastStudiedAt(System.currentTimeMillis());
