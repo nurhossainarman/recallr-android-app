@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,6 +22,7 @@ import comp3350.flashcard.logic.exceptions.StudySessionException;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.presentation.Adapter;
+import comp3350.flashcard.presentation.Messages;
 import comp3350.flashcard.presentation.card.EditCardActivity;
 import comp3350.flashcard.presentation.study.StudyActivity;
 
@@ -86,7 +86,7 @@ public class DeckDetailActivity extends AppCompatActivity {
                 toolbar.setTitle(deck.getName());
             }
         } catch (Exception e) {
-            printToast(e.getMessage());
+            Messages.show(this, e.getMessage());
         }
     }
 
@@ -107,7 +107,7 @@ public class DeckDetailActivity extends AppCompatActivity {
             List<Flashcard> cards = flashcardManager.getFlashcardsByDeck(deckId);
             adapter.updateItems(cards);
         } catch (Exception e) {
-            printToast(e.getMessage());
+            Messages.show(this, e.getMessage());
         }
     }
 
@@ -121,7 +121,7 @@ public class DeckDetailActivity extends AppCompatActivity {
                 flashcardManager.deleteFlashcard(card.getId());
                 loadCards();
             } catch (Exception e) {
-                printToast(e.getMessage());
+                Messages.show(this, e.getMessage());
             }
         });
     }
@@ -155,14 +155,7 @@ public class DeckDetailActivity extends AppCompatActivity {
             intent.putExtra("FILTER_MODE", filterMode.name());
             startActivity(intent);
         } catch (StudySessionException e) {
-            // Error is a result of catching an exception from logic
-            printToast(e.getMessage());
-        }
-    }
-
-    private void printToast(String message) {
-        if (message != null && !message.isEmpty()) {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            Messages.show(this, e.getMessage());
         }
     }
 }

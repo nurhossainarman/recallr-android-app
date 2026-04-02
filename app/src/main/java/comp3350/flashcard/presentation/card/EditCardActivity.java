@@ -88,18 +88,14 @@ public class EditCardActivity extends AppCompatActivity {
         String back = inputCardBack.getText().toString().trim();
 
         try {
-            // Check if the card is new or not
             if (ActivityHelper.isNew(this.cardId)) {
-                if (flashcardManager.createFlashcard(front, back, deckId) != null) {
-                    Messages.show(this, getString(R.string.card_added_prompt));
-                    finish();
-                }
+                flashcardManager.createFlashcard(front, back, deckId);
+                Messages.show(this, getString(R.string.card_added_prompt));
             } else {
-                if (flashcardManager.updateFlashcard(cardId, front, back)) {
-                    Messages.show(this, getString(R.string.card_updated_prompt));
-                    finish();
-                }
+                flashcardManager.updateFlashcard(cardId, front, back);
+                Messages.show(this, getString(R.string.card_updated_prompt));
             }
+            finish();
         } catch (FlashcardValidationException e) {
             Messages.show(this, e.getMessage());
         }

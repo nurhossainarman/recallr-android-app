@@ -84,18 +84,15 @@ public class EditDeckActivity extends AppCompatActivity {
         String name = inputDeckName.getText().toString().trim();
 
         try {
-            //Check if the deck is new or not
+            // Check if the deck is new or not
             if (ActivityHelper.isNew(deckId)) {
-                if (deckManager.createDeck(name, "") != null) {
-                    Messages.show(this, getString(R.string.deck_added_prompt));
-                    finish();
-                }
+                deckManager.createDeck(name, "");
+                Messages.show(this, getString(R.string.deck_added_prompt));
             } else {
-                if (deckManager.updateDeck(deckId, name, "")) {
-                    Messages.show(this, getString(R.string.deck_updated_prompt));
-                    finish();
-                }
+                deckManager.updateDeck(deckId, name, "");
+                Messages.show(this, getString(R.string.deck_updated_prompt));
             }
+            finish();
         } catch (DeckValidationException e) {
             Messages.show(this, e.getMessage());
         }
