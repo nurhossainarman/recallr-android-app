@@ -9,7 +9,7 @@ import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
 import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.IDeckManager;
-import comp3350.flashcard.logic.DeckValidationException;
+import comp3350.flashcard.logic.exceptions.DeckValidationException;
 import comp3350.flashcard.objects.Deck;
 import comp3350.flashcard.presentation.ActivityHelper;
 import comp3350.flashcard.presentation.Messages;

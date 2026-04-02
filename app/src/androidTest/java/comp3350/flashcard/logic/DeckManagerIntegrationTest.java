@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import java.util.List;
 import comp3350.flashcard.constants.ValidationConstants;
+import comp3350.flashcard.logic.exceptions.DeckValidationException;
 import comp3350.flashcard.logic.validators.DeckValidator;
 import comp3350.flashcard.logic.validators.IDeckValidator;
 import comp3350.flashcard.objects.Deck;
@@ -259,12 +260,15 @@ public class DeckManagerIntegrationTest {
     }
 
     @Test
-    public void testDeleteDeck_nonExistentDeck_returnsFalse() {
-        // Act: Try to delete a deck that doesn't exist
-        boolean deleted = deckManager.deleteDeck(99999);
-
-        // Assert: Delete should fail gracefully
-        assertFalse("Delete of non-existent deck should return false", deleted);
+    public void testDeleteDeck_nonExistentDeck_throwsException() {
+        // Act & Assert: Try to delete a deck that doesn't exist, should throw exception
+        try {
+            deckManager.deleteDeck(99999);
+            fail("Should have thrown DeckValidationException");
+        } catch (DeckValidationException e) {
+            assertTrue("Error message should mention not found",
+                e.getMessage().toLowerCase().contains("not found"));
+        }
     }
 
     // ---------------- Test other manager operations with persistence ----------------

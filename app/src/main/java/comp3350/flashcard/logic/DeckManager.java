@@ -1,6 +1,7 @@
 package comp3350.flashcard.logic;
 
 import java.util.List;
+import comp3350.flashcard.logic.exceptions.DeckValidationException;
 import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.validators.IDeckValidator;
 import comp3350.flashcard.logic.validators.ValidationResult;
@@ -41,7 +42,11 @@ public class DeckManager implements IDeckManager {
         }
 
         Deck newDeck = Deck.createNew(name, description);
-        return deckPersistence.insertDeck(newDeck);
+        Deck insert = deckPersistence.insertDeck(newDeck);
+        if (insert == null) {
+            throw new NullPointerException("Failed to create new deck");
+        }
+        return insert;
     }
 
     /**
@@ -81,12 +86,12 @@ public class DeckManager implements IDeckManager {
         }
 
         if (!deckExists(deckId)) {
-            return false;
+            throw new DeckValidationException("Deck not found");
         }
 
         Deck existingDeck = deckPersistence.getDeckById(deckId);
         if (existingDeck == null) {
-            return false;
+            throw new NullPointerException("Failed to create deck.");
         }
 
         existingDeck.setName(name);
@@ -102,7 +107,7 @@ public class DeckManager implements IDeckManager {
      */
     public boolean deleteDeck(int deckId) {
         if (!deckExists(deckId)) {
-            return false;
+            throw new DeckValidationException("Deck not found");
         }
 
         // Delete all flashcards in the deck first
@@ -157,12 +162,12 @@ public class DeckManager implements IDeckManager {
      */
     public boolean markDeckAsStudied(int deckId) {
         if (!deckExists(deckId)) {
-            return false;
+            throw new DeckValidationException("Deck not found");
         }
 
         Deck deck = deckPersistence.getDeckById(deckId);
         if (deck == null) {
-            return false;
+            throw new NullPointerException("Deck not found");
         }
 
         deck.setLastStudiedAt(System.currentTimeMillis());

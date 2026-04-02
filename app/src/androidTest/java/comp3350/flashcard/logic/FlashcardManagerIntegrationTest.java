@@ -239,12 +239,15 @@ public class FlashcardManagerIntegrationTest {
     }
 
     @Test
-    public void testUpdateFlashcard_nonExistent_returnsFalse() {
-        // Act: Try to update a flashcard that doesn't exist
-        boolean updated = flashcardManager.updateFlashcard(99999, "Front", "Back");
-
-        // Assert: Update should fail gracefully
-        assertFalse("Update of non-existent flashcard should return false", updated);
+    public void testUpdateFlashcard_nonExistent_throwsException() {
+        // Act & Assert: Try to update a flashcard that doesn't exist
+        try {
+            flashcardManager.updateFlashcard(99999, "Front", "Back");
+            fail("Should have thrown FlashcardValidationException");
+        } catch (FlashcardValidationException e) {
+            assertTrue("Error message should mention not found",
+                e.getMessage().toLowerCase().contains("not found"));
+        }
     }
 
     // ---------------- Test search functionality with persistence ----------------
@@ -422,6 +425,18 @@ public class FlashcardManagerIntegrationTest {
         // Assert: Flashcard is removed from SQLite
         assertNull("Flashcard should no longer exist",
             flashcardPersistence.getFlashcardById(flashcardId));
+    }
+
+    @Test
+    public void testDeleteFlashcard_nonExistent_throwsException() {
+        // Act & Assert: Try to delete a flashcard that doesn't exist
+        try {
+            flashcardManager.deleteFlashcard(99999);
+            fail("Should have thrown FlashcardValidationException");
+        } catch (FlashcardValidationException e) {
+            assertTrue("Error message should mention not found",
+                e.getMessage().toLowerCase().contains("not found"));
+        }
     }
 
     @Test

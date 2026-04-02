@@ -1,4 +1,4 @@
-package comp3350.flashcard.logic;
+package comp3350.flashcard.logic.exceptions;
 
 import comp3350.flashcard.logic.exceptions.BusinessException;
 

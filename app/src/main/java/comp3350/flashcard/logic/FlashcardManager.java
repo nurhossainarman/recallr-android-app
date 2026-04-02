@@ -33,21 +33,27 @@ public class FlashcardManager implements IFlashcardManager {
      * @param front the text on the front side
      * @param back the text on the back side
      * @param deckId the ID of the deck it belongs to
-     * @return the new card
+     * @return the new card, never null
      * @throws FlashcardValidationException if the front or back is blank, or the deck ID is invalid
+     * @throws NullPointerException if the database fails to insert the card
      */
+    @Override
     public Flashcard createFlashcard(String front, String back, int deckId) {
+        // Validate input
         ValidationResult result = validator.validate(front, back);
         if (!result.isValid()) {
             throw new FlashcardValidationException(result.getErrorMessage());
         }
-
         if (deckId <= 0) {
-            throw new FlashcardValidationException("Deck ID must be a positive integer");
+            throw new FlashcardValidationException("Deck not found");
         }
-
+        // Create
         Flashcard flashcard = Flashcard.createNew(front, back, deckId);
-        return flashcardPersistence.insertFlashcard(flashcard);
+        Flashcard inserted = flashcardPersistence.insertFlashcard(flashcard);
+        if (inserted == null) {
+            throw new NullPointerException("Failed to create flashcard");
+        }
+        return inserted;
     }
 
     /**
@@ -55,6 +61,7 @@ public class FlashcardManager implements IFlashcardManager {
      * @param flashcardId the card's unique ID
      * @return the card object, or null if not found
      */
+    @Override
     public Flashcard getFlashcard(int flashcardId) {
         if (flashcardId <= 0) {
             return null;
@@ -69,30 +76,38 @@ public class FlashcardManager implements IFlashcardManager {
      * @param back the new back text
      * @return true if updated successfully
      * @throws FlashcardValidationException if the front or back is blank
+     * @throws NullPointerException if the card does not exist or update fails
      */
+    @Override
     public boolean updateFlashcard(int flashcardId, String front, String back) {
+        // Validate input
         ValidationResult result = validator.validate(front, back);
         if (!result.isValid()) {
             throw new FlashcardValidationException(result.getErrorMessage());
         }
-
+        // Get the card
         Flashcard existingFlashcard = flashcardPersistence.getFlashcardById(flashcardId);
         if (existingFlashcard == null) {
-            return false;
+            throw new FlashcardValidationException("Flashcard not found");
         }
-
+        // Update
         Flashcard updatedFlashcard = existingFlashcard.withUpdatedContent(front, back);
-        return flashcardPersistence.updateFlashcard(updatedFlashcard);
+        if (!flashcardPersistence.updateFlashcard(updatedFlashcard)) {
+            throw new NullPointerException("Failed to update flashcard");
+        }
+        return true;
     }
 
     /**
      * Deletes a flashcard
      * @param flashcardId the ID of the flashcard to delete
-     * @return true if deletion successful, false otherwise
+     * @return true if deletion successful
+     * @throws FlashcardValidationException if the card is not found
      */
+    @Override
     public boolean deleteFlashcard(int flashcardId) {
-        if (!isValidFlashcardId(flashcardId)) {
-            return false;
+        if (!flashcardPersistence.flashcardExists(flashcardId)) {
+            throw new FlashcardValidationException("Flashcard not found");
         }
         return flashcardPersistence.deleteFlashcard(flashcardId);
     }
@@ -102,6 +117,7 @@ public class FlashcardManager implements IFlashcardManager {
      * @param deckId the ID of the deck
      * @return list of flashcards in the deck
      */
+    @Override
     public List<Flashcard> getFlashcardsByDeck(int deckId) {
         if (deckId < 0) {
             return null;
@@ -113,6 +129,7 @@ public class FlashcardManager implements IFlashcardManager {
      * Gets all flashcards across all decks
      * @return list of all flashcards
      */
+    @Override
     public List<Flashcard> getAllFlashcards() {
         return flashcardPersistence.getAllFlashcards();
     }
@@ -127,6 +144,7 @@ public class FlashcardManager implements IFlashcardManager {
      * @param deckId the ID of the deck to search, or -1 for all decks
      * @return a list of matching cards
      */
+    @Override
     public List<Flashcard> searchFlashcards(String keyword, int deckId) {
         if (StringUtils.isNullOrEmpty(keyword)) {
             return null;
@@ -166,6 +184,7 @@ public class FlashcardManager implements IFlashcardManager {
      * @param deckId the deck ID
      * @return number of flashcards in the deck
      */
+    @Override
     public int getFlashcardCount(int deckId) {
         if (deckId < 0) {
             return 0;
@@ -178,6 +197,7 @@ public class FlashcardManager implements IFlashcardManager {
      * @param deckId the deck ID
      * @return number of flashcards deleted
      */
+    @Override
     public int deleteFlashcardsByDeck(int deckId) {
         if (deckId < 0) {
             return 0;
@@ -190,6 +210,7 @@ public class FlashcardManager implements IFlashcardManager {
      * @param deckId the ID of the deck
      * @return the number of known cards, or -1 if unsuccessful
      */
+    @Override
     public int getKnownAmount(int deckId) {
         if (deckId < 0) {
             return -1;
@@ -215,6 +236,7 @@ public class FlashcardManager implements IFlashcardManager {
      * @param mode the filter type (ALL, KNOWN, UNKNOWN)
      * @return a filtered list of cards
      */
+    @Override
     public List<Flashcard> getFlashcardsByMode(int deckId, FilterMode mode) {
         List<Flashcard> allCards = getFlashcardsByDeck(deckId);
         if (allCards == null) {

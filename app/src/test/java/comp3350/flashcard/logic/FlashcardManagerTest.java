@@ -124,18 +124,18 @@ public class FlashcardManagerTest {
     }
 
     @Test
-    public void updateFlashcard_notFound_fails() {
-        assertFalse(manager.updateFlashcard(99999, "Q", "A"));
+    public void updateFlashcard_notFound_throwsException() {
+        assertThrows(FlashcardValidationException.class, () -> manager.updateFlashcard(99999, "Q", "A"));
     }
 
     @Test
-    public void updateFlashcard_invalidIdZero_fails() {
-        assertFalse(manager.updateFlashcard(0, "Q", "A"));
+    public void updateFlashcard_invalidIdZero_throwsException() {
+        assertThrows(FlashcardValidationException.class, () -> manager.updateFlashcard(0, "Q", "A"));
     }
 
     @Test
-    public void updateFlashcard_invalidIdNegative_fails() {
-        assertFalse(manager.updateFlashcard(-1, "Q", "A"));
+    public void updateFlashcard_invalidIdNegative_throwsException() {
+        assertThrows(FlashcardValidationException.class, () -> manager.updateFlashcard(-1, "Q", "A"));
     }
 
     // ---------------- deleteFlashcard ----------------
@@ -149,14 +149,14 @@ public class FlashcardManagerTest {
     }
 
     @Test
-    public void deleteFlashcard_invalidId_fails() {
-        assertFalse(manager.deleteFlashcard(0));
-        assertFalse(manager.deleteFlashcard(-1));
+    public void deleteFlashcard_invalidId_throwsException() {
+        assertThrows(FlashcardValidationException.class, () -> manager.deleteFlashcard(0));
+        assertThrows(FlashcardValidationException.class, () -> manager.deleteFlashcard(-1));
     }
 
     @Test
-    public void deleteFlashcard_notFound_fails() {
-        assertFalse(manager.deleteFlashcard(99999));
+    public void deleteFlashcard_notFound_throwsException() {
+        assertThrows(FlashcardValidationException.class, () -> manager.deleteFlashcard(99999));
     }
 
     // ---------------- getFlashcardsByDeck ----------------
