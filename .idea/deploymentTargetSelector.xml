@@ -8,16 +8,10 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="All Tests">
+      <SelectionState runConfigName="testStudySession_flipCard_cardFlipsSuccessfully()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testDeleteDeck_nonExistentDeck_throwsException()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="testUpdateFlashcard_nonExistent_returnsFalse()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="testUpdateFlashcard_nonExistent_throwsException()">
+      <SelectionState runConfigName="Tests in 'comp3350.flashcard.presentation'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
