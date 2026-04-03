@@ -36,8 +36,5 @@ Once Iteration Three provided dedicated time for refactoring, the team took the 
 
 
 
-
-
-
-
 ## Velocity Chart: Three Iterations
+![Velocity chart](velocity_chart.png)
