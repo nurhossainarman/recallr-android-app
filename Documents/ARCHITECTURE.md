@@ -6,108 +6,7 @@ Recallr app follows a **three-tier layered architecture** that separates concern
 
 ## Architecture Diagram
 
-```mermaid
-flowchart TB
-    subgraph Presentation["PRESENTATION LAYER (Android UI)"]
-        MainActivity["MainActivity"]
-        DeckDetailActivity["DeckDetailActivity"]
-        EditDeckActivity["EditDeckActivity"]
-        EditCardActivity["EditCardActivity"]
-        StudyActivity["StudyActivity"]
-        Adapter["Adapter"]
-    end
-
-    subgraph Logic["LOGIC LAYER (Business Logic)"]
-        DeckManager["DeckManager
-        ─────────────
-        + createDeck()
-        + getAllDecks()
-        + updateDeck()
-        + deleteDeck()
-        + getFlashcardCount()"]
-
-        FlashcardManager["FlashcardManager
-        ─────────────────
-        + createFlashcard()
-        + getFlashcardsByDeck()
-        + updateFlashcard()
-        + deleteFlashcard()"]
-
-        IStudySession[/"«interface»
-        IStudySession"/]
-
-        StudySessionManager["StudySessionManager
-        ────────────────────
-        + startSession()
-        + nextCard()
-        + previousCard()
-        + flip()
-        + setKnown()
-        + getCurrentText()
-        + getProgressText()
-        + isFinished()
-        + hasCards()"]
-    end
-
-    subgraph Data["DATA LAYER (Persistence)"]
-        DeckPersistence[/"«interface»
-        DeckPersistence"/]
-        FlashcardPersistence[/"«interface»
-        FlashcardPersistence"/]
-
-        DeckPersistenceStub["DeckPersistenceStub
-        (In-Memory)"]
-        FlashcardPersistenceStub["FlashcardPersistenceStub
-        (In-Memory)"]
-
-        DeckPersistenceSQLite["DeckPersistenceSQLite
-        (SQLite Database)"]
-        FlashcardPersistenceSQLite["FlashcardPersistenceSQLite
-        (SQLite Database)"]
-    end
-
-    subgraph Domain["DOMAIN OBJECTS (Shared)"]
-        Deck["Deck
-        ────────
-        - id: int
-        - name: String
-        - cardCount: int"]
-        
-        Flashcard["Flashcard
-        ──────────
-        - id: int
-        - front: String
-        - back: String
-        - deckId: int"]
-    end
-
-    %% Presentation to Logic
-    MainActivity --> DeckManager
-    DeckDetailActivity --> DeckManager
-    DeckDetailActivity --> FlashcardManager
-    EditDeckActivity --> DeckManager
-    EditCardActivity --> FlashcardManager
-    StudyActivity --> IStudySession
-
-    %% Logic to Data
-    DeckManager --> DeckPersistence
-    DeckManager --> FlashcardPersistence
-    FlashcardManager --> FlashcardPersistence
-    StudySessionManager --> FlashcardPersistence
-
-    %% Interface to Implementation (Logic)
-    IStudySession -.-> StudySessionManager
-
-    %% Interface to Implementation
-    DeckPersistence -.-> DeckPersistenceStub
-    DeckPersistence -.-> DeckPersistenceSQLite
-    FlashcardPersistence -.-> FlashcardPersistenceStub
-    FlashcardPersistence -.-> FlashcardPersistenceSQLite
-```
-
-### High-level overview of how components interact
-
-![Layer dependency diagram](diagram.png)
+![Layer dependency diagram](i3-diagram.png)
 
 ### Domain Class Diagram
 
@@ -158,55 +57,65 @@ classDiagram
 This project enforces **strict separation of concerns**.
 ```
 app/src/main/java/comp3350/flashcard/
-├── application/                    # Application configuration
-│   ├── FlashcardApplication.java   # Application class (sets up services)
-│   └── Services.java               # Service locator / dependency injection
-│
-├── objects/                        # Domain objects (shared across layers)
+├── application/
+│   ├── FlashcardApplication.java   # App initialization and context setup
+│   └── Services.java               # Service Locator / Dependency Injection
+├── constants/
+│   ├── AppErrors.java# Centralized error strings
+│   ├── DatabaseConstants.java       # Table and column names
+│   ├── UIConstants.java             # Animation durations and UI settings
+│   └── ValidationConstants.java     # Input length limits and ID constants
+├── logic/
+│   ├── exceptions/                 # Custom checked exceptions
+│   │   ├── BusinessException.java
+│   │   ├── DeckValidationException.java
+│   │   ├── FlashcardValidationException.java
+│   │   └── StudySessionException.java
+│   ├── validators/                 # Business rule enforcement
+│   │   ├── DeckValidator.java
+│   │   ├── IDeckValidator.java
+│   │   ├── FlashcardValidator.java
+│   │   ├── IFlashcardValidator.java
+│   │   └── ValidationResult.java
+│   ├── DeckManager.java            # Deck business logic
+│   ├── IDeckManager.java
+│   ├── FlashcardManager.java       # Flashcard business logic
+│   ├── IFlashcardManager.java
+│   ├── IStudySession.java          # Study session contract
+│   ├── StudySessionManager.java    # Session state management
+│   ├── StudySessionHelper.java     # Progress formatting
+│   └── FilterMode.java             # Enum (ALL, KNOWN, UNKNOWN)
+├── objects/                        # Domain models (POJOs)
 │   ├── Deck.java
 │   └── Flashcard.java
-│
-├── persistence/                    # Data layer
-│   ├── DeckPersistence.java        # Interface
-│   ├── FlashcardPersistence.java   # Interface
-│   ├── PersistenceException.java   # Custom exception for persistence errors
-│   ├── stubs/
+├── persistence/
+│   ├── sqlite/                     # Production database implementation
+│   │   ├── DatabaseHelper.java
+│   │   ├── DeckPersistenceSQLite.java
+│   │   └── FlashcardPersistenceSQLite.java
+│   ├── stubs/                      # Unit testing implementations
 │   │   ├── DeckPersistenceStub.java
 │   │   └── FlashcardPersistenceStub.java
-│   └── sqlite/
-│       ├── DatabaseHelper.java
-│       ├── DeckPersistenceSQLite.java
-│       └── FlashcardPersistenceSQLite.java
-│
-├── logic/                          # Business logic layer
-│   ├── DeckValidationException.java
-│   ├── FilterMode.java             # Enums for logic
-│   ├── IStudySession.java          # Interface for study session 
-│   ├── DeckManager.java
-│   ├── FlashcardManager.java       
-│   └── StudySessionManager.java    # Implements IStudySession (shuffle, filter, flip)
-│
-└── presentation/                   # UI layer (Android Activities)
-    ├── MainActivity.java
-    ├── DeckDetailActivity.java
-    ├── EditDeckActivity.java
-    ├── EditCardActivity.java
-    ├── StudyActivity.java           # Flashcard study UI (swipe, flip, known/unknown)
-    └── Adapter.java
-
-app/src/test/java/comp3350/flashcard/
-├── objects/                        # Domain object tests
-│   ├── DeckTest.java
-│   └── FlashcardTest.java
-│
-└── logic/                          # Logic layer tests
-    ├── DeckManagerTest.java
-    ├── FlashcardManagerTest.java
-    └── StudySessionManagerTest.java # Tests shuffle, filter modes, flip, setKnown
-
-app/src/androidTest/java/comp3350/flashcard/
-└── persistence/                    # Integration tests
-    └── DataAccessTest.java
+│   ├── DeckPersistence.java        # Interface
+│   ├── FlashcardPersistence.java   # Interface
+│   └── PersistenceException.java   # Runtime data errors
+├── presentation/                   # Android UI layer
+│   ├── card/
+│   │   └── EditCardActivity.java
+│   ├── deck/
+│   │   ├── MainActivity.java
+│   │   ├── DeckDetailActivity.java
+│   │   └── EditDeckActivity.java
+│   ├── study/
+│   │   └── StudyActivity.java
+│   ├── viewmodel/
+│   │   └── DeckViewModel.java      # UI-specific deck data
+│   ├── ActivityHelper.java         # Common UI logic (isNew check)
+│   ├── Adapter.java                # Generic RecyclerView Adapter
+│   ├── Messages.java               # Standardized Toast utility
+│   └── StudyGestureListener.java   # Swipe/Flip touch handling
+└── utils/
+    └── StringUtils.java            # String manipulation helpers
 ```
 
 ## Layer Responsibilities
