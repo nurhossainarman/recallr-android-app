@@ -1,6 +1,7 @@
 # A01-G05-Fiver
 
-
+## Project Overview
+Recallr is a flashcard study application designed to help users master new subjects through active recall and organized practice. The app allows users to categorize their learning into custom decks, manage individual flashcards, and engage in interactive study sessions. Key features include randomized practice via card shuffling and the ability to filter sessions by mastery level (focusing on "unknown" or "known" items) to optimize study time. Built with a clean three-tier architecture, Recallr provides a reliable and streamlined experience for students and lifelong learners.
 
 ## Vision Statement
 
@@ -10,6 +11,8 @@ See the vision statement here :  [Vision Statement](https://code.cs.umanitoba.ca
 
 See our architecture [here](/Documents/ARCHITECTURE.md).
 
+## Final Retrospective
+See our final retrospective [here](/Documents/RETROSPECTIVE.md)
 
 ## Iterations
 
