@@ -34,7 +34,7 @@ public class DeckPersistenceStub implements DeckPersistence {
         long now = System.currentTimeMillis();
 
         // Sample Deck 1: Spanish Vocabulary
-        Deck spanishDeck = new Deck(
+        Deck spanishDeck = Deck.fromPersistence(
                 nextId.getAndIncrement(),
                 "Spanish Vocabulary",
                 "Common Spanish words and phrases for beginners",
@@ -44,7 +44,7 @@ public class DeckPersistenceStub implements DeckPersistence {
         decks.add(spanishDeck);
 
         // Sample Deck 2: Java Basics
-        Deck javaDeck = new Deck(
+        Deck javaDeck = Deck.fromPersistence(
                 nextId.getAndIncrement(),
                 "Java Basics",
                 "Fundamental Java programming concepts",
@@ -54,7 +54,7 @@ public class DeckPersistenceStub implements DeckPersistence {
         decks.add(javaDeck);
 
         // Sample Deck 3: World Capitals
-        Deck capitalsDeck = new Deck(
+        Deck capitalsDeck = Deck.fromPersistence(
                 nextId.getAndIncrement(),
                 "World Capitals",
                 "Capital cities of countries around the world",
@@ -96,7 +96,7 @@ public class DeckPersistenceStub implements DeckPersistence {
     @Override
     public Deck insertDeck(Deck deck) {
         int id = nextId.getAndIncrement();
-        Deck newDeck = new Deck(
+        Deck newDeck = Deck.fromPersistence(
                 id,
                 deck.getName(),
                 deck.getDescription(),
@@ -112,7 +112,7 @@ public class DeckPersistenceStub implements DeckPersistence {
         for (int i = 0; i < decks.size(); i++) {
             if (decks.get(i).getId() == deck.getId()) {
                 Deck existing = decks.get(i);
-                Deck updated = new Deck(
+                Deck updated = Deck.fromPersistence(
                         deck.getId(),
                         deck.getName(),
                         deck.getDescription(),

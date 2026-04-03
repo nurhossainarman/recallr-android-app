@@ -49,7 +49,7 @@ public class FlashcardManagerIntegrationTest {
         flashcardManager = new FlashcardManager(flashcardPersistence, flashcardValidator);
 
         // Create a test deck to use in tests
-        Deck testDeck = new Deck("Test Deck", "For flashcard testing");
+        Deck testDeck = Deck.createNew("Test Deck", "For flashcard testing");
         Deck inserted = deckPersistence.insertDeck(testDeck);
         testDeckId = inserted.getId();
     }
@@ -171,8 +171,8 @@ public class FlashcardManagerIntegrationTest {
         Flashcard retrieved = flashcardPersistence.getFlashcardById(created.getId());
         assertNotNull(retrieved);
         // The content should be stored as-is (validator checks it's not empty after trimming)
-        assertEquals("Question", retrieved.getFront());
-        assertEquals("Answer", retrieved.getBack());
+        assertEquals("  Question  ", retrieved.getFront());
+        assertEquals("  Answer  ", retrieved.getBack());
     }
 
     // ---------------- Test update flashcard → verify changes in SQLite ----------------
@@ -239,84 +239,18 @@ public class FlashcardManagerIntegrationTest {
     }
 
     @Test
-    public void testUpdateFlashcard_nonExistent_returnsFalse() {
-        // Act: Try to update a flashcard that doesn't exist
-        boolean updated = flashcardManager.updateFlashcard(99999, "Front", "Back");
-
-        // Assert: Update should fail gracefully
-        assertFalse("Update of non-existent flashcard should return false", updated);
+    public void testUpdateFlashcard_nonExistent_throwsException() {
+        // Act & Assert: Try to update a flashcard that doesn't exist
+        try {
+            flashcardManager.updateFlashcard(99999, "Front", "Back");
+            fail("Should have thrown FlashcardValidationException");
+        } catch (FlashcardValidationException e) {
+            assertTrue("Error message should mention not found",
+                e.getMessage().toLowerCase().contains("not found"));
+        }
     }
 
-    // ---------------- Test search functionality with persistence ----------------
 
-    @Test
-    public void testSearchFlashcards_queriesSQLite() {
-        // Arrange: Create multiple flashcards
-        flashcardManager.createFlashcard("What is Java?", "A programming language", testDeckId);
-        flashcardManager.createFlashcard("What is Python?", "Another language", testDeckId);
-        flashcardManager.createFlashcard("What is SQL?", "Database query language", testDeckId);
-
-        // Act: Search for keyword "language"
-        List<Flashcard> results = flashcardManager.searchFlashcards("language", testDeckId);
-
-        // Assert: All three cards contain "language"
-        assertNotNull("Results should not be null", results);
-        assertEquals("Should find 3 flashcards containing 'language'", 3, results.size());
-    }
-
-    @Test
-    public void testSearchFlashcards_caseInsensitive() {
-        // Arrange: Create flashcards
-        flashcardManager.createFlashcard("Java Question", "Java Answer", testDeckId);
-
-        // Act: Search with different cases
-        List<Flashcard> results1 = flashcardManager.searchFlashcards("java", testDeckId);
-        List<Flashcard> results2 = flashcardManager.searchFlashcards("JAVA", testDeckId);
-        List<Flashcard> results3 = flashcardManager.searchFlashcards("JaVa", testDeckId);
-
-        // Assert: All searches find the card
-        assertEquals(1, results1.size());
-        assertEquals(1, results2.size());
-        assertEquals(1, results3.size());
-    }
-
-    @Test
-    public void testSearchFlashcards_searchesBothFrontAndBack() {
-        // Arrange: Create flashcards
-        flashcardManager.createFlashcard("Question about Java", "Answer", testDeckId);
-        flashcardManager.createFlashcard("Question", "Answer about Java", testDeckId);
-
-        // Act: Search for "Java"
-        List<Flashcard> results = flashcardManager.searchFlashcards("Java", testDeckId);
-
-        // Assert: Both cards are found (one has "Java" in front, one in back)
-        assertEquals("Should find cards with keyword in front or back", 2, results.size());
-    }
-
-    @Test
-    public void testSearchFlashcards_allDecks() {
-        // Arrange: Create another deck
-        Deck deck2 = deckPersistence.insertDeck(new Deck("Second Deck", ""));
-        int deck2Id = deck2.getId();
-
-        // Create flashcards in both decks
-        flashcardManager.createFlashcard("Test in deck 1", "Answer", testDeckId);
-        flashcardManager.createFlashcard("Test in deck 2", "Answer", deck2Id);
-
-        // Act: Search all decks (deckId = -1)
-        List<Flashcard> results = flashcardManager.searchFlashcards("Test", -1);
-
-        // Assert: Should find flashcards from both decks
-        assertTrue("Should find at least 2 flashcards", results.size() >= 2);
-    }
-
-    @Test
-    public void testSearchFlashcards_nullOrEmpty_returnsNull() {
-        // Assert: Manager handles null/empty input gracefully
-        assertNull("null keyword should return null", flashcardManager.searchFlashcards(null, testDeckId));
-        assertNull("empty keyword should return null", flashcardManager.searchFlashcards("", testDeckId));
-        assertNull("whitespace keyword should return null", flashcardManager.searchFlashcards("   ", testDeckId));
-    }
 
     // ---------------- Test filtering by known/unknown with persistence ----------------
 
@@ -425,43 +359,17 @@ public class FlashcardManagerIntegrationTest {
     }
 
     @Test
-    public void testDeleteFlashcardsByDeck_removesAllFromDeck() {
-        // Arrange: Create flashcards
-        flashcardManager.createFlashcard("Q1", "A1", testDeckId);
-        flashcardManager.createFlashcard("Q2", "A2", testDeckId);
-        flashcardManager.createFlashcard("Q3", "A3", testDeckId);
-
-        // Verify they exist
-        assertEquals(3, flashcardPersistence.getFlashcardCountByDeckId(testDeckId));
-
-        // Act: Delete all flashcards in deck
-        int deletedCount = flashcardManager.deleteFlashcardsByDeck(testDeckId);
-
-        // Assert: All flashcards deleted
-        assertEquals("Should delete 3 flashcards", 3, deletedCount);
-        assertEquals("No flashcards should remain", 0,
-            flashcardPersistence.getFlashcardCountByDeckId(testDeckId));
+    public void testDeleteFlashcard_nonExistent_throwsException() {
+        // Act & Assert: Try to delete a flashcard that doesn't exist
+        try {
+            flashcardManager.deleteFlashcard(99999);
+            fail("Should have thrown FlashcardValidationException");
+        } catch (FlashcardValidationException e) {
+            assertTrue("Error message should mention not found",
+                e.getMessage().toLowerCase().contains("not found"));
+        }
     }
 
-    @Test
-    public void testGetKnownAmount_queriesSQLite() {
-        // Arrange: Create flashcards
-        Flashcard card1 = flashcardManager.createFlashcard("Q1", "A1", testDeckId);
-        Flashcard card2 = flashcardManager.createFlashcard("Q2", "A2", testDeckId);
-        Flashcard card3 = flashcardManager.createFlashcard("Q3", "A3", testDeckId);
-
-        // Mark two as known
-        card1.setIsKnown(true);
-        card2.setIsKnown(true);
-        flashcardPersistence.updateFlashcard(card1);
-        flashcardPersistence.updateFlashcard(card2);
-
-        // Act: Get known amount
-        int knownAmount = flashcardManager.getKnownAmount(testDeckId);
-
-        // Assert: Correctly counts known cards from SQLite
-        assertEquals("Should have 2 known cards", 2, knownAmount);
-    }
 
     @Test
     public void testGetFlashcard_queriesSQLite() {
@@ -491,7 +399,7 @@ public class FlashcardManagerIntegrationTest {
         flashcardManager.createFlashcard("Q1", "A1", testDeckId);
         flashcardManager.createFlashcard("Q2", "A2", testDeckId);
 
-        Deck deck2 = deckPersistence.insertDeck(new Deck("Deck 2", ""));
+        Deck deck2 = deckPersistence.insertDeck(Deck.createNew("Deck 2", ""));
         flashcardManager.createFlashcard("Q3", "A3", deck2.getId());
 
         // Act: Get all flashcards

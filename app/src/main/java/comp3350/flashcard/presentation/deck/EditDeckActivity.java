@@ -2,7 +2,6 @@ package comp3350.flashcard.presentation.deck;
 
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -10,8 +9,10 @@ import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
 import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.IDeckManager;
-import comp3350.flashcard.logic.DeckValidationException;
+import comp3350.flashcard.logic.exceptions.DeckValidationException;
 import comp3350.flashcard.objects.Deck;
+import comp3350.flashcard.presentation.ActivityHelper;
+import comp3350.flashcard.presentation.Messages;
 
 /**
  * Controls create a deck screen and edit an existing deck screen.
@@ -57,13 +58,17 @@ public class EditDeckActivity extends AppCompatActivity {
      * @param  saveButton The save button object
      */
     private void setupMode(Toolbar toolbar, Button saveButton) {
-        if (this.deckId != ValidationConstants.INVALID_ID) {
+        if (!ActivityHelper.isNew(this.deckId)) {
             // Intent returns a valid id, that means we are editing an existing deck
             Deck deck = deckManager.getDeck(deckId);
             if (deck != null) {
                 inputDeckName.setText(deck.getName());
                 toolbar.setTitle(R.string.edit_deck);
                 saveButton.setText(R.string.save_deck);
+            } else {
+                // Handle the case where the deck ID is valid but the deck doesn't exist
+                Messages.show(this, "Error: Deck not found");
+                finish();
             }
         } else {
             // Intent returns INVALID_ID, that means we are creating a new deck
@@ -79,26 +84,17 @@ public class EditDeckActivity extends AppCompatActivity {
         String name = inputDeckName.getText().toString().trim();
 
         try {
-            if (deckId == ValidationConstants.INVALID_ID) {
-                if (deckManager.createDeck(name, "") != null) {
-                    printToast(getString(R.string.deck_added_prompt));
-                    finish();
-                }
+            // Check if the deck is new or not
+            if (ActivityHelper.isNew(deckId)) {
+                deckManager.createDeck(name, "");
+                Messages.show(this, getString(R.string.deck_added_prompt));
             } else {
-                if (deckManager.updateDeck(deckId, name, "")) {
-                    printToast(getString(R.string.deck_updated_prompt));
-                    finish();
-                }
+                deckManager.updateDeck(deckId, name, "");
+                Messages.show(this, getString(R.string.deck_updated_prompt));
             }
-        } catch (DeckValidationException e) {
-            printToast(e.getMessage());
+            finish();
+        } catch (DeckValidationException | NullPointerException e) {
+            Messages.show(this, e.getMessage());
         }
-    }
-
-    /**
-     * Shows a quick message at the bottom of the screen.
-     */
-    private void printToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

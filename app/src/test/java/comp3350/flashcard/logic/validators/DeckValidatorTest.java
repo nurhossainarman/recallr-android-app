@@ -75,7 +75,7 @@ public class DeckValidatorTest {
     @Test
     public void validate_duplicateName_returnsError() {
         // Insert a deck so uniqueness check has something to find
-        deckPersistence.insertDeck(new comp3350.flashcard.objects.Deck("Existing Deck", ""));
+        deckPersistence.insertDeck(comp3350.flashcard.objects.Deck.createNew("Existing Deck", ""));
 
         ValidationResult result = validator.validate("Existing Deck", ValidationConstants.INVALID_ID);
         assertFalse(result.isValid());
@@ -86,7 +86,7 @@ public class DeckValidatorTest {
     public void validate_sameName_excludedDeck_returnsSuccess() {
         // Deck renaming to its own name should be allowed
         comp3350.flashcard.objects.Deck deck = deckPersistence.insertDeck(
-                new comp3350.flashcard.objects.Deck("My Deck", ""));
+                comp3350.flashcard.objects.Deck.createNew("My Deck", ""));
 
         ValidationResult result = validator.validate("My Deck", deck.getId());
         assertTrue(result.isValid());
@@ -119,7 +119,7 @@ public class DeckValidatorTest {
 
     @Test
     public void validate_duplicateName_errorMessageDescribesIssue() {
-        deckPersistence.insertDeck(new comp3350.flashcard.objects.Deck("Taken Name", ""));
+        deckPersistence.insertDeck(comp3350.flashcard.objects.Deck.createNew("Taken Name", ""));
 
         ValidationResult result = validator.validate("Taken Name", ValidationConstants.INVALID_ID);
         assertFalse(result.isValid());

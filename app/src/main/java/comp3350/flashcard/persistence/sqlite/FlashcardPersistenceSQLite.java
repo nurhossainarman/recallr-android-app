@@ -249,8 +249,6 @@ public class FlashcardPersistenceSQLite implements FlashcardPersistence {
         long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.FLASHCARD_CREATED_AT));
         boolean isKnown = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.FLASHCARD_IS_KNOWN)) == 1;
 
-        Flashcard flashcard = new Flashcard(id, front, back, deckId, createdAt);
-        flashcard.setIsKnown(isKnown); //TODO:
-        return flashcard;
+        return Flashcard.fromPersistence(id, front, back, deckId, createdAt, isKnown);
     }
 }

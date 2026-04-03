@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import java.util.List;
 import comp3350.flashcard.constants.ValidationConstants;
+import comp3350.flashcard.logic.exceptions.DeckValidationException;
 import comp3350.flashcard.logic.validators.DeckValidator;
 import comp3350.flashcard.logic.validators.IDeckValidator;
 import comp3350.flashcard.objects.Deck;
@@ -239,8 +240,8 @@ public class DeckManagerIntegrationTest {
         int deckId = deck.getId();
 
         // Add flashcards to the deck
-        flashcardPersistence.insertFlashcard(new comp3350.flashcard.objects.Flashcard("Front 1", "Back 1", deckId));
-        flashcardPersistence.insertFlashcard(new comp3350.flashcard.objects.Flashcard("Front 2", "Back 2", deckId));
+        flashcardPersistence.insertFlashcard(comp3350.flashcard.objects.Flashcard.createNew("Front 1", "Back 1", deckId));
+        flashcardPersistence.insertFlashcard(comp3350.flashcard.objects.Flashcard.createNew("Front 2", "Back 2", deckId));
 
         // Verify flashcards exist
         assertEquals(2, flashcardPersistence.getFlashcardCountByDeckId(deckId));
@@ -259,12 +260,15 @@ public class DeckManagerIntegrationTest {
     }
 
     @Test
-    public void testDeleteDeck_nonExistentDeck_returnsFalse() {
-        // Act: Try to delete a deck that doesn't exist
-        boolean deleted = deckManager.deleteDeck(99999);
-
-        // Assert: Delete should fail gracefully
-        assertFalse("Delete of non-existent deck should return false", deleted);
+    public void testDeleteDeck_nonExistentDeck_throwsException() {
+        // Act & Assert: Try to delete a deck that doesn't exist, should throw exception
+        try {
+            deckManager.deleteDeck(99999);
+            fail("Should have thrown DeckValidationException");
+        } catch (DeckValidationException e) {
+            assertTrue("Error message should mention not found",
+                e.getMessage().toLowerCase().contains("not found"));
+        }
     }
 
     // ---------------- Test other manager operations with persistence ----------------
@@ -291,9 +295,9 @@ public class DeckManagerIntegrationTest {
         int deckId = deck.getId();
 
         // Act: Add flashcards directly to persistence
-        flashcardPersistence.insertFlashcard(new comp3350.flashcard.objects.Flashcard("Q1", "A1", deckId));
-        flashcardPersistence.insertFlashcard(new comp3350.flashcard.objects.Flashcard("Q2", "A2", deckId));
-        flashcardPersistence.insertFlashcard(new comp3350.flashcard.objects.Flashcard("Q3", "A3", deckId));
+        flashcardPersistence.insertFlashcard(comp3350.flashcard.objects.Flashcard.createNew("Q1", "A1", deckId));
+        flashcardPersistence.insertFlashcard(comp3350.flashcard.objects.Flashcard.createNew("Q2", "A2", deckId));
+        flashcardPersistence.insertFlashcard(comp3350.flashcard.objects.Flashcard.createNew("Q3", "A3", deckId));
 
         // Assert: Manager's getFlashcardCount queries SQLite correctly
         int count = deckManager.getFlashcardCount(deckId);
