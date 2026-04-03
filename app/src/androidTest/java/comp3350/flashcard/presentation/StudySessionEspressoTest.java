@@ -109,7 +109,8 @@ public class StudySessionEspressoTest {
         addFlashcard(card1Front, card1Back);
         addFlashcard(card2Front, card2Back);
 
-        // Start study session
+        // Go back to MainActivity is not needed here since we're already on DeckDetailActivity
+        // Start study session directly
         onView(withId(R.id.btnStudy)).perform(click());
 
         // Verify first card is displayed
@@ -119,12 +120,26 @@ public class StudySessionEspressoTest {
         // Navigate to next card
         onView(withId(R.id.btnNext)).perform(click());
 
-        // Verify second card is displayed
+        // Wait longer for animation/transition to complete
+        try {
+            Thread.sleep(800);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Verify second card text exists (might not be fully visible due to animations)
         onView(allOf(withId(R.id.tvContent), withText(card2Front)))
                 .check(matches(isDisplayed()));
 
         // Navigate back to previous card
         onView(withId(R.id.btnPrevious)).perform(click());
+
+        // Wait for animation/transition to complete
+        try {
+            Thread.sleep(800);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         // Verify first card is displayed again
         onView(allOf(withId(R.id.tvContent), withText(card1Front)))
@@ -208,7 +223,7 @@ public class StudySessionEspressoTest {
         addFlashcard(card2Front, card2Back);
         addFlashcard(card3Front, card3Back);
 
-        // Enable shuffle checkbox
+        // We're now on DeckDetailActivity, enable shuffle checkbox
         onView(withId(R.id.cbShuffle)).perform(click());
 
         // Start study session
@@ -244,6 +259,7 @@ public class StudySessionEspressoTest {
         addFlashcard(card1Front, card1Back);
         addFlashcard(card2Front, card2Back);
 
+        // We're on DeckDetailActivity
         // Don't click shuffle checkbox (it should be unchecked by default)
         // Start study session directly
         onView(withId(R.id.btnStudy)).perform(click());
@@ -254,6 +270,13 @@ public class StudySessionEspressoTest {
 
         // Navigate to next card
         onView(withId(R.id.btnNext)).perform(click());
+
+        // Wait for animation/transition to complete
+        try {
+            Thread.sleep(800);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         // Verify second card is displayed second
         onView(allOf(withId(R.id.tvContent), withText(card2Front)))
@@ -283,5 +306,7 @@ public class StudySessionEspressoTest {
         createDeck(deckName);
         openDeck(deckName);
         addFlashcard(cardFront, cardBack);
+        // Go back to MainActivity
+        androidx.test.espresso.Espresso.pressBack();
     }
 }

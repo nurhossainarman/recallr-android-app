@@ -7,6 +7,7 @@ import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.hasSibling;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -76,8 +77,8 @@ public class DeckManagementEspressoTest {
         onView(allOf(withId(R.id.tvDeckTitle), withText(originalName)))
                 .check(matches(isDisplayed()));
 
-        // Step 2: Click the edit button on the deck item
-        onView(allOf(withId(R.id.btnEditDeck)))
+        // Step 2: Click the edit button on the specific deck item
+        onView(allOf(withId(R.id.btnEditDeck), hasSibling(withText(originalName))))
                 .perform(click());
 
         // Step 3: Change the deck name
@@ -115,8 +116,8 @@ public class DeckManagementEspressoTest {
         onView(allOf(withId(R.id.tvDeckTitle), withText(deckName)))
                 .check(matches(isDisplayed()));
 
-        // Step 2: Click the delete button on the deck item
-        onView(allOf(withId(R.id.btnDeleteDeck)))
+        // Step 2: Click the delete button on the specific deck item
+        onView(allOf(withId(R.id.btnDeleteDeck), hasSibling(withText(deckName))))
                 .perform(click());
 
         // Step 3: Verify deck is no longer displayed
@@ -151,14 +152,8 @@ public class DeckManagementEspressoTest {
         onView(allOf(withId(R.id.tvDeckTitle), withText(deck3)))
                 .check(matches(isDisplayed()));
 
-        // Step 2: Delete the second deck
-        // We need to find the specific delete button for deck2
-        // Since RecyclerView items can have multiple instances, we'll use a more specific approach
-        onView(allOf(withId(R.id.tvDeckTitle), withText(deck2)))
-                .check(matches(isDisplayed()));
-
-        // Click the first delete button we find (this will delete one of the decks)
-        onView(withId(R.id.btnDeleteDeck))
+        // Step 2: Delete the second deck using a specific matcher
+        onView(allOf(withId(R.id.btnDeleteDeck), hasSibling(withText(deck2))))
                 .perform(click());
 
         // Step 3 & 4: Verify the deck was deleted and others remain
@@ -192,8 +187,9 @@ public class DeckManagementEspressoTest {
         // Return to main (press back)
         androidx.test.espresso.Espresso.pressBack();
 
-        // Edit the deck
-        onView(allOf(withId(R.id.btnEditDeck))).perform(click());
+        // Edit the deck using a specific matcher
+        onView(allOf(withId(R.id.btnEditDeck), hasSibling(withText(originalName))))
+                .perform(click());
         onView(withId(R.id.inputDeckName))
                 .perform(replaceText(updatedName), closeSoftKeyboard());
         onView(withId(R.id.btnSaveDeck)).perform(click());
@@ -203,7 +199,8 @@ public class DeckManagementEspressoTest {
                 .check(matches(isDisplayed()));
 
         // Verify card count is still correct (should show "1 card" or similar)
-        onView(withId(R.id.tvCardCount))
+        // Use hasSibling to target the specific deck's card count
+        onView(allOf(withId(R.id.tvCardCount), hasSibling(withText(updatedName))))
                 .check(matches(isDisplayed()));
     }
 
