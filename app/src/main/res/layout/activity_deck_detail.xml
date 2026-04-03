@@ -131,6 +131,7 @@
         android:src="@android:drawable/ic_input_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:backgroundTint="@color/colorPrimary"
         app:tint="@color/white"
         app:borderWidth="0dp"
         app:elevation="6dp" />
