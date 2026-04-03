@@ -33,6 +33,7 @@ Once Iteration Three provided dedicated time for refactoring, the team took the 
 | **Code Duplication** | Validation logic in 3 layers (8+ files) | Single validator classes | [Commit](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/commit/d52a20196731fbcd15e01f758f190c938a32f7d6)|
 | **Magic Numbers** | 12+ hard-coded values | All constants centralized | [Commit](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/commit/4cca4b1bd2ba1429492e569810e25823931bcaee) |
 | **Public Setters for Immutable Properties** | 6 violations (setId, setCreatedAt) | 0 violations | [Issue #64](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/issues/64) [Commit](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/commit/23242e9220512d9c06e5c1686ed8eaf48aa224ec) |
+| **Factory method adoption** | Domain objects had fields that should have been managed internally |Introduced package-private constructors and factory methods | [Commit](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/blob/main/Documents/RETROSPECTIVE.md?ref_type=heads) |
 
 
 
