@@ -3,62 +3,28 @@ package comp3350.flashcard.objects;
 import java.io.Serializable;
 import java.util.Objects;
 
+import comp3350.flashcard.constants.ValidationConstants;
+
 /**
  * Represents a collection of flashcards organized by subject or topic.
  * Each deck has a unique name and contains zero or more flashcards.
+ * This class follows immutability principles for core fields (id, createdAt).
+ * Use factory methods to create instances and withUpdated*() methods to modify.
  */
 public class Deck implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private int id;
+    private final int id;
     private String name;
     private String description;
-    private long createdAt;
+    private final long createdAt;
     private long lastStudiedAt;
 
-    // These are computed fields, not stored directly
-    // Will be populated by the logic layer when needed
-    private transient int cardCount;
-
-    // Future fields for Iteration 3 and more
-    // private int knownCardCount;
-    // private int studySessionCount;
-    // private long totalStudyTime;
 
     /**
-     * Default constructor required for certain frameworks and testing.
-     */
-    public Deck() {
-        this.createdAt = System.currentTimeMillis();
-        this.lastStudiedAt = 0;
-        this.cardCount = 0;
-        this.description = "";
-    }
-
-    /**
-     * Creates a new deck with just a name (for new decks before persistence).
-     *
-     * @param name The name of the deck
-     */
-    public Deck(String name) {
-        this();
-        setName(name);
-    }
-
-    /**
-     * Creates a new deck with name and description.
-     *
-     * @param name        The name of the deck
-     * @param description A brief description of the deck's content
-     */
-    public Deck(String name, String description) {
-        this(name);
-        setDescription(description);
-    }
-
-    /**
-     * Creates a deck with all fields specified (for loading from persistence).
+     * Package-private constructor - only persistence layer can call directly.
+     * Use factory methods createNew() or fromPersistence() instead.
      *
      * @param id            The unique identifier for this deck
      * @param name          The name of the deck
@@ -66,13 +32,46 @@ public class Deck implements Serializable {
      * @param createdAt     The timestamp when this deck was created
      * @param lastStudiedAt The timestamp when this deck was last studied
      */
-    public Deck(int id, String name, String description, long createdAt, long lastStudiedAt) {
+    Deck(int id, String name, String description, long createdAt, long lastStudiedAt) {
         this.id = id;
-        setName(name);
-        setDescription(description);
+        this.name = name;
+        this.description = description;
         this.createdAt = createdAt;
         this.lastStudiedAt = lastStudiedAt;
-        this.cardCount = 0;
+    }
+
+    /**
+     * Public factory for creating new (unpersisted) decks.
+     * ID will be INVALID_ID until persisted.
+     *
+     * @param name        The name of the deck
+     * @param description A brief description of the deck's content
+     * @return A new Deck instance ready to be persisted
+     */
+    public static Deck createNew(String name, String description) {
+        return new Deck(
+            ValidationConstants.INVALID_ID,
+            name,
+            description != null ? description : "",
+            System.currentTimeMillis(),
+            0
+        );
+    }
+
+    /**
+     * Public factory for reconstructing decks from persistence.
+     * Only the persistence layer should call this method.
+     *
+     * @param id            The unique identifier for this deck
+     * @param name          The name of the deck
+     * @param description   A brief description of the deck's content
+     * @param createdAt     The timestamp when this deck was created
+     * @param lastStudiedAt The timestamp when this deck was last studied
+     * @return A Deck instance loaded from persistence
+     */
+    public static Deck fromPersistence(int id, String name, String description,
+                                       long createdAt, long lastStudiedAt) {
+        return new Deck(id, name, description, createdAt, lastStudiedAt);
     }
 
     // ==================== Getters ====================
@@ -97,37 +96,19 @@ public class Deck implements Serializable {
         return lastStudiedAt;
     }
 
-    public int getCardCount() {
-        return cardCount;
-    }
-
-    // ==================== Setters ====================
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    // ==================== Setters (Limited - prefer immutable updates) ====================
 
     public void setName(String name) {
-        this.name = (name != null) ? name.trim() : "";
+        this.name = name;
     }
+
 
     public void setDescription(String description) {
-        this.description = description != null ? description.trim() : "";
-    }
-
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
+        this.description = description != null ? description : "";
     }
 
     public void setLastStudiedAt(long lastStudiedAt) {
         this.lastStudiedAt = lastStudiedAt;
-    }
-
-    public void setCardCount(int cardCount) {
-        if (cardCount < 0) {
-            throw new IllegalArgumentException("Card count cannot be negative");
-        }
-        this.cardCount = cardCount;
     }
 
     // ==================== Utility Methods ====================
@@ -139,15 +120,6 @@ public class Deck implements Serializable {
      */
     public boolean isPersisted() {
         return id > 0;
-    }
-
-    /**
-     * Checks if this deck has any flashcards.
-     *
-     * @return true if the deck contains at least one flashcard
-     */
-    public boolean hasCards() {
-        return cardCount > 0;
     }
 
     /**
@@ -167,15 +139,23 @@ public class Deck implements Serializable {
     }
 
     /**
-     * Creates a copy of this deck with a new name.
+     * Creates a copy of this deck with an updated name (immutable update).
      *
      * @param newName The new name for the deck
      * @return A new Deck instance with the updated name
      */
     public Deck withUpdatedName(String newName) {
-        Deck updated = new Deck(this.id, newName, this.description, this.createdAt, this.lastStudiedAt);
-        updated.setCardCount(this.cardCount);
-        return updated;
+        return new Deck(this.id, newName, this.description, this.createdAt, this.lastStudiedAt);
+    }
+
+    /**
+     * Creates a copy of this deck with an updated description (immutable update).
+     *
+     * @param newDescription The new description for the deck
+     * @return A new Deck instance with the updated description
+     */
+    public Deck withUpdatedDescription(String newDescription) {
+        return new Deck(this.id, this.name, newDescription, this.createdAt, this.lastStudiedAt);
     }
 
     @Override
@@ -199,7 +179,6 @@ public class Deck implements Serializable {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", cardCount=" + cardCount +
                 ", createdAt=" + createdAt +
                 ", lastStudiedAt=" + lastStudiedAt +
                 '}';

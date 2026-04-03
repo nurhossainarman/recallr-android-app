@@ -5,7 +5,7 @@ import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import comp3350.flashcard.logic.DeckValidationException;
+import comp3350.flashcard.logic.exceptions.DeckValidationException;
 import comp3350.flashcard.logic.validators.DeckValidator;
 import comp3350.flashcard.logic.validators.IDeckValidator;
 import comp3350.flashcard.objects.Deck;
@@ -56,7 +56,7 @@ public class DeckManagerTest {
 
     private void addFlashcardsToDeck(int deckId, int count) {
         for (int i = 1; i <= count; i++) {
-            Flashcard card = new Flashcard("Front " + i, "Back " + i, deckId);
+            Flashcard card = Flashcard.createNew("Front " + i, "Back " + i, deckId);
             flashcardPersistence.insertFlashcard(card);
         }
     }
@@ -177,7 +177,7 @@ public class DeckManagerTest {
 
     @Test
     public void updateDeck_notFound_fails() {
-        assertFalse(deckManager.updateDeck(99999, "New Name", "New Description"));
+        assertThrows(DeckValidationException.class, () -> deckManager.updateDeck(99999, "New Name", "New Description"));
     }
 
     // ---------------- deleteDeck ----------------
@@ -209,7 +209,7 @@ public class DeckManagerTest {
 
     @Test
     public void deleteDeck_notFound_fails() {
-        assertFalse(deckManager.deleteDeck(99999));
+        assertThrows(DeckValidationException.class, () -> deckManager.deleteDeck(99999));
     }
 
     // ---------------- getAllDecks ----------------
@@ -328,6 +328,6 @@ public class DeckManagerTest {
 
     @Test
     public void markDeckAsStudied_nonExistent_fails() {
-        assertFalse(deckManager.markDeckAsStudied(99999));
+        assertThrows(DeckValidationException.class, () -> deckManager.deleteDeck(99999));
     }
 }

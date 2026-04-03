@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import comp3350.flashcard.logic.exceptions.StudySessionException;
 import comp3350.flashcard.objects.Flashcard;
 import comp3350.flashcard.persistence.FlashcardPersistence;
 
@@ -35,27 +36,25 @@ public class StudySessionManagerTest {
     private List<Flashcard> createMockCards(int count) {
         List<Flashcard> cards = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
-            cards.add(new Flashcard(i, "Front " + i, "Back " + i, 1, 0));
+            cards.add(Flashcard.fromPersistence(i, "Front " + i, "Back " + i, 1, 0, false));
         }
         return cards;
     }
 
     // ---------------- Session Initialization & Customization ----------------
 
-    @Test
-    public void startSession_emptyDeck_initializesEmpty() {
+    @Test(expected = StudySessionException.class)
+    public void startSession_emptyDeck_throwsException() throws StudySessionException {
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(0);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(Collections.emptyList());
 
         manager.startSession(1, false, FilterMode.ALL);
-
-        assertNull(manager.getCurrentCard());
-        assertEquals(0, manager.getTotalCards());
-        assertTrue(manager.isFinished());
     }
 
     @Test
-    public void startSession_withCards_initializesCorrectly() {
+    public void startSession_withCards_initializesCorrectly() throws StudySessionException {
         List<Flashcard> cards = createMockCards(3);
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(3);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
 
         manager.startSession(1, false, FilterMode.ALL);
@@ -69,8 +68,9 @@ public class StudySessionManagerTest {
     }
 
     @Test
-    public void startSession_withShuffle_changesOrder() {
+    public void startSession_withShuffle_changesOrder() throws StudySessionException {
         List<Flashcard> cards = createMockCards(50);
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(50);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(new ArrayList<>(cards));
 
         manager.startSession(1, true, FilterMode.ALL);
@@ -80,12 +80,10 @@ public class StudySessionManagerTest {
     }
 
     @Test
-    public void startSession_filterKnown_onlyReturnsKnown() {
-        Flashcard known = new Flashcard(1, "Q1", "A1", 1, 0);
-        known.setIsKnown(true);
-        Flashcard unknown = new Flashcard(2, "Q2", "A2", 1, 0);
-        unknown.setIsKnown(false);
-
+    public void startSession_filterKnown_onlyReturnsKnown() throws StudySessionException {
+        Flashcard known = Flashcard.fromPersistence(1, "Q1", "A1", 1, 0, true);
+        
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(2);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.KNOWN)).thenReturn(Arrays.asList(known));
 
         manager.startSession(1, false, FilterMode.KNOWN);
@@ -95,12 +93,10 @@ public class StudySessionManagerTest {
     }
 
     @Test
-    public void startSession_filterUnknown_onlyReturnsUnknown() {
-        Flashcard known = new Flashcard(1, "Q1", "A1", 1, 0);
-        known.setIsKnown(true);
-        Flashcard unknown = new Flashcard(2, "Q2", "A2", 1, 0);
-        unknown.setIsKnown(false);
+    public void startSession_filterUnknown_onlyReturnsUnknown() throws StudySessionException {
+        Flashcard unknown = Flashcard.fromPersistence(2, "Q2", "A2", 1, 0, false);
 
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(2);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.UNKNOWN)).thenReturn(Arrays.asList(unknown));
 
         manager.startSession(1, false, FilterMode.UNKNOWN);
@@ -110,8 +106,9 @@ public class StudySessionManagerTest {
     }
 
     @Test
-    public void startSession_resetsProgress() {
+    public void startSession_resetsProgress() throws StudySessionException {
         List<Flashcard> cards = createMockCards(3);
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(3);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
 
         manager.startSession(1, false, FilterMode.ALL);
@@ -125,8 +122,9 @@ public class StudySessionManagerTest {
     // ---------------- Navigation ----------------
 
     @Test
-    public void nextCard_traversesList() {
+    public void nextCard_traversesList() throws StudySessionException {
         List<Flashcard> cards = createMockCards(2);
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(2);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
 
         manager.startSession(1, false, FilterMode.ALL);
@@ -143,8 +141,9 @@ public class StudySessionManagerTest {
     }
 
     @Test
-    public void previousCard_traversesBackwards() {
+    public void previousCard_traversesBackwards() throws StudySessionException {
         List<Flashcard> cards = createMockCards(2);
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(2);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
 
         manager.startSession(1, false, FilterMode.ALL);
@@ -160,8 +159,9 @@ public class StudySessionManagerTest {
     // ---------------- Card Operations (Flip/Known) ----------------
 
     @Test
-    public void flip_changesShowingSide() {
-        Flashcard card = new Flashcard(1, "Question", "Answer", 1, 0);
+    public void flip_changesShowingSide() throws StudySessionException {
+        Flashcard card = Flashcard.fromPersistence(1, "Question", "Answer", 1, 0, false);
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(1);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(Collections.singletonList(card));
 
         manager.startSession(1, false, FilterMode.ALL);
@@ -174,9 +174,9 @@ public class StudySessionManagerTest {
     }
 
     @Test
-    public void setKnown_updatesPersistence() {
-        Flashcard card = new Flashcard(1, "Q", "A", 1, 0);
-        card.setIsKnown(false);
+    public void setKnown_updatesPersistence() throws StudySessionException {
+        Flashcard card = Flashcard.fromPersistence(1, "Q", "A", 1, 0, false);
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(1);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(Collections.singletonList(card));
         when(persistence.updateFlashcard(any(Flashcard.class))).thenReturn(true);
 
@@ -190,8 +190,9 @@ public class StudySessionManagerTest {
     // ---------------- Progress & State ----------------
 
     @Test
-    public void getProgressText_formatsCorrectly() {
+    public void getProgressText_formatsCorrectly() throws StudySessionException {
         List<Flashcard> cards = createMockCards(2);
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(2);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
 
         manager.startSession(1, false, FilterMode.ALL);
@@ -205,12 +206,17 @@ public class StudySessionManagerTest {
     }
 
     @Test
-    public void hasCards_checksState() {
+    public void hasCards_checksState() throws StudySessionException {
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(0);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(Collections.emptyList());
-        manager.startSession(1, false, FilterMode.ALL);
-        assertFalse(manager.hasCards());
+        
+        try {
+            manager.startSession(1, false, FilterMode.ALL);
+            fail("Should have thrown StudySessionException");
+        } catch (StudySessionException ignored) {}
 
         List<Flashcard> cards = createMockCards(1);
+        when(flashcardManager.getFlashcardCount(1)).thenReturn(1);
         when(flashcardManager.getFlashcardsByMode(1, FilterMode.ALL)).thenReturn(cards);
         manager.startSession(1, false, FilterMode.ALL);
         assertTrue(manager.hasCards());

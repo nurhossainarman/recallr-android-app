@@ -1,6 +1,8 @@
 package comp3350.flashcard.logic;
 
 import java.util.List;
+import comp3350.flashcard.logic.exceptions.DeckValidationException;
+import comp3350.flashcard.constants.AppErrors;
 import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.validators.IDeckValidator;
 import comp3350.flashcard.logic.validators.ValidationResult;
@@ -27,37 +29,27 @@ public class DeckManager implements IDeckManager {
         this.validator = validator;
     }
 
-    /**
-     * Creates a new deck
-     * @param name the name of the deck
-     * @param description optional description of the deck
-     * @return the created deck
-     * @throws DeckValidationException if the name is invalid or already taken
-     */
+    @Override
     public Deck createDeck(String name, String description) {
         ValidationResult result = validator.validate(name, ValidationConstants.INVALID_ID);
         if (!result.isValid()) {
             throw new DeckValidationException(result.getErrorMessage());
         }
 
-        Deck newDeck = new Deck(name, description);
-        return deckPersistence.insertDeck(newDeck);
+        Deck newDeck = Deck.createNew(name, description);
+        Deck insert = deckPersistence.insertDeck(newDeck);
+        if (insert == null) {
+            throw new NullPointerException(AppErrors.FAILED_CREATE_DECK);
+        }
+        return insert;
     }
 
-    /**
-     * Retrieves a deck by ID
-     * @param deckId the ID of the deck to retrieve
-     * @return the deck object, or null if not found
-     */
+   @Override
     public Deck getDeck(int deckId) {
         return deckPersistence.getDeckById(deckId);
     }
 
-    /**
-     * Retrieves a deck by name
-     * @param name the name of the deck to retrieve
-     * @return the deck object, or null if not found
-     */
+   @Override
     public Deck getDeckByName(String name) {
         if (StringUtils.isNullOrEmpty(name)) {
             return null;
@@ -66,27 +58,19 @@ public class DeckManager implements IDeckManager {
         return deckPersistence.getDeckByName(name);
     }
 
-    /**
-     * Updates an existing deck
-     * @param deckId the ID of the deck to update
-     * @param name the new name
-     * @param description the new description
-     * @return true if update successful, false otherwise
-     * @throws DeckValidationException if the name is invalid or already taken by another deck
-     */
+    @Override
     public boolean updateDeck(int deckId, String name, String description) {
         ValidationResult result = validator.validate(name, deckId);
         if (!result.isValid()) {
             throw new DeckValidationException(result.getErrorMessage());
         }
-
         if (!deckExists(deckId)) {
-            return false;
+            throw new DeckValidationException(AppErrors.DECK_NOT_FOUND);
         }
 
         Deck existingDeck = deckPersistence.getDeckById(deckId);
         if (existingDeck == null) {
-            return false;
+            throw new NullPointerException(AppErrors.FAILED_UPDATE_DECK);
         }
 
         existingDeck.setName(name);
@@ -95,14 +79,10 @@ public class DeckManager implements IDeckManager {
         return deckPersistence.updateDeck(existingDeck);
     }
 
-    /**
-     * Deletes a deck and all its flashcards
-     * @param deckId the ID of the deck to delete
-     * @return true if deletion successful, false otherwise
-     */
+    @Override
     public boolean deleteDeck(int deckId) {
         if (!deckExists(deckId)) {
-            return false;
+            throw new DeckValidationException(AppErrors.DECK_NOT_FOUND);
         }
 
         // Delete all flashcards in the deck first
@@ -112,19 +92,12 @@ public class DeckManager implements IDeckManager {
         return deckPersistence.deleteDeck(deckId);
     }
 
-    /**
-     * Gets all decks
-     * @return list of all decks
-     */
+    @Override
     public List<Deck> getAllDecks() {
         return deckPersistence.getAllDecks();
     }
 
-    /**
-     * Gets the count of flashcards in a deck
-     * @param deckId the ID of the deck
-     * @return number of flashcards in the deck
-     */
+    @Override
     public int getFlashcardCount(int deckId) {
         if (!deckExists(deckId)) {
             return 0;
@@ -133,19 +106,12 @@ public class DeckManager implements IDeckManager {
         return flashcardPersistence.getFlashcardCountByDeckId(deckId);
     }
 
-    /**
-     * Checks if a deck exists
-     * @param deckId the ID of the deck
-     * @return true if deck exists, false otherwise
-     */
+    @Override
     public boolean deckExists(int deckId) {
         return deckPersistence.deckExists(deckId);
     }
 
-    /**
-     * Gets the total number of decks
-     * @return total deck count
-     */
+    @Override
     public int getDeckCount() {
         return deckPersistence.getDeckCount();
     }
@@ -157,12 +123,12 @@ public class DeckManager implements IDeckManager {
      */
     public boolean markDeckAsStudied(int deckId) {
         if (!deckExists(deckId)) {
-            return false;
+            throw new DeckValidationException(AppErrors.DECK_NOT_FOUND);
         }
 
         Deck deck = deckPersistence.getDeckById(deckId);
         if (deck == null) {
-            return false;
+            throw new NullPointerException(AppErrors.DECK_NOT_FOUND);
         }
 
         deck.setLastStudiedAt(System.currentTimeMillis());

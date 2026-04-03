@@ -251,6 +251,6 @@ public class DeckPersistenceSQLite implements DeckPersistence {
         long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.DECK_CREATED_AT));
         long lastStudiedAt = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.DECK_LAST_STUDIED_AT));
 
-        return new Deck(id, name, description, createdAt, lastStudiedAt);
+        return Deck.fromPersistence(id, name, description, createdAt, lastStudiedAt);
     }
 }

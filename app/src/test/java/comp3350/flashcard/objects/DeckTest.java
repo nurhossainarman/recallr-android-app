@@ -1,116 +1,104 @@
 package comp3350.flashcard.objects;
 
 import static org.junit.Assert.*;
-import org.junit.Before;
 import org.junit.Test;
+import comp3350.flashcard.constants.ValidationConstants;
 
 /**
  * Unit tests for the Deck domain object.
+ * Tests the factory methods and immutability principles.
  */
 public class DeckTest {
 
-    private Deck deck;
-
-    @Before
-    public void setUp() {
-        deck = new Deck("Test Deck");
-    }
-
-    // ==================== Constructor Tests ====================
+    // ==================== Factory Method Tests ====================
 
     @Test
-    public void testDefaultConstructor_SetsCurrentTimestamp() {
+    public void testCreateNew_SetsCurrentTimestamp() {
         long before = System.currentTimeMillis();
-        Deck newDeck = new Deck();
+        Deck newDeck = Deck.createNew("Test Deck", "Description");
         long after = System.currentTimeMillis();
 
         assertTrue(newDeck.getCreatedAt() >= before && newDeck.getCreatedAt() <= after);
         assertEquals(0, newDeck.getLastStudiedAt());
-        assertEquals(0, newDeck.getCardCount());
+        assertEquals(ValidationConstants.INVALID_ID, newDeck.getId());
     }
 
     @Test
-    public void testSingleArgConstructor_SetsName() {
-        Deck newDeck = new Deck("My Deck");
-        assertEquals("My Deck", newDeck.getName());
+    public void testCreateNew_SetsNameAndDescription() {
+        Deck deck = Deck.createNew("My Deck", "A test deck");
+
+        assertEquals("My Deck", deck.getName());
+        assertEquals("A test deck", deck.getDescription());
+        assertFalse(deck.isPersisted());
     }
 
     @Test
-    public void testTwoArgConstructor_SetsNameAndDescription() {
-        Deck newDeck = new Deck("My Deck", "A test deck");
+    public void testCreateNew_NullDescription_BecomesEmptyString() {
+        Deck deck = Deck.createNew("My Deck", null);
 
-        assertEquals("My Deck", newDeck.getName());
-        assertEquals("A test deck", newDeck.getDescription());
-    }
-
-    @Test
-    public void testFullConstructor_SetsAllFields() {
-        long createdAt = 1000L;
-        long lastStudiedAt = 2000L;
-        Deck newDeck = new Deck(5, "Full Deck", "Description", createdAt, lastStudiedAt);
-
-        assertEquals(5, newDeck.getId());
-        assertEquals("Full Deck", newDeck.getName());
-        assertEquals("Description", newDeck.getDescription());
-        assertEquals(createdAt, newDeck.getCreatedAt());
-        assertEquals(lastStudiedAt, newDeck.getLastStudiedAt());
-    }
-
-    // ==================== Validation Tests ====================
-
-    @Test
-    public void testSetName_ExactlyMaxLength_Succeeds() {
-        String maxName = new String(new char[100]).replace('\0', 'A');
-        Deck newDeck = new Deck(maxName);
-        assertEquals(100, newDeck.getName().length());
-    }
-
-
-    @Test
-    public void testSetDescription_Null_BecomesEmptyString() {
-        deck.setDescription(null);
+        assertEquals("My Deck", deck.getName());
         assertEquals("", deck.getDescription());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testSetCardCount_Negative_ThrowsException() {
-        deck.setCardCount(-1);
+    @Test
+    public void testFromPersistence_SetsAllFields() {
+        long createdAt = 1000L;
+        long lastStudiedAt = 2000L;
+        Deck deck = Deck.fromPersistence(5, "Full Deck", "Description", createdAt, lastStudiedAt);
+
+        assertEquals(5, deck.getId());
+        assertEquals("Full Deck", deck.getName());
+        assertEquals("Description", deck.getDescription());
+        assertEquals(createdAt, deck.getCreatedAt());
+        assertEquals(lastStudiedAt, deck.getLastStudiedAt());
+        assertTrue(deck.isPersisted());
+    }
+
+    // ==================== Immutability Tests ====================
+
+    @Test
+    public void testId_IsImmutable() {
+        Deck deck = Deck.fromPersistence(10, "Test", "Desc", 1000L, 0L);
+        assertEquals(10, deck.getId());
+        // Cannot change ID - it's final
+        // deck.setId(20); // This should not compile
     }
 
     @Test
-    public void testSetName_Trimmed() {
-        Deck newDeck = new Deck("  Trimmed Name  ");
-        assertEquals("Trimmed Name", newDeck.getName());
+    public void testCreatedAt_IsImmutable() {
+        long createdAt = 1000L;
+        Deck deck = Deck.fromPersistence(1, "Test", "Desc", createdAt, 0L);
+        assertEquals(createdAt, deck.getCreatedAt());
+        // Cannot change createdAt - it's final
+        // deck.setCreatedAt(2000L); // This should not compile
     }
 
     // ==================== Getter and Setter Tests ====================
 
     @Test
-    public void testSetId_UpdatesId() {
-        deck.setId(42);
-        assertEquals(42, deck.getId());
-    }
-
-    @Test
     public void testSetName_UpdatesName() {
+        Deck deck = Deck.createNew("Original", "Description");
         deck.setName("New Name");
         assertEquals("New Name", deck.getName());
     }
 
     @Test
     public void testSetDescription_UpdatesDescription() {
+        Deck deck = Deck.createNew("Name", "Original Description");
         deck.setDescription("New Description");
         assertEquals("New Description", deck.getDescription());
     }
 
     @Test
-    public void testSetCardCount_UpdatesCardCount() {
-        deck.setCardCount(10);
-        assertEquals(10, deck.getCardCount());
+    public void testSetDescription_Null_BecomesEmptyString() {
+        Deck deck = Deck.createNew("Name", "Description");
+        deck.setDescription(null);
+        assertEquals("", deck.getDescription());
     }
 
     @Test
     public void testSetLastStudiedAt_UpdatesTimestamp() {
+        Deck deck = Deck.createNew("Name", "Description");
         deck.setLastStudiedAt(5000L);
         assertEquals(5000L, deck.getLastStudiedAt());
     }
@@ -118,95 +106,116 @@ public class DeckTest {
     // ==================== Utility Method Tests ====================
 
     @Test
-    public void testIsPersisted_IdZero_ReturnsFalse() {
-        deck.setId(0);
+    public void testIsPersisted_NewDeck_ReturnsFalse() {
+        Deck deck = Deck.createNew("Test", "Description");
         assertFalse(deck.isPersisted());
     }
 
     @Test
-    public void testIsPersisted_IdPositive_ReturnsTrue() {
-        deck.setId(1);
+    public void testIsPersisted_PersistedDeck_ReturnsTrue() {
+        Deck deck = Deck.fromPersistence(1, "Test", "Desc", 1000L, 0L);
         assertTrue(deck.isPersisted());
     }
 
     @Test
-    public void testHasCards_ZeroCards_ReturnsFalse() {
-        deck.setCardCount(0);
-        assertFalse(deck.hasCards());
-    }
-
-    @Test
-    public void testHasCards_PositiveCards_ReturnsTrue() {
-        deck.setCardCount(5);
-        assertTrue(deck.hasCards());
-    }
-
-    @Test
     public void testHasBeenStudied_NeverStudied_ReturnsFalse() {
-        deck.setLastStudiedAt(0);
+        Deck deck = Deck.createNew("Test", "Description");
         assertFalse(deck.hasBeenStudied());
     }
 
     @Test
     public void testHasBeenStudied_HasBeenStudied_ReturnsTrue() {
-        deck.setLastStudiedAt(1000L);
+        Deck deck = Deck.fromPersistence(1, "Test", "Desc", 1000L, 2000L);
         assertTrue(deck.hasBeenStudied());
     }
 
     @Test
     public void testMarkAsStudied_UpdatesTimestamp() {
+        Deck deck = Deck.createNew("Test", "Description");
         long before = System.currentTimeMillis();
         deck.markAsStudied();
         long after = System.currentTimeMillis();
 
         assertTrue(deck.getLastStudiedAt() >= before && deck.getLastStudiedAt() <= after);
+        assertTrue(deck.hasBeenStudied());
     }
 
     @Test
     public void testWithUpdatedName_CreatesNewDeck() {
-        deck.setId(10);
-        deck.setCardCount(5);
-        Deck updated = deck.withUpdatedName("Updated Name");
+        Deck original = Deck.fromPersistence(10, "Original Name", "Description", 1000L, 2000L);
+        Deck updated = original.withUpdatedName("Updated Name");
 
+        // Verify new deck has updated name
         assertEquals(10, updated.getId());
         assertEquals("Updated Name", updated.getName());
-        assertEquals(deck.getDescription(), updated.getDescription());
-        assertEquals(deck.getCreatedAt(), updated.getCreatedAt());
-        assertEquals(deck.getCardCount(), updated.getCardCount());
+
+        // Verify other fields preserved
+        assertEquals(original.getDescription(), updated.getDescription());
+        assertEquals(original.getCreatedAt(), updated.getCreatedAt());
+        assertEquals(original.getLastStudiedAt(), updated.getLastStudiedAt());
+
+        // Verify original unchanged
+        assertEquals("Original Name", original.getName());
+    }
+
+    @Test
+    public void testWithUpdatedDescription_CreatesNewDeck() {
+        Deck original = Deck.fromPersistence(10, "Name", "Original Desc", 1000L, 2000L);
+        Deck updated = original.withUpdatedDescription("Updated Desc");
+
+        // Verify new deck has updated description
+        assertEquals(10, updated.getId());
+        assertEquals("Updated Desc", updated.getDescription());
+
+        // Verify other fields preserved
+        assertEquals(original.getName(), updated.getName());
+        assertEquals(original.getCreatedAt(), updated.getCreatedAt());
+        assertEquals(original.getLastStudiedAt(), updated.getLastStudiedAt());
+
+        // Verify original unchanged
+        assertEquals("Original Desc", original.getDescription());
     }
 
     // ==================== Equals and HashCode Tests ====================
 
     @Test
     public void testEquals_SameId_ReturnsTrue() {
-        Deck deck1 = new Deck(1, "Deck 1", "Desc 1", 1000L, 2000L);
-        Deck deck2 = new Deck(1, "Deck 2", "Desc 2", 3000L, 4000L);
+        Deck deck1 = Deck.fromPersistence(1, "Deck 1", "Desc 1", 1000L, 2000L);
+        Deck deck2 = Deck.fromPersistence(1, "Deck 2", "Desc 2", 3000L, 4000L);
 
         assertEquals(deck1, deck2);
     }
 
     @Test
     public void testEquals_DifferentId_ReturnsFalse() {
-        Deck deck1 = new Deck(1, "Deck", "Desc", 1000L, 2000L);
-        Deck deck2 = new Deck(2, "Deck", "Desc", 1000L, 2000L);
+        Deck deck1 = Deck.fromPersistence(1, "Deck", "Desc", 1000L, 2000L);
+        Deck deck2 = Deck.fromPersistence(2, "Deck", "Desc", 1000L, 2000L);
 
         assertNotEquals(deck1, deck2);
     }
 
     @Test
     public void testEquals_Null_ReturnsFalse() {
+        Deck deck = Deck.createNew("Test", "Description");
         assertNotEquals(deck, null);
     }
 
     @Test
     public void testEquals_DifferentType_ReturnsFalse() {
+        Deck deck = Deck.createNew("Test", "Description");
         assertNotEquals(deck, "Not a deck");
     }
 
     @Test
+    public void testEquals_SameReference_ReturnsTrue() {
+        Deck deck = Deck.createNew("Test", "Description");
+        assertEquals(deck, deck);
+    }
+
+    @Test
     public void testHashCode_EqualDecks_SameHashCode() {
-        Deck deck1 = new Deck(5, "Deck 1", "Desc 1", 1000L, 2000L);
-        Deck deck2 = new Deck(5, "Deck 2", "Desc 2", 3000L, 4000L);
+        Deck deck1 = Deck.fromPersistence(5, "Deck 1", "Desc 1", 1000L, 2000L);
+        Deck deck2 = Deck.fromPersistence(5, "Deck 2", "Desc 2", 3000L, 4000L);
 
         assertEquals(deck1.hashCode(), deck2.hashCode());
     }
@@ -215,12 +224,13 @@ public class DeckTest {
 
     @Test
     public void testToString_ContainsAllInfo() {
-        deck.setId(1);
-        deck.setCardCount(10);
+        Deck deck = Deck.fromPersistence(1, "Test Deck", "Description", 1000L, 2000L);
         String result = deck.toString();
 
         assertTrue(result.contains("id=1"));
         assertTrue(result.contains("name='Test Deck'"));
-        assertTrue(result.contains("cardCount=10"));
+        assertTrue(result.contains("description='Description'"));
+        assertTrue(result.contains("createdAt=1000"));
+        assertTrue(result.contains("lastStudiedAt=2000"));
     }
 }

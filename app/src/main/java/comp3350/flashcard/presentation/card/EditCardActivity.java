@@ -2,7 +2,6 @@ package comp3350.flashcard.presentation.card;
 
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -12,6 +11,8 @@ import comp3350.flashcard.constants.ValidationConstants;
 import comp3350.flashcard.logic.IFlashcardManager;
 import comp3350.flashcard.logic.exceptions.FlashcardValidationException;
 import comp3350.flashcard.objects.Flashcard;
+import comp3350.flashcard.presentation.ActivityHelper;
+import comp3350.flashcard.presentation.Messages;
 
 /**
  * Controller for creating a new flashcard or editing a flashcard.
@@ -62,7 +63,7 @@ public class EditCardActivity extends AppCompatActivity {
      * @param  saveButton The save button object
      */
     private void setupMode(Toolbar toolbar, Button saveButton) {
-        if (this.cardId != ValidationConstants.INVALID_ID) {
+        if (!ActivityHelper.isNew(this.cardId)) {
             // Intent returns a valid id, that means we are editing an existing card
             Flashcard card = flashcardManager.getFlashcard(cardId);
             if (card != null) {
@@ -87,28 +88,16 @@ public class EditCardActivity extends AppCompatActivity {
         String back = inputCardBack.getText().toString().trim();
 
         try {
-            if (this.cardId == ValidationConstants.INVALID_ID) {
-                // Manager handles validation and creation internally
-                if (flashcardManager.createFlashcard(front, back, deckId) != null) {
-                    printToast(getString(R.string.card_added_prompt));
-                    finish();
-                }
+            if (ActivityHelper.isNew(this.cardId)) {
+                flashcardManager.createFlashcard(front, back, deckId);
+                Messages.show(this, getString(R.string.card_added_prompt));
             } else {
-                // Manager handles validation and update internally
-                if (flashcardManager.updateFlashcard(cardId, front, back)) {
-                    printToast(getString(R.string.card_updated_prompt));
-                    finish();
-                }
+                flashcardManager.updateFlashcard(cardId, front, back);
+                Messages.show(this, getString(R.string.card_updated_prompt));
             }
-        } catch (FlashcardValidationException e) {
-            printToast(e.getMessage());
+            finish();
+        } catch (FlashcardValidationException | NullPointerException e) {
+            Messages.show(this, e.getMessage());
         }
-    }
-
-    /**
-     * Shows a message at the bottom of the screen.
-     */
-    private void printToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

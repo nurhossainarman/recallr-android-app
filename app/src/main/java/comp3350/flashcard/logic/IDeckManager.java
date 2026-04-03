@@ -1,6 +1,8 @@
 package comp3350.flashcard.logic;
 
 import java.util.List;
+
+import comp3350.flashcard.logic.exceptions.DeckValidationException;
 import comp3350.flashcard.objects.Deck;
 
 /**

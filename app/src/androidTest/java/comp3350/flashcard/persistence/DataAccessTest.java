@@ -45,7 +45,7 @@ public class DataAccessTest {
 
     @Test
     public void testCreateAndRetrieveDeck() {
-        Deck newDeck = new Deck("Test Deck", "Test Description");
+        Deck newDeck = Deck.createNew("Test Deck", "Test Description");
         Deck inserted = deckPersistence.insertDeck(newDeck);
 
         assertNotNull(inserted);
@@ -117,7 +117,7 @@ public class DataAccessTest {
         int initialCount = deckPersistence.getDeckCount();
         assertEquals(3, initialCount);
 
-        Deck newDeck = new Deck("Count Test", "Description");
+        Deck newDeck = Deck.createNew("Count Test", "Description");
         deckPersistence.insertDeck(newDeck);
 
         int newCount = deckPersistence.getDeckCount();
@@ -139,7 +139,7 @@ public class DataAccessTest {
 
     @Test
     public void testCreateAndRetrieveFlashcard() {
-        Flashcard newCard = new Flashcard("Question", "Answer", 1);
+        Flashcard newCard = Flashcard.createNew("Question", "Answer", 1);
         Flashcard inserted = flashcardPersistence.insertFlashcard(newCard);
 
         assertNotNull(inserted);
@@ -244,7 +244,7 @@ public class DataAccessTest {
 
     @Test
     public void testFlashcardPersistsAcrossInstances() {
-        Flashcard newCard = new Flashcard("Persistent Question", "Persistent Answer", 1);
+        Flashcard newCard = Flashcard.createNew("Persistent Question", "Persistent Answer", 1);
         Flashcard inserted = flashcardPersistence.insertFlashcard(newCard);
         int insertedId = inserted.getId();
 

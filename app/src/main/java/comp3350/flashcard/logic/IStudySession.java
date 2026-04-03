@@ -1,5 +1,7 @@
 package comp3350.flashcard.logic;
 
+import comp3350.flashcard.logic.exceptions.StudySessionException;
+
 /**
  * Interface for managing a study session and navigation.
  */
@@ -10,16 +12,17 @@ public interface IStudySession {
      * @param deckId the ID of the deck to study
      * @param shuffle whether the cards should be presented in random order
      * @param filterMode specifies which cards to include (e.g., ALL, KNOWN, UNKNOWN)
+     * @throws StudySessionException if the session cannot start (e.g., no cards)
      */
-    void startSession(int deckId, boolean shuffle, FilterMode filterMode);
+    void startSession(int deckId, boolean shuffle, FilterMode filterMode) throws StudySessionException;
 
     /**
-     * Checks if a session can be started and returns an error message if not.
+     * Validates if a session can be started.
      * @param deckId the ID of the deck to check
      * @param filterMode the filter to apply
-     * @return null if the session can start, or a specific error message (e.g., "Deck is empty")
+     * @throws StudySessionException if the session cannot start (e.g., no cards)
      */
-    String getStartupMessage(int deckId, FilterMode filterMode);
+    void validateSession(int deckId, FilterMode filterMode) throws StudySessionException;
 
     /**
      * Moves to the next card in the session.
