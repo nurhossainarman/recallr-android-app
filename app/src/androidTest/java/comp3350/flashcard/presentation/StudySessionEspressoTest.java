@@ -25,6 +25,7 @@ import org.junit.runner.RunWith;
 
 import comp3350.flashcard.R;
 import comp3350.flashcard.application.Services;
+import comp3350.flashcard.constants.UIConstants;
 import comp3350.flashcard.presentation.deck.MainActivity;
 
 /**
@@ -82,6 +83,13 @@ public class StudySessionEspressoTest {
         // Flip the card
         onView(withId(R.id.btnFlip)).perform(click());
 
+        // Wait for flip animation to complete
+        try {
+            Thread.sleep(UIConstants.ANIMATION_DURATION_FLIP + 200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         // Verify back of card is displayed
         onView(allOf(withId(R.id.tvContentBack), withText(cardBack)))
                 .check(matches(isDisplayed()));
@@ -109,8 +117,7 @@ public class StudySessionEspressoTest {
         addFlashcard(card1Front, card1Back);
         addFlashcard(card2Front, card2Back);
 
-        // Go back to MainActivity is not needed here since we're already on DeckDetailActivity
-        // Start study session directly
+        // Start study session
         onView(withId(R.id.btnStudy)).perform(click());
 
         // Verify first card is displayed
@@ -120,23 +127,23 @@ public class StudySessionEspressoTest {
         // Navigate to next card
         onView(withId(R.id.btnNext)).perform(click());
 
-        // Wait longer for animation/transition to complete
+        // Wait for slide animation to complete
         try {
-            Thread.sleep(800);
+            Thread.sleep(UIConstants.ANIMATION_DURATION_SLIDE + 400);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        // Verify second card text exists (might not be fully visible due to animations)
+        // Verify second card is displayed
         onView(allOf(withId(R.id.tvContent), withText(card2Front)))
                 .check(matches(isDisplayed()));
 
         // Navigate back to previous card
         onView(withId(R.id.btnPrevious)).perform(click());
 
-        // Wait for animation/transition to complete
+        // Wait for slide animation to complete
         try {
-            Thread.sleep(800);
+            Thread.sleep(UIConstants.ANIMATION_DURATION_SLIDE + 400);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -223,7 +230,7 @@ public class StudySessionEspressoTest {
         addFlashcard(card2Front, card2Back);
         addFlashcard(card3Front, card3Back);
 
-        // We're now on DeckDetailActivity, enable shuffle checkbox
+        // Enable shuffle checkbox
         onView(withId(R.id.cbShuffle)).perform(click());
 
         // Start study session
@@ -259,8 +266,6 @@ public class StudySessionEspressoTest {
         addFlashcard(card1Front, card1Back);
         addFlashcard(card2Front, card2Back);
 
-        // We're on DeckDetailActivity
-        // Don't click shuffle checkbox (it should be unchecked by default)
         // Start study session directly
         onView(withId(R.id.btnStudy)).perform(click());
 
@@ -271,9 +276,9 @@ public class StudySessionEspressoTest {
         // Navigate to next card
         onView(withId(R.id.btnNext)).perform(click());
 
-        // Wait for animation/transition to complete
+        // Wait for slide animation to complete
         try {
-            Thread.sleep(800);
+            Thread.sleep(UIConstants.ANIMATION_DURATION_SLIDE + 400);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
