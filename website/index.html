@@ -176,10 +176,10 @@
             width="100%"
             style="border-radius: 10px; max-width: 800px"
           >
-            <source src="assets/demo.mov" type="video/mp4" />
+            <source src="assets/demo.mp4" type="video/mp4" />
             <p>
               Your browser doesn't support embedded video.
-              <a href="assets/demo.mov">Download the demo video.</a>
+              <a href="assets/demo.mp4">Download the demo video.</a>
             </p>
           </video>
         </div>
@@ -267,7 +267,7 @@
           <div class="card">
             <h3>Logic</h3>
             <p>
-              Pure Java — no Android SDK dependency. Contains all business
+              Pure Java with no Android SDK dependency. Contains all business
               rules, validators, session state, and custom exceptions.
             </p>
             <ul class="styled-list">
@@ -281,7 +281,7 @@
             <h3>Data</h3>
             <p>
               Interface-driven persistence with two implementations switched via
-              dependency injection — no code changes needed to swap them.
+              dependency injection, with no code changes needed to swap them.
             </p>
             <ul class="styled-list">
               <li>SQLite (production) — persists across restarts</li>
@@ -289,86 +289,6 @@
               <li>CASCADE DELETE for referential integrity</li>
               <li>Pre-populated sample data on first launch</li>
             </ul>
-          </div>
-        </div>
-
-        <div
-          class="card-grid"
-          style="
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            margin-top: 2rem;
-            gap: 1rem;
-          "
-        >
-          <div class="card" style="text-align: center; padding: 1.25rem">
-            <div
-              style="
-                font-size: 2rem;
-                font-weight: 800;
-                color: var(--accent-light);
-              "
-            >
-              44
-            </div>
-            <div style="font-size: 0.85rem; color: var(--text-muted-dark)">
-              Java Classes
-            </div>
-          </div>
-          <div class="card" style="text-align: center; padding: 1.25rem">
-            <div
-              style="
-                font-size: 2rem;
-                font-weight: 800;
-                color: var(--accent-light);
-              "
-            >
-              208
-            </div>
-            <div style="font-size: 0.85rem; color: var(--text-muted-dark)">
-              Automated Tests
-            </div>
-          </div>
-          <div class="card" style="text-align: center; padding: 1.25rem">
-            <div
-              style="
-                font-size: 2rem;
-                font-weight: 800;
-                color: var(--accent-light);
-              "
-            >
-              7,300
-            </div>
-            <div style="font-size: 0.85rem; color: var(--text-muted-dark)">
-              Lines of Java
-            </div>
-          </div>
-          <div class="card" style="text-align: center; padding: 1.25rem">
-            <div
-              style="
-                font-size: 2rem;
-                font-weight: 800;
-                color: var(--accent-light);
-              "
-            >
-              100%
-            </div>
-            <div style="font-size: 0.85rem; color: var(--text-muted-dark)">
-              Tests Passing
-            </div>
-          </div>
-          <div class="card" style="text-align: center; padding: 1.25rem">
-            <div
-              style="
-                font-size: 2rem;
-                font-weight: 800;
-                color: var(--accent-light);
-              "
-            >
-              16
-            </div>
-            <div style="font-size: 0.85rem; color: var(--text-muted-dark)">
-              Test Classes
-            </div>
           </div>
         </div>
       </div>
@@ -514,8 +434,8 @@
                 was the inconsistent placement of validation logic and poor
                 domain-object encapsulation. Beginning in Iteration 1,
                 validation rules for <code>Flashcard</code> and
-                <code>Deck</code> were spread across multiple layers — domain
-                objects, the logic layer, and even the presentation layer —
+                <code>Deck</code> were spread across multiple layers, including
+                domain objects, the logic layer and even the presentation layer,
                 rather than being centralized.
               </p>
               <p>
@@ -624,7 +544,7 @@
               <li>
                 <strong>Issue tracking.</strong> Creating GitLab issues for
                 known debt (#50, #69) during Iteration 2 meant nothing fell
-                through the cracks — Iteration 3 had a clear, prioritized
+                through the cracks, and Iteration 3 had a clear, prioritized
                 backlog from day one.
               </li>
               <li>
@@ -634,8 +554,8 @@
               </li>
               <li>
                 <strong>Incremental delivery.</strong> Shipping a working app
-                after each iteration made feedback concrete and grounding — the
-                team always had something real to demo.
+                after each iteration made feedback concrete and grounding, and
+                the team always had something real to demo.
               </li>
             </ul>
           </div>
@@ -677,7 +597,7 @@
             <p>
               The Iteration 0 vision described a clean layered app with study
               sessions, mastery tracking, and progress indicators. The final
-              product delivers all of those — but the path was more iterative
+              product delivers all of those, but the path was more iterative
               than the original plan implied.
             </p>
             <p>
@@ -692,7 +612,7 @@
             </p>
             <p>
               The result is a codebase whose architecture closely matches the
-              original diagram — something not guaranteed in iterative
+              original diagram, something not guaranteed in iterative
               development. The lesson: tracking debt as real issues, not
               informal notes, was the practice that made it possible to pay it
               back on schedule.
@@ -717,9 +637,9 @@
               <h4>On Technical Debt</h4>
               <p>
                 Debt is manageable when it is <em>visible</em>. Writing a GitLab
-                issue the moment a shortcut is taken — rather than leaving a
-                mental note — was the single most effective practice for keeping
-                Iteration 3 on track.
+                issue the moment a shortcut is taken rather than leaving a
+                mental note, which was the single most effective practice for
+                keeping Iteration 3 on track.
               </p>
             </div>
             <div class="card">
@@ -727,7 +647,7 @@
               <p>
                 A shared codebase rewards consistency: consistent naming,
                 consistent comment style, and consistent review practices. These
-                habits compounded — the codebase was measurably easier to
+                habits compounded; the codebase was measurably easier to
                 navigate in Iteration 3 than in Iteration 1.
               </p>
             </div>
