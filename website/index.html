@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recallr — Flashcard Study App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── Nav ────────────────────────────────────────────────── -->
+  <nav class="nav">
+    <span class="nav-logo">Recallr</span>
+    <ul class="nav-links">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#demo">Demo</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#team">Team</a></li>
+      <li><a href="#postmortem">Postmortem</a></li>
+    </ul>
+  </nav>
+
+  <!-- ─── Hero ─────────────────────────────────────────────────── -->
+  <header class="hero">
+    <div class="hero-content">
+      <p class="hero-tag">COMP 3350 &mdash; A01 Group 05</p>
+      <h1>Recallr</h1>
+      <p class="hero-sub">A focused flashcard study tool that turns passive reading into active recall.</p>
+      <a href="#demo" class="btn">Watch Demo</a>
+    </div>
+  </header>
+
+  <!-- ─── Overview ─────────────────────────────────────────────── -->
+  <section id="overview" class="section section-light">
+    <div class="container">
+      <h2>Project Overview</h2>
+
+      <div class="card-grid two-col">
+        <div class="card">
+          <h3>Vision Statement</h3>
+          <p>
+            Recallr is a focused study tool that allows students to create customizable
+            flashcards to help them efficiently learn and review study material.
+          </p>
+          <p>
+            Recallr encourages active recall and efficient study sessions by letting users
+            create, organize, and review flashcard sets across a wide range of subjects.
+            The system stores decks, tracks learning progress through review sessions, and
+            maintains a history of which cards users have mastered.
+          </p>
+          <p>
+            Traditional methods often promote passive re-reading, which results in poor
+            memory retention. Recallr addresses this by centering the study experience
+            around active recall, repetition, and immediate feedback.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Intended Users</h3>
+          <ul class="styled-list">
+            <li>
+              <strong>High school &amp; undergraduate students</strong> who rely on
+              memorization for coursework and exam preparation.
+            </li>
+            <li>
+              <strong>Instructors &amp; tutors</strong> who want to create and share
+              deck sets with their students.
+            </li>
+            <li>
+              <strong>Independent learners</strong> preparing for certifications,
+              interviews, or personal enrichment.
+            </li>
+          </ul>
+          <h3 style="margin-top:1.5rem;">Success Criteria</h3>
+          <ul class="styled-list">
+            <li>Survey shows students feel more confident and prepared after using Recallr.</li>
+            <li>&ge;70% of active users complete multiple study sessions per week.</li>
+            <li>Majority of users show reduced error rates over time.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Features ─────────────────────────────────────────────── -->
+  <section id="features" class="section section-dark">
+    <div class="container">
+      <h2>Major Features</h2>
+      <div class="card-grid three-col">
+
+        <div class="card">
+          <div class="feature-icon">&#128220;</div>
+          <h3>Deck Management</h3>
+          <p>Create, rename, and delete custom study decks. Each deck holds an unlimited number of flashcards and tracks the last time you studied it.</p>
+        </div>
+
+        <div class="card">
+          <div class="feature-icon">&#9998;</div>
+          <h3>Flashcard Editing</h3>
+          <p>Add, update, and remove individual cards within any deck. Cards store front &amp; back text and a mastery flag that persists across sessions.</p>
+        </div>
+
+        <div class="card">
+          <div class="feature-icon">&#127922;</div>
+          <h3>Shuffled Practice</h3>
+          <p>Study sessions shuffle cards at random so you never fall into a predictable order, keeping your recall sharp and unpredictable.</p>
+        </div>
+
+        <div class="card">
+          <div class="feature-icon">&#127919;</div>
+          <h3>Filter by Mastery</h3>
+          <p>Choose to study <em>All</em> cards, only <em>Known</em> ones for a quick review, or focus exclusively on <em>Unknown</em> cards that need more work.</p>
+        </div>
+
+        <div class="card">
+          <div class="feature-icon">&#128260;</div>
+          <h3>Re-queue Until Known</h3>
+          <p>Cards you mark as unknown are automatically re-queued within the same session so you keep seeing them until you've nailed them.</p>
+        </div>
+
+        <div class="card">
+          <div class="feature-icon">&#128200;</div>
+          <h3>Progress Tracking</h3>
+          <p>A real-time progress bar shows how far through a session you are. Mastery status persists to the database so you can pick up exactly where you left off.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Demo ──────────────────────────────────────────────────── -->
+  <section id="demo" class="section section-light">
+    <div class="container">
+      <h2>Product Demonstration</h2>
+      <p class="section-intro">
+        The walkthrough below covers the primary user flows: creating a deck, adding
+        flashcards, filtering a study session by mastery level, and tracking progress
+        through to completion.
+      </p>
+
+      <div class="demo-embed">
+        <video controls width="100%" style="border-radius: 10px; max-width: 800px;">
+          <source src="assets/demo.mov" type="video/mp4" />
+          <p>Your browser doesn't support embedded video.
+             <a href="assets/demo.mov">Download the demo video.</a>
+          </p>
+        </video>
+      </div>
+
+      <div class="card-grid two-col" style="margin-top: 2.5rem;">
+        <div class="card">
+          <h3>User Flow: Create &amp; Study</h3>
+          <ol class="styled-list ordered">
+            <li>Launch app &rarr; tap <strong>+</strong> to create a new deck.</li>
+            <li>Enter a deck name and optional description, then save.</li>
+            <li>Open the deck &rarr; tap <strong>Add Card</strong> for each flashcard.</li>
+            <li>Enter front and back text, then save each card.</li>
+            <li>Tap <strong>Study</strong> to start a session.</li>
+            <li>Choose a filter mode (All / Known / Unknown).</li>
+            <li>Flip cards, mark known/unknown, watch progress bar advance.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>User Flow: Focused Review</h3>
+          <ol class="styled-list ordered">
+            <li>Return to an existing deck.</li>
+            <li>Select <strong>Study &rarr; Unknown only</strong> to target weak cards.</li>
+            <li>Work through the reduced set; unknown cards loop until marked known.</li>
+            <li>Session ends when all cards in the filter set have been reviewed.</li>
+            <li>Deck records a new <em>last studied</em> timestamp on the home screen.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Architecture ─────────────────────────────────────────── -->
+  <section id="architecture" class="section section-dark">
+    <div class="container">
+      <h2>Architecture</h2>
+      <p class="section-intro">
+        Recallr is built on a strict <strong>three-tier layered architecture</strong>:
+        Presentation &rarr; Logic &rarr; Data. Dependencies flow downward only; no layer
+        reaches upward.
+      </p>
+
+      <div class="arch-diagram">
+        <img src="../Documents/i3-diagram.png" alt="Layer dependency diagram for Iteration 3" />
+        <p class="caption">Layer dependency diagram (Iteration 3)</p>
+      </div>
+
+      <div class="card-grid three-col" style="margin-top: 2rem;">
+        <div class="card">
+          <h3>Presentation</h3>
+          <p>Android Activities handle all user input and display. They call the Logic layer for every operation and contain <em>zero</em> business logic or direct database calls.</p>
+          <ul class="styled-list">
+            <li>MainActivity (deck list)</li>
+            <li>DeckDetailActivity</li>
+            <li>EditDeckActivity / EditCardActivity</li>
+            <li>StudyActivity + gesture listener</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Logic</h3>
+          <p>Pure Java — no Android SDK dependency. Contains all business rules, validators, session state, and custom exceptions.</p>
+          <ul class="styled-list">
+            <li>DeckManager / FlashcardManager</li>
+            <li>StudySessionManager</li>
+            <li>DeckValidator / FlashcardValidator</li>
+            <li>FilterMode enum (ALL, KNOWN, UNKNOWN)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Data</h3>
+          <p>Interface-driven persistence with two implementations switched via dependency injection — no code changes needed to swap them.</p>
+          <ul class="styled-list">
+            <li>SQLite (production) — persists across restarts</li>
+            <li>Stub (unit tests) — in-memory ArrayList</li>
+            <li>CASCADE DELETE for referential integrity</li>
+            <li>Pre-populated sample data on first launch</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 2rem; gap: 1rem;">
+        <div class="card" style="text-align:center; padding: 1.25rem;">
+          <div style="font-size:2rem; font-weight:800; color:var(--accent-light);">44</div>
+          <div style="font-size:.85rem; color:var(--text-muted-dark);">Java Classes</div>
+        </div>
+        <div class="card" style="text-align:center; padding: 1.25rem;">
+          <div style="font-size:2rem; font-weight:800; color:var(--accent-light);">208</div>
+          <div style="font-size:.85rem; color:var(--text-muted-dark);">Automated Tests</div>
+        </div>
+        <div class="card" style="text-align:center; padding: 1.25rem;">
+          <div style="font-size:2rem; font-weight:800; color:var(--accent-light);">7,300</div>
+          <div style="font-size:.85rem; color:var(--text-muted-dark);">Lines of Java</div>
+        </div>
+        <div class="card" style="text-align:center; padding: 1.25rem;">
+          <div style="font-size:2rem; font-weight:800; color:var(--accent-light);">100%</div>
+          <div style="font-size:.85rem; color:var(--text-muted-dark);">Tests Passing</div>
+        </div>
+        <div class="card" style="text-align:center; padding: 1.25rem;">
+          <div style="font-size:2rem; font-weight:800; color:var(--accent-light);">16</div>
+          <div style="font-size:.85rem; color:var(--text-muted-dark);">Test Classes</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Team ──────────────────────────────────────────────────── -->
+  <section id="team" class="section section-light">
+    <div class="container">
+      <h2>Team Members &amp; Contributions</h2>
+      <p class="section-intro">
+        Recallr was developed by a four-person team over three two-week iterations.
+        All members contributed across layers; the focus areas below reflect each
+        person's deepest involvement and skills gained.
+      </p>
+
+      <div class="card-grid two-col">
+
+        <div class="card team-card">
+          <div class="team-avatar">GF</div>
+          <div class="team-info">
+            <h3>Gerick Francisco</h3>
+            <p><strong>Focus:</strong> Business logic, refactoring, architecture enforcement</p>
+            <p><strong>Technical skills gained:</strong></p>
+            <ul class="styled-list">
+              <li>Designing and enforcing three-tier layered architecture</li>
+              <li>Service Locator / dependency injection patterns in Java</li>
+              <li>Factory method pattern and package-private constructors</li>
+              <li>Iterative refactoring guided by code-review feedback</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card team-card">
+          <div class="team-avatar">TB</div>
+          <div class="team-info">
+            <h3>M. Tausif Tajwar Bhuiyan</h3>
+            <p><strong>Focus:</strong> Android UI, study session flow</p>
+            <p><strong>Technical skills gained:</strong></p>
+            <ul class="styled-list">
+              <li>Android Activity lifecycle and RecyclerView adapters</li>
+              <li>Gesture detection and touch event handling</li>
+              <li>UI state management and progress tracking</li>
+              <li>Integration between presentation and logic layers</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card team-card">
+          <div class="team-avatar">SM</div>
+          <div class="team-info">
+            <h3>Sophie Maki</h3>
+            <p><strong>Focus:</strong> Persistence layer, database design</p>
+            <p><strong>Technical skills gained:</strong></p>
+            <ul class="styled-list">
+              <li>SQLite schema design with foreign keys and cascade deletes</li>
+              <li>Writing integration tests against a real database</li>
+              <li>Stub implementation strategy for fast unit testing</li>
+              <li>Gradle build configuration for Android projects</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card team-card">
+          <div class="team-avatar">NA</div>
+          <div class="team-info">
+            <h3>Nur Hossain Arman</h3>
+            <p><strong>Focus:</strong> Domain modeling, validation, testing</p>
+            <p><strong>Technical skills gained:</strong></p>
+            <ul class="styled-list">
+              <li>Domain object design: encapsulation, immutability</li>
+              <li>Centralized validation with custom exception hierarchy</li>
+              <li>Test-driven development and unit test coverage strategies</li>
+              <li>Agile issue tracking and milestone planning in GitLab</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Postmortem ────────────────────────────────────────────── -->
+  <section id="postmortem" class="section section-dark">
+    <div class="container">
+      <h2>Development Postmortem</h2>
+
+      <!-- Improvement area from I2 retrospective -->
+      <div class="postmortem-block">
+        <h3 class="pm-heading accent">Iteration 2 Improvement Area: Scattered Validation &amp; Poor Encapsulation</h3>
+
+        <div class="card-grid two-col">
+          <div class="card">
+            <h4>What Was the Problem?</h4>
+            <p>
+              The most significant weakness identified across our iterations was the
+              inconsistent placement of validation logic and poor domain-object encapsulation.
+              Beginning in Iteration 1, validation rules for <code>Flashcard</code> and
+              <code>Deck</code> were spread across multiple layers — domain objects, the logic
+              layer, and even the presentation layer — rather than being centralized.
+            </p>
+            <p>
+              Domain objects also exposed fields that should have been managed internally,
+              violating encapsulation principles (flagged in the post-Iteration 1 review, Issue&nbsp;#47).
+              These issues were known after Iteration 1 but were deferred to allow the team to
+              finish features first. Tracked issues (#50, #69) were created to ensure nothing
+              was forgotten.
+            </p>
+          </div>
+          <div class="card">
+            <h4>What Changed in Iteration 3?</h4>
+            <ul class="styled-list">
+              <li><strong>Centralized validation</strong> — a dedicated <code>validators/</code> package was created in the logic layer, with separate validator classes for <code>Deck</code> and <code>Flashcard</code>.</li>
+              <li><strong>Restored encapsulation</strong> — all previously exposed fields are now managed internally with controlled access through methods.</li>
+              <li><strong>Factory methods introduced</strong> — constructors made package-private; static factory methods enforce correct object creation at a single point.</li>
+              <li><strong>Expanded DI infrastructure</strong> — additional interfaces decoupled components further and improved testability.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h4 style="margin-top: 2rem;">Measurable Evidence of Improvement</h4>
+        <div class="metrics-table-wrap">
+          <table class="metrics-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Iteration 2</th>
+                <th>Iteration 3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>SOLID Violations</td>
+                <td class="bad">15+ identified</td>
+                <td class="good">0 critical violations</td>
+              </tr>
+              <tr>
+                <td>Validation Code Duplication</td>
+                <td class="bad">3 layers, 8+ files</td>
+                <td class="good">Single validator classes</td>
+              </tr>
+              <tr>
+                <td>Magic Numbers</td>
+                <td class="bad">12+ hard-coded values</td>
+                <td class="good">All centralized as constants</td>
+              </tr>
+              <tr>
+                <td>Public Setters on Immutable Fields</td>
+                <td class="bad">6 violations (setId, setCreatedAt)</td>
+                <td class="good">0 violations</td>
+              </tr>
+              <tr>
+                <td>Factory Method Adoption</td>
+                <td class="bad">Fields exposed at construction</td>
+                <td class="good">Package-private constructors + factory methods</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Velocity chart -->
+      <div class="postmortem-block">
+        <h3 class="pm-heading">Velocity Across Three Iterations</h3>
+        <div class="arch-diagram">
+          <img src="../Documents/velocity_chart.png" alt="Velocity chart across three iterations" />
+          <p class="caption">Story-point velocity per iteration</p>
+        </div>
+      </div>
+
+      <!-- What went well / wrong -->
+      <div class="card-grid two-col" style="margin-top: 2rem;">
+        <div class="card">
+          <h3>&#10003; What Went Well</h3>
+          <ul class="styled-list">
+            <li><strong>Architecture discipline.</strong> The team consistently enforced the three-tier boundary. No activity ever touched the database directly, which made the SQLite ↔ stub swap painless throughout development.</li>
+            <li><strong>Issue tracking.</strong> Creating GitLab issues for known debt (#50, #69) during Iteration 2 meant nothing fell through the cracks — Iteration 3 had a clear, prioritized backlog from day one.</li>
+            <li><strong>Stub-first testing.</strong> Decoupling persistence behind interfaces let the team write fast, reliable unit tests without needing an emulator, keeping the feedback loop tight.</li>
+            <li><strong>Incremental delivery.</strong> Shipping a working app after each iteration made feedback concrete and grounding — the team always had something real to demo.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>&#10007; What Went Wrong</h3>
+          <ul class="styled-list">
+            <li><strong>Deferred refactoring.</strong> Knowing about encapsulation violations after Iteration 1 but waiting until Iteration 3 to fix them created compounding friction. Factory method adoption ultimately touched the majority of files in the codebase.</li>
+            <li><strong>Validation sprawl.</strong> Placing validation in three layers simultaneously made it unclear which layer "owned" the rule, leading to inconsistent error messages and duplicated logic.</li>
+            <li><strong>Late integration testing.</strong> Integration tests were added later than ideal. Earlier cross-layer tests would have caught constraint issues (e.g., UNIQUE deck names) sooner.</li>
+            <li><strong>Learning curve on group workflow.</strong> Early iterations had inconsistent commit granularity and review cadence; the team improved significantly by Iteration 3 with clearer merge-request norms.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Architecture evolution -->
+      <div class="postmortem-block">
+        <h3 class="pm-heading">How the Project Evolved</h3>
+        <div class="card">
+          <p>
+            The Iteration 0 vision described a clean layered app with study sessions, mastery
+            tracking, and progress indicators. The final product delivers all of those — but the
+            path was more iterative than the original plan implied.
+          </p>
+          <p>
+            Iteration 1 established the skeleton: domain objects, stub persistence, and basic
+            CRUD activities. Iteration 2 expanded features (study sessions, filter modes,
+            gesture-based flipping) and introduced the <code>DeckValidationException</code>, but
+            accumulated technical debt. Iteration 3 was deliberately a refactoring sprint: new
+            features were minimal while the team paid down all tracked debt, centralized
+            validation, and tightened encapsulation.
+          </p>
+          <p>
+            The result is a codebase whose architecture closely matches the original diagram —
+            something not guaranteed in iterative development. The lesson: tracking debt as
+            real issues, not informal notes, was the practice that made it possible to pay it
+            back on schedule.
+          </p>
+        </div>
+      </div>
+
+      <!-- Lessons learned -->
+      <div class="postmortem-block">
+        <h3 class="pm-heading">Lessons Learned</h3>
+        <div class="card-grid three-col">
+          <div class="card">
+            <h4>On Architecture</h4>
+            <p>Enforcing layer boundaries from the very first commit is far cheaper than refactoring them later. Interface-driven design gave us the flexibility to swap persistence implementations without touching business logic.</p>
+          </div>
+          <div class="card">
+            <h4>On Technical Debt</h4>
+            <p>Debt is manageable when it is <em>visible</em>. Writing a GitLab issue the moment a shortcut is taken — rather than leaving a mental note — was the single most effective practice for keeping Iteration 3 on track.</p>
+          </div>
+          <div class="card">
+            <h4>On Teamwork</h4>
+            <p>A shared codebase rewards consistency: consistent naming, consistent comment style, and consistent review practices. These habits compounded — the codebase was measurably easier to navigate in Iteration 3 than in Iteration 1.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── Footer ─────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>Recallr &mdash; A01 Group 05 &middot; COMP 3350, University of Manitoba &middot; Winter 2026</p>
+    <p>Arman &middot; Bhuiyan &middot; Francisco &middot; Maki</p>
+  </footer>
+
+</body>
+</html>
