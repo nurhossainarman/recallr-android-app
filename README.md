@@ -16,13 +16,12 @@ See our final retrospective [here](/Documents/RETROSPECTIVE.md)
 
 ## Iterations
 
-* [Iteration-1](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/milestones/1#tab-issues)
+* [Iteration-1](https://github.com/nurhossainarman/recallr-android-app/releases/tag/iteration-1)
 
-* [Iteration-2](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/milestones/2#tab-issues)
+* [Iteration-2](https://github.com/nurhossainarman/recallr-android-app/releases/tag/iteration-2)
 
-* [Iteration-3](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/milestones/3#tab-issues)
+* [Iteration-3](https://github.com/nurhossainarman/recallr-android-app/releases/tag/iteration3)
 
-* [Future](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/milestones/4#tab-issues)
 
 
 
