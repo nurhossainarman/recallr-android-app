@@ -5,7 +5,7 @@ Recallr is a flashcard study application designed to help users master new subje
 
 ## Vision Statement
 
-See the vision statement here :  [Vision Statement](https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver/-/blob/main/Documents/Vision_Statement.md?ref_type=heads)
+See the vision statement here :  [Vision Statement](https://github.com/nurhossainarman/recallr-android-app/blob/main/Documents/Vision_Statement.md)
 
 ## Architecture & Package Structure
 
@@ -71,7 +71,7 @@ Gradle Wrapper (included)
 
 1. Clone the repository:  
 ```bash
-git clone https://code.cs.umanitoba.ca/comp3350-winter2026/a01-g05-fiver.git
+https://github.com/nurhossainarman/recallr-android-app.git
 ```
 2. Open the project in Android Studio.
 3. Sync Gradle:
